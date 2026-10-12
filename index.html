@@ -1,0 +1,2169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>F&amp;S 공장 라이브 | 에프앤에스식품</title>
+<meta name="description" content="에프앤에스식품 오산 HQ의 7층 제품 개발부터 1층 출고까지, 공정이 움직이는 3D 공장 화면" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+:root {
+  --glass: rgba(17, 20, 27, .74);
+  --glass-hi: rgba(255, 255, 255, .07);
+  --glass-hi2: rgba(255, 255, 255, .13);
+  --line: rgba(255, 255, 255, .10);
+  --text: #f4f5f7;
+  --muted: #9aa3ae;
+  --accent: #e8333c;
+  --accent-soft: rgba(232, 51, 60, .2);
+  --ok: #37d399;
+  --warn: #f6b94a;
+  --info: #62a8ff;
+  --radius: 14px;
+  font-family: Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #20232b; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible { outline: 2px solid #ffffffcc; outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+#scene:active { cursor: grabbing; }
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .28);
+}
+
+/* top bar */
+.topbar { position: fixed; z-index: 30; top: 10px; left: 10px; right: 10px; height: 58px; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 12px; }
+.brand { display: flex; align-items: center; gap: 10px; padding-right: 6px; white-space: nowrap; }
+.logo { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font: italic 700 12.5px/1 Georgia, serif; color: #fff; box-shadow: inset 0 0 0 2px var(--accent), inset 0 0 0 3.5px #fff; }
+.brand b { display: block; font-size: 15px; letter-spacing: -.2px; }
+.brand small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.search { position: relative; flex: 0 1 300px; min-width: 150px; }
+.search input { width: 100%; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--glass-hi); padding: 0 12px 0 34px; font-size: 13.5px; outline: none; }
+.search input::placeholder { color: var(--muted); }
+.search svg { position: absolute; left: 11px; top: 11px; width: 16px; height: 16px; opacity: .6; }
+.chip { height: 38px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--glass-hi); font-size: 13.5px; white-space: nowrap; }
+.chip:hover { background: var(--glass-hi2); }
+.chip.accent { background: var(--accent); border-color: transparent; font-weight: 600; }
+.chip.accent:hover { background: #ff4750; }
+.chip small { color: var(--muted); font-size: 12px; }
+.chip .caret { opacity: .7; font-size: 10px; }
+.spacer { flex: 1; }
+.dd { position: relative; }
+.menu { position: absolute; top: 46px; right: 0; min-width: 210px; padding: 6px; z-index: 40; }
+.menu.left { left: 0; right: auto; }
+.menu button { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 10px; border: 0; border-radius: 8px; background: transparent; font-size: 13.5px; }
+.menu button:hover, .menu button[aria-selected='true'] { background: var(--glass-hi2); }
+.menu small { color: var(--muted); margin-left: auto; font-size: 12px; }
+.menu .sep { height: 1px; background: var(--line); margin: 4px 6px; }
+.clock { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; white-space: nowrap; }
+.clock b { font-size: 16px; }
+.clock small { color: var(--muted); font-size: 11.5px; }
+.sim { font-size: 11px; font-weight: 700; color: #fff; background: var(--accent); padding: 3px 7px; border-radius: 6px; letter-spacing: .2px; white-space: nowrap; }
+.icon-btn { position: relative; width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--glass-hi); display: grid; place-items: center; }
+.icon-btn svg { width: 18px; height: 18px; }
+.badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.alerts-menu { width: 300px; max-height: 340px; overflow: auto; }
+.alert-row { display: flex; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.4; }
+.alert-row + .alert-row { border-top: 1px solid var(--line); border-radius: 0; }
+.alert-row time { color: var(--muted); font-size: 12px; flex: 0 0 38px; }
+.seg { display: flex; padding: 3px; border-radius: 10px; background: var(--glass-hi); border: 1px solid var(--line); }
+.seg button { border: 0; background: transparent; padding: 0 13px; height: 30px; border-radius: 7px; font-size: 13px; color: var(--muted); }
+.seg button[aria-pressed='true'] { background: #fff; color: #15171c; font-weight: 600; }
+.user { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4b5563, #1f2937); display: grid; place-items: center; font-size: 12px; font-weight: 700; border: 1px solid var(--line); }
+
+/* KPI cards */
+.kpis { position: fixed; z-index: 20; top: 78px; left: 10px; display: flex; gap: 10px; }
+.kpi { width: 232px; padding: 13px 14px 12px; display: grid; grid-template-columns: 34px 1fr auto; column-gap: 11px; align-items: center; }
+.kpi .ic { width: 34px; height: 34px; border-radius: 10px; background: var(--accent-soft); display: grid; place-items: center; color: #ff7b80; }
+.kpi .ic svg { width: 18px; height: 18px; }
+.kpi h3 { margin: 0; font-size: 12px; font-weight: 500; color: var(--muted); }
+.kpi .val { font-size: 23px; font-weight: 700; letter-spacing: -.4px; margin-top: 2px; }
+.kpi .val small { font-size: 12.5px; font-weight: 500; color: var(--muted); margin-left: 3px; }
+.kpi .sub { grid-column: 2 / 4; font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+.kpi .spark { width: 64px; height: 30px; }
+.bars { display: flex; gap: 3px; align-items: flex-end; height: 30px; }
+.bars i { width: 9px; border-radius: 2px; background: var(--accent); opacity: .9; }
+
+/* detail panel */
+.detail { position: fixed; z-index: 20; top: 78px; right: 10px; width: 340px; max-height: calc(100% - 300px); display: flex; flex-direction: column; overflow: hidden; }
+.detail-head { padding: 14px 14px 10px; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--line); }
+.detail-head .kind { font-size: 12px; color: var(--muted); }
+.detail-head h2 { margin: 2px 0 0; font-size: 19px; letter-spacing: -.3px; line-height: 1.3; }
+.detail-head .x { margin-left: auto; width: 30px; height: 30px; border-radius: 8px; border: 0; background: var(--glass-hi); font-size: 18px; line-height: 1; flex: 0 0 30px; }
+.detail-body { padding: 10px 14px 14px; overflow-y: auto; }
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--ok); background: rgba(55, 211, 153, .12); }
+.pill.warn { color: var(--warn); background: rgba(246, 185, 74, .13); }
+.pill.info { color: var(--info); background: rgba(98, 168, 255, .13); }
+.pill.red { color: #ff7b80; background: var(--accent-soft); }
+.pill.mute { color: var(--muted); background: var(--glass-hi); }
+.stats { display: grid; gap: 0; margin: 4px 0 6px; }
+.stat { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.stat span:first-child { color: var(--muted); }
+.stat b { font-weight: 600; text-align: right; }
+.prog { height: 6px; border-radius: 3px; background: var(--glass-hi2); overflow: hidden; margin: 6px 0 2px; }
+.prog i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.desc { font-size: 13.5px; line-height: 1.65; color: #d9dde2; margin: 10px 0 4px; word-break: keep-all; }
+.note { font-size: 11.5px; line-height: 1.55; color: var(--muted); margin: 10px 0 0; word-break: keep-all; }
+.cams-title { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 600; margin: 14px 0 8px; }
+.cams-title small { color: var(--muted); font-weight: 400; }
+.cams { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.cam { position: relative; padding: 0; border: 0; border-radius: 8px; overflow: hidden; aspect-ratio: 16 / 10; background: #000; }
+.cam img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .92; }
+.cam span { position: absolute; left: 6px; bottom: 5px; font-size: 11px; font-weight: 600; text-shadow: 0 1px 3px #000; }
+.cam:hover img { opacity: 1; }
+
+/* batch tracker */
+.tracker { position: fixed; z-index: 20; left: 10px; bottom: 10px; width: 440px; padding: 13px 16px 14px; }
+.tr-head { display: flex; align-items: center; gap: 8px; }
+.tr-head h3 { margin: 0; font-size: 14px; }
+.tr-id { font-size: 12px; font-weight: 700; background: var(--accent); padding: 3px 8px; border-radius: 6px; }
+.tr-meta { font-size: 12px; color: var(--muted); }
+.tr-eta { margin-left: auto; text-align: right; }
+.tr-eta b { display: block; font-size: 17px; color: var(--ok); }
+.tr-eta small { font-size: 11px; color: var(--muted); }
+.tr-line { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 14px; }
+.tr-line::before { content: ''; position: absolute; left: 8%; right: 8%; top: 9px; height: 2px; background: var(--glass-hi2); }
+.tr-fill { position: absolute; left: 8%; top: 9px; height: 2px; background: var(--accent); width: 0; transition: width .4s; }
+.tr-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 5px; }
+.tr-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--glass-hi2); background: #22262f; display: grid; place-items: center; font-size: 11px; }
+.tr-step.done .tr-dot { background: var(--accent); border-color: var(--accent); }
+.tr-step.now .tr-dot { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.tr-step time { font-size: 12px; font-weight: 600; }
+.tr-step span { font-size: 11px; color: var(--muted); line-height: 1.25; word-break: keep-all; }
+
+/* table */
+.table { position: fixed; z-index: 20; left: 460px; right: 360px; bottom: 10px; height: 214px; padding: 10px 12px; display: flex; flex-direction: column; }
+.tabs { display: flex; gap: 4px; align-items: center; }
+.tabs button { border: 0; background: transparent; color: var(--muted); padding: 7px 12px; border-radius: 8px; font-size: 13px; }
+.tabs button[aria-selected='true'] { background: var(--accent); color: #fff; font-weight: 600; }
+.tabs .live { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.tabs .live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(55, 211, 153, .2); }
+.tbl-wrap { overflow: auto; margin-top: 6px; flex: 1; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th { text-align: left; font-weight: 500; color: var(--muted); padding: 6px 8px; position: sticky; top: 0; background: rgba(22, 25, 32, .96); }
+td { padding: 6px 8px; border-top: 1px solid var(--line); white-space: nowrap; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--glass-hi); }
+tbody tr.sel td { background: var(--accent-soft); }
+.mini { display: inline-block; width: 70px; height: 5px; border-radius: 3px; background: var(--glass-hi2); vertical-align: middle; overflow: hidden; }
+.mini i { display: block; height: 100%; background: var(--accent); }
+
+/* world labels, selection label */
+#labels { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+.wlabel { position: absolute; left: 0; top: 0; pointer-events: auto; border: 0; padding: 5px 10px; border-radius: 8px; background: rgba(17, 20, 27, .82); font-size: 12.5px; font-weight: 600; white-space: nowrap; transform-origin: 50% 100%; }
+.wlabel::after { content: ''; position: absolute; left: 50%; top: 100%; width: 2px; height: 12px; margin-left: -1px; background: rgba(17, 20, 27, .82); }
+.wlabel.sel { background: var(--accent); pointer-events: none; }
+.wlabel.sel::after { background: var(--accent); }
+.wlabel small { display: block; font-size: 11px; font-weight: 500; opacity: .85; }
+
+.lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, .78); display: grid; place-items: center; padding: 30px; }
+.lightbox figure { margin: 0; max-width: min(1100px, 100%); }
+.lightbox img { width: 100%; border-radius: 12px; display: block; }
+.lightbox figcaption { margin-top: 10px; font-size: 13px; color: #d9dde2; }
+.loading { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: #20232b; font-size: 14px; color: var(--muted); }
+.mtabs { display: none; }
+
+@media (max-width: 1320px) { .table { display: none; } }
+@media (max-width: 1080px) { .kpi:nth-child(3) { display: none; } }
+@media (max-width: 820px) {
+  .topbar { top: 8px; left: 8px; right: 8px; height: auto; flex-wrap: wrap; padding: 8px; gap: 8px; }
+  .brand small, .clock small, .user, .search, .brand div, .chip .caret, #weather-name { display: none; }
+  .chip { padding: 0 9px; }
+  .sim { font-size: 10.5px; padding: 3px 5px; }
+  .seg button { padding: 0 9px; }
+  .brand { padding-right: 0; }
+  #area { order: 5; flex: 1 1 100%; }
+  #area .chip { width: 100%; justify-content: space-between; }
+  .chip#weather-btn small { display: none; }
+  .kpis { top: var(--top, 112px); left: 8px; right: 8px; overflow-x: auto; scrollbar-width: none; }
+  .kpi { flex: 0 0 200px; padding: 10px 12px; }
+  .kpi:nth-child(3) { display: grid; }
+  .kpi .val { font-size: 19px; }
+  .kpi .spark, .kpi .bars { display: none; }
+  .detail, .tracker, .table { left: 8px; right: 8px; width: auto; bottom: 62px; top: auto; max-height: 46vh; height: auto; display: none; }
+  body[data-mtab='detail'] .detail { display: flex; }
+  body[data-mtab='tracker'] .tracker { display: block; }
+  body[data-mtab='table'] .table { display: flex; height: 46vh; }
+  .mtabs { position: fixed; z-index: 25; left: 8px; right: 8px; bottom: 8px; display: flex; gap: 4px; padding: 5px; }
+  .mtabs button { flex: 1; border: 0; background: transparent; color: var(--muted); height: 38px; border-radius: 9px; font-size: 13px; }
+  .mtabs button[aria-pressed='true'] { background: var(--accent); color: #fff; font-weight: 600; }
+  .tr-step span { font-size: 10.5px; }
+}
+@media (prefers-reduced-motion: reduce) { .tr-fill { transition: none; } }
+</style>
+</head>
+<body data-mtab="none">
+<canvas id="scene" aria-label="에프앤에스식품 오산 HQ와 평택 공장, 서울 사옥을 담은 3D 공장 화면"></canvas>
+<div id="labels"></div>
+
+<header class="topbar glass">
+  <div class="brand"><span class="logo" aria-hidden="true">F&amp;S</span><div><b>에프앤에스식품</b><small>공장 라이브</small></div></div>
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="search" type="search" placeholder="층, 설비, 트럭 검색" autocomplete="off" aria-label="층, 설비, 트럭 검색" />
+    <div class="menu left glass" id="search-menu" hidden></div>
+  </div>
+  <div class="dd" id="area">
+    <button class="chip accent" id="area-btn" aria-haspopup="true" aria-expanded="false"><span id="area-name">오산 HQ 전체</span><span class="caret">▼</span></button>
+    <div class="menu left glass" id="area-menu" hidden></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="dd">
+    <button class="chip" id="weather-btn" aria-haspopup="true" aria-expanded="false"><span id="weather-ic"></span><b class="num" id="weather-temp">17°C</b><small id="weather-name">맑음</small><span class="caret">▼</span></button>
+    <div class="menu glass" id="weather-menu" hidden></div>
+  </div>
+  <div class="clock"><b class="num" id="clock">16:50</b><small id="date">10월 12일 일요일</small></div>
+  <span class="sim">시뮬레이션</span>
+  <div class="dd">
+    <button class="icon-btn" id="alert-btn" aria-label="알림" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="badge num" id="alert-count">0</span>
+    </button>
+    <div class="menu glass alerts-menu" id="alert-menu" hidden></div>
+  </div>
+  <div class="seg" id="facade-seg" role="group" aria-label="건물 보기"><button data-f="ext" aria-pressed="true">외관</button><button data-f="cut" aria-pressed="false">단면</button></div>
+  <div class="seg" id="time-seg" role="group" aria-label="낮과 밤"><button data-time="day" aria-pressed="true">낮</button><button data-time="night" aria-pressed="false">밤</button></div>
+  <div class="user" title="운영실">운영</div>
+</header>
+
+<section class="kpis" aria-label="주요 지표">
+  <article class="kpi glass">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span>
+    <div><h3>최근 1시간 출고</h3><div class="val num"><span id="k1">0</span><small>팔레트</small></div></div>
+    <svg class="spark" id="k1-spark" viewBox="0 0 64 30"></svg>
+    <div class="sub num" id="k1-sub">트럭 0대 출발</div>
+  </article>
+  <article class="kpi glass">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V10l5 3V10l5 3V7l8 4v10z"/></svg></span>
+    <div><h3>가동 중인 생산층</h3><div class="val num"><span id="k2">0</span><small>/ 4개 층</small></div></div>
+    <div class="bars" id="k2-bars"><i></i><i></i><i></i><i></i></div>
+    <div class="sub" id="k2-sub">6·5F 파우더·시즈닝, 4·3F 소스·육수</div>
+  </article>
+  <article class="kpi glass">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="m9 9 3-3 3 3M9 15l3 3 3-3"/></svg></span>
+    <div><h3>화물엘리베이터</h3><div class="val num"><span id="k3">0</span><small>건 대기</small></div></div>
+    <svg class="spark" id="k3-spark" viewBox="0 0 64 30"></svg>
+    <div class="sub num" id="k3-sub">1F 대기</div>
+  </article>
+</section>
+
+<aside class="detail glass" id="detail" aria-live="polite">
+  <div class="detail-head">
+    <div><div class="kind" id="d-kind">오산 HQ</div><h2 id="d-title">개발부터 출고까지</h2></div>
+    <button class="x" id="d-close" aria-label="선택 해제">×</button>
+  </div>
+  <div class="detail-body" id="d-body"></div>
+</aside>
+
+<section class="tracker glass" id="tracker" aria-label="배치 트래커">
+  <div class="tr-head">
+    <h3>배치 트래커</h3><span class="tr-id num" id="tr-id">B-0000</span><span class="tr-meta" id="tr-meta"></span>
+    <div class="tr-eta"><b class="num" id="tr-eta">--:--</b><small id="tr-eta-l">출고 예정</small></div>
+  </div>
+  <div class="tr-line" id="tr-line"><div class="tr-fill" id="tr-fill"></div></div>
+</section>
+
+<section class="table glass" id="table" aria-label="실시간 현황표">
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="floors" aria-selected="true">생산층 <span class="num" id="t-c1"></span></button>
+    <button role="tab" data-tab="vehicles" aria-selected="false">차량 <span class="num" id="t-c2"></span></button>
+    <button role="tab" data-tab="shipments" aria-selected="false">출고 <span class="num" id="t-c3"></span></button>
+    <span class="live">실시간 시뮬레이션</span>
+  </div>
+  <div class="tbl-wrap"><table><thead id="t-head"></thead><tbody id="t-body"></tbody></table></div>
+</section>
+
+<nav class="mtabs glass" aria-label="정보 보기">
+  <button data-m="detail" aria-pressed="false">상세</button>
+  <button data-m="tracker" aria-pressed="false">트래커</button>
+  <button data-m="table" aria-pressed="false">현황표</button>
+</nav>
+
+<div class="lightbox" id="lightbox" hidden><figure><img id="lb-img" alt="" /><figcaption id="lb-cap"></figcaption></figure></div>
+<div class="loading" id="loading">공장을 준비하고 있습니다</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+/* ================================================================
+   0. basics
+   ================================================================ */
+const DEBUG = new URLSearchParams(location.search).has('debug');
+const $ = s => document.querySelector(s);
+const mqMobile = matchMedia('(max-width: 820px)');
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => (t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+let seed = 20261012;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const angleDelta = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
+
+const canvas = $('#scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.AgXToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(28, innerWidth / innerHeight, 2, 5000);
+const controls = new OrbitControls(camera, canvas);
+controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE };
+controls.screenSpacePanning = false;
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.minDistance = 22; controls.maxDistance = 1100;
+controls.minPolarAngle = .3; controls.maxPolarAngle = 1.45;
+
+// physical sky, image-based reflections, fog for aerial perspective
+const sky = new Sky(); sky.scale.setScalar(2200); scene.add(sky);
+const skyU = sky.material.uniforms;
+skyU.turbidity.value = 6.5; skyU.rayleigh.value = 1.5; skyU.mieCoefficient.value = .006; skyU.mieDirectionalG.value = .83;
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .5;
+scene.fog = new THREE.Fog(0xf3b58c, 900, 2600);
+// desktop: ambient occlusion pass for contact shadows
+const USE_POST = !mqMobile.matches;
+let composer = null, gtao = null;
+if (USE_POST) {
+  composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType, samples: 4 }));
+  composer.addPass(new RenderPass(scene, camera));
+  gtao = new GTAOPass(scene, camera, innerWidth, innerHeight);
+  gtao.blendIntensity = .9;
+  gtao.updateGtaoMaterial({ radius: 1.4, distanceExponent: 1.4, thickness: 1.2, scale: 1, samples: 12, distanceFallOff: 1, screenSpaceRadius: false });
+  gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 5, radiusExponent: 1, rings: 2, samples: 12 });
+  composer.addPass(gtao);
+  composer.addPass(new OutputPass());
+}
+const hemi = new THREE.HemisphereLight(0xd6e2ff, 0x8f7b63, 1.0);
+const sun = new THREE.DirectionalLight(0xffc690, 3.0);
+sun.castShadow = true;
+sun.shadow.mapSize.set(mqMobile.matches ? 1024 : 4096, mqMobile.matches ? 1024 : 4096);
+sun.shadow.bias = -.0004; sun.shadow.normalBias = .5;
+scene.add(hemi, sun, sun.target);
+
+/* ================================================================
+   1. palette, materials, static geometry baking
+   ================================================================ */
+const P = {
+  ground: 0xe6ddcd, lawn: 0xb3c495, lawn2: 0x9db480, field: 0xcfc39a, asphalt: 0x5b6169, asphalt2: 0x6c727a,
+  line: 0xf3efe4, yellow: 0xf1bf4c, concrete: 0xd8d3c9, pave: 0xcfc8bb,
+  facade: 0xdcdedc, facade2: 0xb8bdbf, white: 0xf7f6f2, steel: 0xcdd3d6, steel2: 0x8c969c,
+  black: 0x2b2f34, red: 0xd2232a, red2: 0x9c1a20, wood: 0xc99f6c, kraft: 0xcfa874, sack: 0xeae2cf,
+  teal: 0x3fa3a0, blueRoof: 0x4f80b6, roofGrey: 0xa9afb3, belt: 0x3e8e5a, cold: 0x8ec5de, frozen: 0x4f86b8,
+  tree: 0x6f9a57, tree2: 0x547f45, trunk: 0x86664b, skin: 0xe2bb98, suit: 0xf3f3ef, navy: 0x34495e, orange: 0xf08a24,
+};
+const matCache = new Map();
+function M(color, o = {}) {
+  const key = color + JSON.stringify(o);
+  if (!matCache.has(key)) matCache.set(key, new THREE.MeshStandardMaterial({ color, roughness: .82, metalness: 0, ...o }));
+  return matCache.get(key);
+}
+const GLASS = new THREE.MeshStandardMaterial({ color: 0xa9cbd8, transparent: true, opacity: .3, roughness: .08, metalness: .2, depthWrite: false });
+const WIN = new THREE.MeshStandardMaterial({ color: 0x1c2832, roughness: .1, metalness: .65, emissive: 0xffc27a, emissiveIntensity: 0 });
+const ENTRY_GLASS = new THREE.MeshStandardMaterial({ color: 0x6f8798, transparent: true, opacity: .42, roughness: .05, metalness: .5, depthWrite: false });
+const BLUEGLASS = new THREE.MeshStandardMaterial({ color: 0x2c5d97, roughness: .05, metalness: .75, emissive: 0xffd9a0, emissiveIntensity: 0 });
+const LIGHTP = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff2dc, emissiveIntensity: .6 });
+const LAMP = new THREE.MeshStandardMaterial({ color: 0xfff1d0, emissive: 0xffd590, emissiveIntensity: .2 });
+const HEAD = new THREE.MeshStandardMaterial({ color: 0xfffbe8, emissive: 0xfff2c4, emissiveIntensity: .2 });
+const TAIL = new THREE.MeshStandardMaterial({ color: 0xc0262c, emissive: 0xff2a2a, emissiveIntensity: .2 });
+const HIDE = new THREE.MeshBasicMaterial({ visible: false });
+// materials whose colour shifts with snow / rain
+const GROUND_MATS = [];
+function groundMat(color) { const m = M(color); if (!GROUND_MATS.includes(m)) { m.userData.base = m.color.clone(); GROUND_MATS.push(m); } return m; }
+function canvasTex(size, draw) {
+  const c = document.createElement('canvas'); c.width = c.height = size; draw(c.getContext('2d'), size);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+}
+function speckle(g, s, base, amp, n, rmax = 2) {
+  g.fillStyle = base; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < n; i++) { const v = (rnd() - .5) * amp; g.fillStyle = v > 0 ? `rgba(255,255,255,${v})` : `rgba(0,0,0,${-v})`; const r = .6 + rnd() * rmax; g.fillRect(rnd() * s, rnd() * s, r, r); }
+}
+const TEX = {
+  asphalt: canvasTex(512, (g, s) => speckle(g, s, '#62676e', .28, 30000, 1.6)),
+  concrete: canvasTex(512, (g, s) => { speckle(g, s, '#cdc8bd', .14, 16000, 2); g.strokeStyle = 'rgba(80,75,68,.35)'; g.lineWidth = 3; g.strokeRect(0, 0, s, s); }),
+  grass: canvasTex(512, (g, s) => { speckle(g, s, '#8ea56c', .3, 36000, 2.2); for (let i = 0; i < 70; i++) { g.fillStyle = rnd() > .5 ? 'rgba(70,90,40,.10)' : 'rgba(190,190,120,.10)'; g.beginPath(); g.arc(rnd() * s, rnd() * s, 12 + rnd() * 50, 0, 7); g.fill(); } }),
+  panel: canvasTex(512, (g, s) => {               // composite metal panels, 1.2 m x 0.6 m, light joints
+    const cw = s / 2, ch = s / 4;
+    for (let i = 0; i < 2; i++) for (let j = 0; j < 4; j++) {
+      g.fillStyle = `hsl(214, 14%, ${33 + rnd() * 4}%)`; g.fillRect(i * cw, j * ch, cw, ch);
+      const gr = g.createLinearGradient(0, j * ch, 0, (j + 1) * ch); gr.addColorStop(0, 'rgba(255,255,255,.07)'); gr.addColorStop(1, 'rgba(0,0,0,.07)'); g.fillStyle = gr; g.fillRect(i * cw, j * ch, cw, ch);
+    }
+    g.fillStyle = '#8b95a0'; for (let i = 0; i <= 2; i++) g.fillRect(i * cw - 2, 0, 4, s); for (let j = 0; j <= 4; j++) g.fillRect(0, j * ch - 2, s, 4);
+  }),
+  ribs: canvasTex(256, (g, s) => { g.fillStyle = '#dcdfe0'; g.fillRect(0, 0, s, s); for (let x = 0; x < s; x += 16) { g.fillStyle = '#c1c6c9'; g.fillRect(x, 0, 3, s); g.fillStyle = '#f1f2f3'; g.fillRect(x + 3, 0, 2, s); } }),
+  apt: canvasTex(256, (g, s) => {
+    g.fillStyle = '#ecebe6'; g.fillRect(0, 0, s, s);
+    g.fillStyle = '#74879a'; g.fillRect(s * .08, s * .16, s * .84, s * .56);
+    g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(s * .08, s * .16, s * .84, s * .1);
+    g.fillStyle = '#cfcdc6'; g.fillRect(s * .49, s * .16, s * .02, s * .56); g.fillRect(0, s * .76, s, s * .07);
+  }),
+  roof: canvasTex(256, (g, s) => speckle(g, s, '#a4a8a6', .2, 9000, 1.5)),
+};
+function tiled(tex, tile, o = {}) { const m = new THREE.MeshStandardMaterial({ map: tex, roughness: .9, ...o }); m.userData.tile = tile; return m; }
+const MAT = {
+  asphalt: tiled(TEX.asphalt, 7, { roughness: .95 }),
+  yard: tiled(TEX.asphalt, 7, { color: 0xd8d8d8, roughness: .95 }),
+  concrete: tiled(TEX.concrete, 4),
+  grass: tiled(TEX.grass, 12, { roughness: .98 }),
+  field: tiled(TEX.grass, 16, { color: 0xe3d6ad, roughness: .98 }),
+  panel: tiled(TEX.panel, 2.4, { roughness: .4, metalness: .35 }),
+  panelDark: tiled(TEX.panel, 2.4, { color: 0x9aa2ab, roughness: .4, metalness: .35 }),
+  ribs: tiled(TEX.ribs, 2.4, { roughness: .6, metalness: .15 }),
+  apt: tiled(TEX.apt, 3.0, { roughness: .8 }),
+  roof: tiled(TEX.roof, 6),
+};
+for (const m of [MAT.asphalt, MAT.yard, MAT.concrete, MAT.grass, MAT.field, MAT.roof]) { m.userData.base = m.color.clone(); GROUND_MATS.push(m); }
+// layered ground surfaces sit a few cm apart; bias the upper ones so distant views do not flicker
+[[MAT.concrete, 1], [MAT.yard, 2], [MAT.asphalt, 3]].forEach(([m, k]) => Object.assign(m, { polygonOffset: true, polygonOffsetFactor: -k, polygonOffsetUnits: -k * 2 }));
+function planarUV(g, t) {
+  const p = g.attributes.position, n = g.attributes.normal, uv = g.attributes.uv;
+  for (let i = 0; i < p.count; i++) {
+    const ax = Math.abs(n.getX(i)), ay = Math.abs(n.getY(i)), az = Math.abs(n.getZ(i));
+    if (ay >= ax && ay >= az) uv.setXY(i, p.getX(i) / t, p.getZ(i) / t);
+    else if (ax >= az) uv.setXY(i, p.getZ(i) / t, p.getY(i) / t);
+    else uv.setXY(i, p.getX(i) / t, p.getY(i) / t);
+  }
+}
+
+const UNIT = {
+  box: new THREE.BoxGeometry(1, 1, 1).toNonIndexed(),
+  cyl: new THREE.CylinderGeometry(1, 1, 1, 14).toNonIndexed(),
+  cyl8: new THREE.CylinderGeometry(1, 1, 1, 8).toNonIndexed(),
+  cone: new THREE.CylinderGeometry(0, 1, 1, 9).toNonIndexed(),
+  sph: new THREE.SphereGeometry(1, 14, 10).toNonIndexed(),
+};
+const layers = new Map();
+let LAYER = 'world', OY = 0;
+const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = V(), _s = V();
+function put(geo, mat, x, y, z, sx, sy, sz, ry = 0, rx = 0, rz = 0) {
+  const g = geo.clone();
+  g.applyMatrix4(_m4.compose(_p.set(x, y + OY, z), _q.setFromEuler(_e.set(rx, ry, rz)), _s.set(sx, sy, sz)));
+  if (mat.userData.tile) planarUV(g, mat.userData.tile);
+  let L = layers.get(LAYER); if (!L) layers.set(LAYER, L = new Map());
+  let list = L.get(mat); if (!list) L.set(mat, list = []);
+  list.push(g);
+}
+// base-anchored primitives: y is the bottom
+const box = (w, h, d, x, y, z, c, ry = 0) => put(UNIT.box, c.isMaterial ? c : M(c), x, y + h / 2, z, w, h, d, ry);
+const cyl = (r, h, x, y, z, c, seg = 'cyl') => put(UNIT[seg], c.isMaterial ? c : M(c), x, y + h / 2, z, r, h, r);
+const cone = (r, h, x, y, z, c) => put(UNIT.cone, c.isMaterial ? c : M(c), x, y + h / 2, z, r, h, r);
+const ball = (r, x, y, z, c, sy = 1) => put(UNIT.sph, c.isMaterial ? c : M(c), x, y, z, r, r * sy, r);
+function bake(name, parent = scene, { shadow = true } = {}) {
+  const L = layers.get(name); const g = new THREE.Group(); g.name = name;
+  if (L) for (const [mat, list] of L) {
+    const geo = mergeGeometries(list, false); list.forEach(x => x.dispose());
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = shadow && !mat.transparent; mesh.receiveShadow = true;
+    g.add(mesh);
+  }
+  layers.delete(name); parent.add(g); return g;
+}
+// dynamic-mesh helpers (individual meshes inside a group)
+function mbox(parent, w, h, d, x, y, z, c, ry = 0) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), c.isMaterial ? c : M(c));
+  m.position.set(x, y + h / 2, z); m.rotation.y = ry; m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+function mcyl(parent, r, h, x, y, z, c, seg = 14) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), c.isMaterial ? c : M(c));
+  m.position.set(x, y + h / 2, z); m.castShadow = true; parent.add(m); return m;
+}
+function group(parent = scene, x = 0, y = 0, z = 0, ry = 0) { const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; parent.add(g); return g; }
+
+// text planes (signs) and the F&S mark
+function textTexture(text, { w = 1024, h = 256, bg = null, fg = '#fff', size = 150, weight = 700, font = 'Pretendard, "Apple SD Gothic Neo", sans-serif', italic = false } = {}) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d');
+  if (bg) { x.fillStyle = bg; x.fillRect(0, 0, w, h); }
+  x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${font}`; x.fillText(text, w / 2, h / 2 + size * .04);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function sign(parent, text, w, h, x, y, z, { ry = 0, rx = 0, bg = '#d2232a', fg = '#fff', size } = {}) {
+  const px = 1024, ph = Math.round(1024 * h / w);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: textTexture(text, { w: px, h: ph, bg, fg, size: size ?? Math.round(ph * .62) }), transparent: !bg, toneMapped: false }));
+  m.position.set(x, y, z); m.rotation.set(rx, ry, 0); parent.add(m); return m;
+}
+let logoMat;
+function logo(parent, d, x, y, z, ry = 0) {
+  if (!logoMat) {
+    const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+    g.fillStyle = '#d2232a'; g.beginPath(); g.arc(256, 256, 252, 0, 7); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 12; g.beginPath(); g.arc(256, 256, 222, 0, 7); g.stroke();
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = 'italic 700 196px Georgia, serif'; g.fillText('F&S', 256, 268);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    logoMat = new THREE.MeshBasicMaterial({ map: t, transparent: true, toneMapped: false });
+  }
+  const m = new THREE.Mesh(new THREE.CircleGeometry(d / 2, 48), logoMat); m.position.set(x, y, z); m.rotation.y = ry; parent.add(m); return m;
+}
+
+/* ================================================================
+   2. world: ground, roads, campus, buildings
+   ================================================================ */
+const HQ = { W: 40, D: 22, H: 4.2, F1: 1.1 };
+const fy = n => HQ.F1 + (n - 1) * HQ.H;
+const TOWER_X = 23.25;
+const ROAD_PTS = [[-440, -40], [-320, -14], [-240, 22], [-160, 50], [-60, 50], [60, 50], [150, 50], [215, 74], [300, 110], [440, 160]];
+const roadCurve = new THREE.CatmullRomCurve3(ROAD_PTS.map(([x, z]) => V(x, 0, z)), false, 'centripetal');
+const ROAD_LEN = roadCurve.getLength();
+const SITES = { seoul: V(-236, 0, -22), pyeongtaek: V(256, 0, 18) };
+
+function ribbon(curve, width, y, mat, seg = 400, offset = 0) {
+  const pos = [], uv = [];
+  const pts = [];
+  for (let i = 0; i <= seg; i++) {
+    const u = i / seg, p = curve.getPointAt(u), t = curve.getTangentAt(u);
+    const nx = -t.z, nz = t.x;
+    pts.push([p.x + nx * (offset + width / 2), p.z + nz * (offset + width / 2), p.x + nx * (offset - width / 2), p.z + nz * (offset - width / 2)]);
+  }
+  for (let i = 0; i < seg; i++) {
+    const [ax, az, bx, bz] = pts[i], [cx, cz, dx, dz] = pts[i + 1];
+    pos.push(ax, y, az, bx, y, bz, cx, y, cz, bx, y, bz, dx, y, dz, cx, y, cz);
+    const t = mat.userData.tile;
+    if (t) uv.push(ax / t, az / t, bx / t, bz / t, cx / t, cz / t, bx / t, bz / t, dx / t, dz / t, cx / t, cz / t);
+    else uv.push(0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.computeVertexNormals();
+  // make normals point up regardless of winding
+  const n = g.attributes.normal; for (let i = 0; i < n.count; i++) n.setXYZ(i, 0, 1, 0);
+  let L = layers.get(LAYER); if (!L) layers.set(LAYER, L = new Map());
+  let list = L.get(mat); if (!list) L.set(mat, list = []); list.push(g);
+}
+function dashes(curve, y, every, len, w, offset, mat, from = 0, to = 1) {
+  const L0 = curve.getLength();
+  for (let s = from * L0; s < to * L0; s += every) {
+    const u = s / L0, p = curve.getPointAt(u), t = curve.getTangentAt(u);
+    put(UNIT.box, mat, p.x - t.z * offset, y, p.z + t.x * offset, w, .02, len, Math.atan2(t.x, t.z));
+  }
+}
+
+// instanced trees, lamps and parked cars collect positions first
+const TREES = [], LAMPS = [], PARKED = [], POLES = [], PINES = [], BLUE_PALLETS = [];
+function buildGround() {
+  LAYER = 'world'; OY = 0;
+  box(4200, .2, 4200, 0, -.2, 0, MAT.field);
+  // fields and lawns
+  const fields = [[-120, 120, 180, 90], [90, 130, 160, 80], [-330, 90, 140, 90], [330, 230, 150, 90], [-30, -150, 220, 70], [-360, -130, 170, 120], [160, -120, 160, 90]];
+  fields.forEach(([x, z, w, d], i) => box(w, .04, d, x, 0, z, groundMat(i % 2 ? P.field : P.lawn2)));
+  box(170, .05, 92, 0, 0, -2, MAT.grass);                          // campus lawn
+  box(108, .07, 42.3, 2, 0, -9.85, MAT.concrete);                  // hq plaza / service road ring (stops at the yard)
+  box(100, .09, 32, 24, 0, 27.3, MAT.yard);                        // truck yard
+  box(48, .09, 52, -54, 0, 13, MAT.yard);                          // staff parking
+  box(10, .11, 8, 30, 0, 44.5, MAT.yard);                          // gate apron
+  // road + sidewalks + markings
+  ribbon(roadCurve, 13.6, .1, MAT.concrete);
+  ribbon(roadCurve, 8.4, .12, MAT.asphalt);
+  for (let i = 0; i < 6; i++) box(.7, .02, 3.2, 26.5 + i * 1.4, .13, 50, M(P.line));   // crosswalk at the gate
+  for (const off of [-.18, .18]) dashes(roadCurve, .14, 2.0, 2.05, .12, off, M(P.yellow));
+  for (const off of [-3.9, 3.9]) dashes(roadCurve, .14, 2.0, 2.05, .1, off, M(P.line));
+  // yard markings: travel lane, bays
+  for (let x = -24; x < 72; x += 4) box(2, .02, .14, x, .1, 25, M(P.line));
+  for (const bx of [-6, 8, 13, 18]) for (const dx of [-2.5, 2.5]) box(.14, .02, 10, bx + dx, .1, 16.4, M(P.yellow));
+  // parking stalls
+  for (let i = 0; i < 10; i++) for (const z of [-6, 8, 22, 34]) box(.12, .02, 5, -76 + i * 4.8, .1, z, M(P.line));
+  // staff parking cars
+  for (let i = 0; i < 10; i++) for (const z of [-6, 8, 22]) if (rnd() > .22) PARKED.push([-73.6 + i * 4.8, z + (z === 22 ? 0 : 0), rnd() > .5 ? 0 : Math.PI]);
+  // campus fence along the road, gap at the gate
+  for (const [x0, x1] of [[-84, 24], [36, 84]]) {
+    box(x1 - x0, 1.6, .12, (x0 + x1) / 2, 0, 43.2, M(P.steel2));
+    for (let x = x0; x <= x1; x += 4) box(.18, 1.8, .18, x, 0, 43.2, M(P.steel2));
+  }
+  // street lamps along the road and yard
+  for (let s = 0; s < ROAD_LEN; s += 34) {
+    const u = s / ROAD_LEN, p = roadCurve.getPointAt(u), t = roadCurve.getTangentAt(u);
+    for (const side of [-1, 1]) LAMPS.push([p.x - t.z * 6.4 * side, p.z + t.x * 6.4 * side, side * t.z, -side * t.x]);
+  }
+  for (const x of [-20, 4, 52, 70]) LAMPS.push([x, 41, 0, -1]);
+  // utility poles and wires along the north side of the road (street view)
+  for (let s = 10; s < ROAD_LEN; s += 32) {
+    const u = s / ROAD_LEN, p = roadCurve.getPointAt(u), t = roadCurve.getTangentAt(u);
+    const x = p.x + t.z * 7.6, z = p.z - t.x * 7.6;
+    if (Math.abs(x - 30) < 7 && Math.abs(z - 44) < 6) continue;
+    POLES.push([x, z, Math.atan2(t.x, t.z)]);
+  }
+  // Korean red pines in front of the HQ and along the fence (street view)
+  for (const [x, z] of [[-24, 13.5], [-22.6, 18], [-27.4, 15.6], [-25.2, 22.4], [-29.6, 12.4], [24.6, 13.8], [-31, 20], [-12, 41.2], [-2, 41.6], [10, 41.2], [18, 41.6]]) PINES.push([x, z, .9 + rnd() * .35]);
+  // neighbouring panel warehouse east of the tower and its blue pallet stacks
+  box(34, 11, 34, 44.5, 0, -4, MAT.ribs);
+  box(34.6, .5, 34.6, 44.5, 11, -4, MAT.roof);
+  box(33, 1.2, .1, 44.5, 7.6, 13.06, WIN);
+  for (const x of [34, 42, 50, 58]) { box(4.2, 4.6, .14, x, 0, 13.05, MAT.ribs); box(4.6, .3, .2, x, 4.6, 13.1, P.steel2); }
+  for (let x = 29; x < 61; x += 1.45) for (const z of [14.8, 16.1, 17.4]) if (rnd() > .28) BLUE_PALLETS.push([x, z, 1 + Math.floor(rnd() * 14)]);
+  // trees: road verges, campus edges, clusters
+  for (let s = 6; s < ROAD_LEN; s += 11) {
+    const u = s / ROAD_LEN, p = roadCurve.getPointAt(u), t = roadCurve.getTangentAt(u);
+    for (const side of [-1, 1]) {
+      const x = p.x - t.z * 9.5 * side, z = p.z + t.x * 9.5 * side;
+      if (Math.abs(x - 30) < 9 && z < 52) continue;                     // keep the gate clear
+      if (Math.abs(x - SITES.pyeongtaek.x) < 60 && z < 80 && z > 40 && side < 0) continue;
+      TREES.push([x, z, .9 + rnd() * .5]);
+    }
+  }
+  for (let x = -82; x <= 82; x += 9) { TREES.push([x, -46, 1 + rnd() * .4]); }
+  for (let z = -40; z <= 38; z += 9) { TREES.push([-84, z, 1 + rnd() * .4]); TREES.push([84, z, 1 + rnd() * .4]); }
+  for (let i = TREES.length - 1; i >= 0; i--) { const [x, z] = TREES[i]; if (x > 26 && x < 63 && z > -23 && z < 20) TREES.splice(i, 1); }
+  for (let i = 0; i < 260; i++) {
+    const x = (rnd() - .5) * 900, z = (rnd() - .5) * 640;
+    if (Math.abs(x) < 95 && z > -55 && z < 62) continue;
+    if (Math.abs(x - SITES.pyeongtaek.x) < 80 && Math.abs(z - SITES.pyeongtaek.z) < 60) continue;
+    if (Math.abs(x - SITES.seoul.x) < 50 && Math.abs(z - SITES.seoul.z) < 45) continue;
+    const u = clamp((x + 440) / 880, 0, 1), rp = roadCurve.getPointAt(u);
+    if (Math.abs(z - rp.z) < 16) continue;
+    TREES.push([x, z, .8 + rnd() * .9]);
+  }
+}
+
+function buildBackdrop() {
+  LAYER = 'world'; OY = 0;
+  // neighbouring industrial buildings behind the campus
+  const sheds = [[-30, -82, 64, 13, 34, P.white, P.roofGrey], [52, -78, 54, 11, 36, P.white, P.blueRoof], [118, -30, 40, 15, 52, P.facade, P.roofGrey], [-120, -60, 48, 12, 40, P.white, P.blueRoof], [-128, 4, 34, 10, 30, P.facade, P.roofGrey], [125, 30, 36, 9, 24, P.white, P.blueRoof]];
+  for (const [x, z, w, h, d, wall, roof] of sheds) {
+    box(w, h, d, x, 0, z, wall);
+    box(w + .6, .6, d + .6, x, h, z, roof);
+    for (let i = 0; i < Math.floor(w / 8); i++) box(3, 1.4, 3, x - w / 2 + 5 + i * 8, h + .6, z - d / 4, P.steel);
+    box(w - 4, 1.4, .1, x, h * .55, z + d / 2 + .05, WIN);
+  }
+  cyl(1.6, 26, -6, 0, -96, P.facade2); cyl(1.6, 22, -1, 0, -96, P.facade2);
+  // apartment complexes (high-rise slabs behind the site, as in the street view)
+  const apt = (x, z, w, h, ry = 0) => { box(w, h, 14, x, 0, z, MAT.apt, ry); box(w + .6, 1.6, 14.6, x, h, z, MAT.roof, ry); box(6, 3, 6, x, h + 1.6, z, P.facade, ry); };
+  for (const [x, z, h, ry] of [[-150, -105, 66, .1], [-112, -128, 72, .1], [-74, -150, 60, .1], [-176, -60, 69, .1], [-136, -36, 54, .1], [-186, -2, 60, .1], [110, -120, 63, -.15], [152, -100, 72, -.15], [190, -140, 57, -.15], [-70, 118, 48, .2], [-114, 132, 66, .2]]) apt(x, z, 38, h, ry);
+  for (let i = 0; i < 16; i++) apt(-420 + i * 56 + rnd() * 20, -300 - rnd() * 60, 30, 55 + rnd() * 45);
+  // low hills
+  for (const [x, z, r, h] of [[-520, -420, 260, 90], [-80, -480, 300, 120], [380, -440, 280, 100], [620, 140, 220, 70], [-640, 200, 240, 80]]) put(UNIT.cone, M(0x9fae8a), x, h / 2, z, r, h, r);
+}
+
+/* ---------- Osan HQ shell, tower, dock, gate ---------- */
+const floors = {};       // n -> { group, dyn, y }
+function floorSign(n, text, layerGroup) { return sign(layerGroup, text, 7.6, .62, n === 1 ? 2 : -15.6, fy(n) + HQ.H - .78, 11.36, { bg: '#d2232a' }); }
+function buildHQShell() {
+  const { W, D, H } = HQ;
+  for (let n = 1; n <= 7; n++) {
+    LAYER = 'f' + n; OY = fy(n);
+    box(W + .6, .4, D + .6, 0, -.4, 0, P.concrete);
+    box(W + .6, .55, .5, 0, H - .95, 11.05, P.facade2);                    // front fascia
+    box(W + .6, H, .45, 0, -.4, -11.1, MAT.panel);                         // back wall
+    box(.45, H, D + .6, -20.1, -.4, 0, MAT.panel);                         // west wall
+    box(.45, H, 7.6, 20.1, -.4, -7.5, MAT.panel);                          // east wall (tower opening between)
+    box(.45, H, 7.6, 20.1, -.4, 7.5, MAT.panel);
+    box(W - .2, H - .4, .05, 0, 0, -10.85, P.white);                       // interior lining
+    box(.05, H - .4, D - .2, -19.85, 0, 0, P.white);
+    box(W - 2, 1.5, .06, 0, 1.0, -10.8, WIN);
+    box(.06, 1.5, D - 2, -19.8, 1.0, 0, WIN);
+    box(W - 5, n === 7 ? 2.4 : 1.0, .1, 1.5, n === 7 ? .7 : 1.35, -11.36, n === 7 ? BLUEGLASS : WIN);   // outer ribbon windows
+    box(.1, n === 7 ? 2.4 : 1.0, D - 4, -20.36, n === 7 ? .7 : 1.35, 0, n === 7 ? BLUEGLASS : WIN);
+    box(W + .7, .22, .5, 0, -.42, -11.12, 0x48525c); box(.5, .22, D + .7, -20.12, -.42, 0, 0x48525c);
+    for (const x of [-20, 20]) box(.6, H - .4, .6, x, 0, 11.0, P.facade2);
+    for (const x of [-10, 0, 10]) box(.4, H - .4, .4, x, 0, 10.95, P.facade2);
+    if (n > 1) for (let x = -15; x <= 15; x += 7.5) for (const z of [-6, 1, 7.5]) box(2.6, .08, .55, x, -.5, z, LIGHTP);
+    // front facade (hidden when the building is shown in section)
+    LAYER = 'ff' + n;
+    box(3, H, .14, -18.8, -.4, 11.42, BLUEGLASS);                            // blue stair glazing at the corner
+    for (let k = 0; k < 3; k++) box(3.04, .08, .2, -18.8, .3 + k * 1.4, 11.45, P.facade2);
+    box(W + .7, .22, .44, 0, -.42, 11.24, 0x48525c);                         // floor line
+    if (n > 1) {
+      box(W - 2.4, H, .3, 1.2, -.4, 11.2, MAT.panel);
+      if (n === 7) box(W - 5, 2.4, .1, 1.7, .7, 11.4, BLUEGLASS);
+      else { box(W - 5, 1.0, .1, 1.7, 1.35, 11.38, WIN); for (let x = -15; x <= 18; x += 3) box(.1, 1.0, .14, x, 1.35, 11.42, 0x48525c); }
+    } else {
+      for (const [x0, x1] of [[-9.6, -8.2], [-3.8, 5.8], [10.2, 10.8], [15.2, 15.8]]) box(x1 - x0, H - .4, .3, (x0 + x1) / 2, 0, 11.2, MAT.panel);
+      for (const bx of [-6, 8, 13, 18]) box(4.4, H - 3.4, .3, bx, 3.0, 11.2, MAT.panel);
+      box(7.7, H - 4.0, .3, -13.45, 3.6, 11.2, MAT.panel);
+      box(7.6, 3.5, .1, -13.45, 0, 11.3, ENTRY_GLASS);                       // entrance glazing with door frames
+      for (const x of [-15.35, -13.45, -11.55]) box(.12, 3.5, .16, x, 0, 11.32, 0x2b3036);
+      box(7.6, .12, .16, -13.45, 2.7, 11.32, 0x2b3036);
+      for (const x of [-17.2, -9.7]) box(.3, 3.7, .3, x, 0, 11.75, P.red);
+      box(8.2, .45, 2.6, -13.45, 3.4, 12.3, P.red);                          // red entrance canopy
+      for (let i = 0; i < 4; i++) box(7.4 - i * .4, .18, .5, -13.45, -.2 - i * .18, 12.6 + i * .5, P.concrete);   // steps
+    }
+    LAYER = 'f' + n;
+    if (n === 1) {
+      box(W + .6, HQ.F1 - .4, D + .6, 0, -HQ.F1, 0, MAT.panelDark);         // dock-height plinth under the slab
+      box(7, HQ.F1 - .1, D + .6, 23.8, -HQ.F1, 0, MAT.panelDark);           // plinth under the tower (below the lift floor)
+      for (const bx of [-6, 8, 13, 18]) for (const dx of [-2.6, 2.6]) { box(.3, 1.0, .3, bx + dx, -HQ.F1, 12.2, P.yellow); box(.32, .25, .32, bx + dx, -HQ.F1 + .5, 12.2, P.black); }
+      for (const bx of [-6, 8, 13, 18]) {
+        for (const dx of [-2.2, 2.2]) box(.4, H - .4, .5, bx + dx, 0, 11.05, P.black);
+        box(4.0, .5, .45, bx, 2.5, 11.0, P.steel2);                          // rolled shutter
+        box(3.6, .12, 1.1, bx, -.12, 11.85, P.steel2);                       // leveller
+        for (const dx of [-1.7, 1.7]) box(.42, .55, .35, bx + dx, -.72, 11.5, P.black);
+      }
+    }
+  }
+  // parapet and rooftop sign stay; the roof slab is hidden in section view
+  LAYER = 'roof'; OY = fy(8);
+  box(W + .6, 1.3, .45, 0, 0, -11.1, MAT.panel);
+  box(.45, 1.3, D + .6, -20.1, 0, 0, MAT.panel);
+  box(.45, 1.3, 7.6, 20.1, 0, -7.5, MAT.panel); box(.45, 1.3, 7.6, 20.1, 0, 7.5, MAT.panel);
+  box(W + .6, .5, .5, 0, -.5, 11.05, P.facade2);
+  box(17, 2.8, .4, -8, 1.3, -11.1, P.red);
+  LAYER = 'roofslab';
+  box(W + .6, 1.3, .4, 0, 0, 11.15, MAT.panel);
+  box(W - .4, .4, D - .4, 0, -.4, 0, MAT.roof);
+  for (const x of [-16, 4, 12]) box(4, 1.8, 3, x, 0, -7.8, P.steel);
+  for (const x of [-8, 0]) box(2.4, 1.2, 2.4, x, 0, 3, P.steel2);
+  // tower
+  LAYER = 'tower'; OY = 0;
+  const top = fy(8);
+  for (const x of [20.3, 26.2]) for (const z of [-3.45, 3.45]) box(.45, top + 4.4, .45, x, 0, z, P.facade2);
+  box(6.3, top, .3, TOWER_X, 0, -3.5, P.facade);
+  box(.08, top - HQ.F1, 6.6, 26.3, HQ.F1, 0, GLASS);
+  box(5.9, top - HQ.F1, .08, TOWER_X, HQ.F1, 3.5, GLASS);
+  for (let n = 1; n <= 8; n++) { box(6.4, .28, .14, TOWER_X, fy(n) - .3, 3.55, P.facade2); box(.14, .28, 7, 26.35, fy(n) - .3, 0, P.facade2); }
+  for (const z of [-2.6, 2.6]) box(.12, top, .12, 25.6, 0, z, P.steel2);
+  box(6.9, 4.6, 7.5, TOWER_X, top, 0, MAT.panelDark);
+  // opaque tower skin like the real building (hidden in section view to show the lift)
+  LAYER = 'tskin';
+  // the core projects in front of the main facade (street view); exterior only
+  box(6.4, top + 4.6, 8.6, TOWER_X, 0, 7.75, MAT.panelDark);
+  box(.8, top - 5, .1, TOWER_X, 3.5, 12.1, WIN);
+  for (let n = 2; n <= 8; n++) box(6.5, .22, .3, TOWER_X, fy(n) - .4, 12.05, 0x48525c);
+  box(6.9, top, .3, TOWER_X, 0, 3.75, MAT.panelDark);
+  box(.3, top, 7.5, 26.6, 0, 0, MAT.panelDark);
+  box(.8, top - 5, .1, TOWER_X, 3.5, 3.95, WIN);
+  for (let n = 2; n <= 8; n++) { box(7, .22, .4, TOWER_X, fy(n) - .4, 3.8, 0x48525c); box(.4, .22, 7.6, 26.65, fy(n) - .4, 0, 0x48525c); }
+}
+
+let gateArms = [];
+function buildGate() {
+  LAYER = 'world'; OY = 0;
+  box(3.2, 2.8, 3.2, 38.5, 0, 41.5, P.white);
+  box(3.8, .35, 3.8, 38.5, 2.8, 41.5, P.red);
+  box(2.6, .9, .06, 38.5, 1.3, 43.12, WIN);
+  box(.5, 1.0, .5, 35.4, 0, 43.2, P.red2); box(.5, 1.0, .5, 24.6, 0, 43.2, P.red2);
+  for (const [px, dir] of [[35.4, -1], [24.6, 1]]) {
+    const pivot = group(scene, px, 1.0, 43.2);
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(5, .16, .16), M(P.white));
+    arm.position.x = 2.5 * dir; pivot.add(arm);
+    for (let i = 0; i < 3; i++) { const s = new THREE.Mesh(new THREE.BoxGeometry(.5, .17, .17), M(P.red)); s.position.x = (1 + i * 1.5) * dir; pivot.add(s); }
+    pivot.userData.dir = dir; gateArms.push(pivot);
+  }
+}
+
+function buildSites() {
+  // Pyeongtaek: wide, low production plant with silos and docks (company description)
+  LAYER = 'world'; OY = 0;
+  const { x: px, z: pz } = SITES.pyeongtaek;
+  box(96, 15, 46, px, 0, pz, MAT.ribs);
+  box(97, .8, 47, px, 15, pz, MAT.roof);
+  for (let i = 0; i < 8; i++) box(8, 1.6, 40, px - 42 + i * 12, 15.8, pz, P.facade);       // roof lanterns
+  box(96.2, 1.4, 46.2, px, 11.5, pz, P.red);
+  box(92, 1.8, .1, px, 6, pz + 23.06, WIN);
+  for (let i = 0; i < 6; i++) { const x = px - 35 + i * 14; box(4.2, 4.4, .3, x, 0, pz + 23.1, P.steel2); box(4, .12, 1.4, x, 1.0, pz + 23.8, P.steel2); }
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) { cyl(3.6, 20, px + 56 + j * 9, 0, pz - 12 + i * 11, P.steel); cone(3.6, 2.4, px + 56 + j * 9, 20, pz - 12 + i * 11, P.steel2); }
+  box(110, .09, 26, px + 6, 0, pz + 37, MAT.yard);
+  // Seoul: triangular 'pizza slice' office tower, four floors (company description)
+  const { x: sx, z: sz } = SITES.seoul;
+  const tri = [[-16, -14], [-17, 10], [19, 8]];
+  const shape = new THREE.Shape(tri.map(([x, z]) => new THREE.Vector2(x, -z)));
+  const extrude = (depth, mat, y, sc = 1) => {
+    const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
+    g.rotateX(-Math.PI / 2); g.scale(sc, 1, sc); g.translate(sx, y, sz);
+    let L = layers.get('world'); let list = L.get(mat); if (!list) L.set(mat, list = []); list.push(g);
+  };
+  extrude(1.2, M(P.facade2), 0);
+  for (let i = 0; i < 4; i++) { extrude(.45, M(P.concrete), 1.2 + i * 4.4); extrude(3.95, GLASS, 1.65 + i * 4.4, .97); }
+  extrude(.9, M(P.facade), 18.8);
+  box(56, .08, 22, sx + 4, 0, sz + 26, MAT.concrete);
+  for (let i = 0; i < 7; i++) PARKED.push([sx - 20 + i * 5, sz + 22, 0]);
+}
+
+function buildInstanced() {
+  // trees: pines and round autumn trees (October)
+  const pines = TREES.filter((_, i) => i % 3 === 0), rounds = TREES.filter((_, i) => i % 3 !== 0);
+  const trunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(.35, .45, 2.4, 6), M(P.trunk), TREES.length);
+  const crown = new THREE.InstancedMesh(new THREE.ConeGeometry(2.6, 6.4, 8), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .85 }), pines.length);
+  const ball = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1.9, 1), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .85, flatShading: true }), rounds.length * 3);
+  const col = new THREE.Color();
+  const AUTUMN = [0xe08a3a, 0xe9c35a, 0xc65a3e, 0x86a35a, 0xd9a441, 0x9bb062];
+  TREES.forEach(([x, z, s], i) => { _m4.compose(_p.set(x, 1.2 * s, z), _q.identity(), _s.set(s, s, s)); trunk.setMatrixAt(i, _m4); });
+  pines.forEach(([x, z, s], i) => {
+    _m4.compose(_p.set(x, 5.2 * s, z), _q.identity(), _s.set(s, s * (.9 + (i % 5) * .08), s)); crown.setMatrixAt(i, _m4);
+    crown.setColorAt(i, col.set(i % 2 ? P.tree : P.tree2).offsetHSL(0, 0, (i % 4) * .02 - .03));
+  });
+  rounds.forEach(([x, z, s], i) => {
+    for (let k = 0; k < 3; k++) {
+      const a = i * 2.3 + k * 2.1, r = k === 0 ? 0 : 1.1 * s;
+      _m4.compose(_p.set(x + Math.cos(a) * r, (k === 0 ? 5.0 : 3.9) * s, z + Math.sin(a) * r), _q.setFromEuler(_e.set(0, a, 0)), _s.set(s * (1.1 - k * .12), s * .95, s * (1.1 - k * .12)));
+      ball.setMatrixAt(i * 3 + k, _m4);
+      ball.setColorAt(i * 3 + k, col.set(AUTUMN[i % AUTUMN.length]).offsetHSL((i % 7) * .006 - .02, 0, k * .03 - .03));
+    }
+  });
+  trunk.castShadow = crown.castShadow = ball.castShadow = true; crown.receiveShadow = ball.receiveShadow = true;
+  scene.add(trunk, crown, ball);
+  for (const m of [crown.material, ball.material]) { m.userData = { base: new THREE.Color(0xffffff), crown: true }; GROUND_MATS.push(m); }
+  // Korean red pines: tall reddish trunks with flat layered crowns
+  const pTrunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(.22, .38, 9, 7), M(0x8a5338), PINES.length);
+  const pCrown = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1.6, 1), new THREE.MeshStandardMaterial({ color: 0x3f6038, roughness: .9, flatShading: true }), PINES.length * 4);
+  PINES.forEach(([x, z, s], i) => {
+    const lean = (i % 2 ? .06 : -.05);
+    _m4.compose(_p.set(x, 4.5 * s, z), _q.setFromEuler(_e.set(lean, 0, lean * .7)), _s.set(s, s, s)); pTrunk.setMatrixAt(i, _m4);
+    for (let k = 0; k < 4; k++) {
+      const a = i * 1.7 + k * 1.9, r = k === 3 ? 0 : 1.5 * s;
+      _m4.compose(_p.set(x + Math.cos(a) * r + lean * 6, (6.6 + k * .9) * s, z + Math.sin(a) * r), _q.identity(), _s.set(s * 1.5, s * .45, s * 1.25));
+      pCrown.setMatrixAt(i * 4 + k, _m4);
+    }
+  });
+  pTrunk.castShadow = pCrown.castShadow = true; scene.add(pTrunk, pCrown);
+  pCrown.material.userData = { base: new THREE.Color(0x3f6038), crown: true }; GROUND_MATS.push(pCrown.material);
+  // concrete utility poles with three wires
+  const pole2 = new THREE.InstancedMesh(new THREE.CylinderGeometry(.16, .22, 12, 8), M(0xb9b8b2), POLES.length);
+  const arm = new THREE.InstancedMesh(new THREE.BoxGeometry(2.8, .16, .16), M(0x6f747a), POLES.length * 2);
+  const wire = [];
+  POLES.forEach(([x, z, r], i) => {
+    _m4.compose(_p.set(x, 6, z), _q.identity(), _s.set(1, 1, 1)); pole2.setMatrixAt(i, _m4);
+    for (let k = 0; k < 2; k++) { _m4.compose(_p.set(x, 10.6 - k * 1.3, z), _q.setFromEuler(_e.set(0, r + Math.PI / 2, 0)), _s.set(1, 1, 1)); arm.setMatrixAt(i * 2 + k, _m4); }
+    const nx = POLES[i + 1]; if (!nx || Math.hypot(nx[0] - x, nx[1] - z) > 45) return;
+    for (const off of [-1.2, 0, 1.2]) {
+      const ox = Math.cos(r) * off, oz = -Math.sin(r) * off;
+      for (let k = 0; k < 8; k++) {
+        const a = k / 8, b = (k + 1) / 8, sag = t => 10.7 - Math.sin(t * Math.PI) * .9;
+        wire.push(lerp(x, nx[0], a) + ox, sag(a), lerp(z, nx[1], a) + oz, lerp(x, nx[0], b) + ox, sag(b), lerp(z, nx[1], b) + oz);
+      }
+    }
+  });
+  const wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(wire, 3));
+  pole2.castShadow = true; scene.add(pole2, arm, new THREE.LineSegments(wg, new THREE.LineBasicMaterial({ color: 0x2b2f34, transparent: true, opacity: .7 })));
+  // blue plastic pallet stacks
+  const bp = new THREE.InstancedMesh(new THREE.BoxGeometry(1.2, 1, 1.1), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .6 }), BLUE_PALLETS.length);
+  BLUE_PALLETS.forEach(([x, z, n], i) => { const h = n * .16; _m4.compose(_p.set(x, h / 2, z), _q.identity(), _s.set(1, h, 1)); bp.setMatrixAt(i, _m4); bp.setColorAt(i, col.set(0x2c5fb4).offsetHSL(0, 0, (i % 5) * .015 - .03)); });
+  bp.castShadow = bp.receiveShadow = true; scene.add(bp);
+  // street lamps
+  const pole = new THREE.InstancedMesh(new THREE.CylinderGeometry(.12, .16, 7, 6), M(P.steel2), LAMPS.length);
+  const head = new THREE.InstancedMesh(new THREE.BoxGeometry(1.6, .3, .6), LAMP, LAMPS.length);
+  LAMPS.forEach(([x, z, dx, dz], i) => {
+    _m4.compose(_p.set(x, 3.5, z), _q.identity(), _s.set(1, 1, 1)); pole.setMatrixAt(i, _m4);
+    _m4.compose(_p.set(x + dx * .8, 7, z + dz * .8), _q.setFromEuler(_e.set(0, Math.atan2(-dz, dx), 0)), _s.set(1, 1, 1)); head.setMatrixAt(i, _m4);
+  });
+  scene.add(pole, head);
+  // parked cars
+  const body = new THREE.InstancedMesh(new RoundedBoxGeometry(1.86, .78, 4.4, 2, .26), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .32, metalness: .45 }), PARKED.length);
+  const cabin = new THREE.InstancedMesh(new RoundedBoxGeometry(1.64, .66, 2.3, 2, .22), WIN, PARKED.length);
+  const carCols = [0xf2f2f0, 0x2f3338, 0x9aa3aa, 0x7b1e24, 0x2d4a6b, 0xd7d3c8, 0x4b5157];
+  PARKED.forEach(([x, z, r], i) => {
+    _m4.compose(_p.set(x, .65, z), _q.setFromEuler(_e.set(0, r, 0)), _s.set(1, 1, 1)); body.setMatrixAt(i, _m4);
+    _m4.compose(_p.set(x, 1.4, z - Math.cos(r) * .2), _q.setFromEuler(_e.set(0, r, 0)), _s.set(1, 1, 1)); cabin.setMatrixAt(i, _m4);
+    body.setColorAt(i, col.set(carCols[i % carCols.length]));
+  });
+  body.castShadow = true; scene.add(body, cabin);
+}
+
+/* ================================================================
+   3. HQ interiors (static parts are merged per floor)
+   ================================================================ */
+const KIND = {
+  suit: [P.suit, 0xffffff, 0xe9ebe8], office: [0x3f5d7a, 0x2b2f34, 0x3a3f46], chef: [0xffffff, 0xffffff, 0x2f3338],
+  lab: [0xf7f7f5, 0x2b2f34, 0x34495e], vest: [P.orange, 0x2b2f34, 0x34495e],
+};
+function personS(x, z, kind = 'suit', seated = false) {
+  const [shirt, cap, pants] = KIND[kind];
+  if (seated) {
+    box(.36, .45, .55, x, 0, z + .12, pants);
+    cyl(.24, .62, x, .5, z, shirt, 'cyl8');
+    ball(.15, x, 1.27, z, P.skin); ball(.158, x, 1.33, z, cap, .62);
+  } else {
+    box(.36, .8, .24, x, 0, z, pants);
+    cyl(.24, .7, x, .8, z, shirt, 'cyl8');
+    ball(.15, x, 1.66, z, P.skin); ball(.158, x, 1.72, z, cap, .62);
+  }
+}
+const NOZ = {};
+const PHOTO_LABELS = [];
+function rack(x0, x1, z, levels = 2, full = .85) {
+  for (let x = x0; x <= x1 + .01; x += 2.6) for (const dz of [-.55, .55]) box(.12, 3.3, .12, x, 0, z + dz, 0x3f6ea8);
+  for (let l = 0; l < levels; l++) {
+    const y = l * 1.7;
+    for (const dz of [-.55, .55]) box(x1 - x0, .14, .12, (x0 + x1) / 2, y + .05, z + dz, P.orange);
+    for (let x = x0 + 1.3; x < x1; x += 2.6) if (rnd() < full) { box(1.1, .14, 1.1, x, y + .19, z, P.wood); box(1.0, .9, 1.0, x, y + .33, z, P.kraft); }
+  }
+}
+function storageRooms(n) {
+  const rooms = [[4, 9.3, P.kraft, '재고', '#8a6a3e'], [9.3, 14.6, P.cold, '냉장', '#2f6f95'], [14.6, 19.8, P.frozen, '냉동', '#2d4a8a']];
+  for (const [x0, x1, col, name, bg] of rooms) {
+    const cx = (x0 + x1) / 2, w = x1 - x0;
+    box(.2, 3, 6.4, x0 + .1, 0, -7.7, P.white);
+    box((w - 2) / 2, 3, .2, x0 + (w - 2) / 4, 0, -4.5, P.white);
+    box((w - 2) / 2, 3, .2, x1 - (w - 2) / 4, 0, -4.5, P.white);
+    box(2, .6, .2, cx, 2.4, -4.5, P.white);
+    box(1.8, 2.35, .08, cx, 0, -4.42, col);
+    box(w - .3, .05, 6.2, cx, 0, -7.7, col === P.kraft ? 0xe6dccb : 0xdbe8ee);
+    for (const y of [.9, 1.8]) box(w - 1, .08, .7, cx, y, -10.2, P.steel);
+    for (let i = 0; i < 3; i++) for (const y of [.98, 1.88]) box(.7, .5, .55, x0 + 1 + i * (w - 2) / 2, y, -10.2, col === P.kraft ? P.kraft : 0xeef3f6);
+    sign(floors[n].group, name, 2.0, .55, cx, fy(n) + 2.72, -4.36, { bg });
+  }
+}
+function airShower(n) {
+  NOZ[n] = new THREE.MeshStandardMaterial({ color: 0x55636b, emissive: 0x8fdcff, emissiveIntensity: 0 });
+  box(3, .06, 4, 12.5, 0, 2, P.steel);
+  box(3, 2.6, .14, 12.5, 0, 0, P.steel);
+  box(3, 2.6, .06, 12.5, 0, 4, GLASS);
+  box(3.1, .14, 4.1, 12.5, 2.6, 2, P.steel2);
+  for (const x of [11, 14]) for (const z of [0, 4]) box(.14, 2.6, .14, x, 0, z, P.steel2);
+  for (const z of [.12, 3.88]) for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) put(UNIT.cyl8, NOZ[n], 11.9 + j * 1.2, .7 + i * .65, z, .1, .1, .1, 0, Math.PI / 2);
+  sign(floors[n].group, '에어샤워', 2.4, .45, 12.5, fy(n) + 2.95, 4.08, { bg: '#2b2f34' });
+}
+function partition() {
+  for (const [z0, z1] of [[-4.5, 0], [4, 7], [10, 11]]) {
+    box(.08, 3.6, z1 - z0, 12.5, 0, (z0 + z1) / 2, GLASS);
+    box(.14, .14, z1 - z0, 12.5, 3.55, (z0 + z1) / 2, P.steel2);
+  }
+  for (let i = 0; i < 12; i++) box(.04, 3.2, .2, 12.5, .3, 7.15 + i * .24, GLASS);
+}
+function conveyorStatic(x0, x1, z, beltColor) {
+  const cx = (x0 + x1) / 2, w = x1 - x0;
+  box(w, .25, 1.15, cx, .65, z, P.steel);
+  box(w, .1, 1.0, cx, .9, z, beltColor);
+  for (let x = x0 + .4; x < x1; x += 2.5) for (const dz of [-.45, .45]) box(.12, .65, .12, x, 0, z + dz, P.steel2);
+}
+const LINES = [], SPINNERS = [], STEAM = [];
+function lineItems(n, x0, x1, z, color, accent) {
+  const items = [];
+  for (let i = 0; i < 14; i++) {
+    const it = new THREE.Group();
+    it.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(.32, .08, .44), M(color)), {}));
+    if (accent) { const a = new THREE.Mesh(new THREE.BoxGeometry(.2, .085, .18), M(accent)); a.position.z = .06; it.add(a); }
+    it.position.set(x0, 1.04, z); floors[n].dyn.add(it); items.push(it);
+  }
+  LINES.push({ n, items, x0, x1, z, speed: .9, phase: rnd() * 20 });
+}
+function powderFloor(n) {
+  for (const x of [-14, -6.5]) {
+    for (const dx of [-2.2, 2.2]) for (const dz of [-.9, .9]) box(.16, 1.4, .16, x + dx, 0, -7.6 + dz, P.steel2);
+    box(5.2, 1.0, 2.2, x, 1.4, -7.6, P.steel);
+    const drum = group(floors[n].dyn, x, 2.35, -7.6);
+    const d = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 5.0, 20), M(0xdde3e6, { metalness: .3, roughness: .45 }));
+    d.rotation.z = Math.PI / 2; d.castShadow = true; drum.add(d);
+    const st = new THREE.Mesh(new THREE.BoxGeometry(5.02, .2, .35), M(P.steel2)); st.position.y = .92; drum.add(st);
+    SPINNERS.push({ n, obj: drum, axis: 'x', speed: 1.2 });
+    put(UNIT.cyl, M(P.steel), x, 3.15, -7.6, .35, .5, .35);
+    put(UNIT.cone, M(P.steel), x, 3.0, -7.6, 1.0, 1.0, 1.0, 0, Math.PI);
+    box(1.0, 1.0, 1.2, x + 3.2, 1.6, -7.6, 0x7f8b91);
+  }
+  box(1.6, 3.4, 1.6, -19, 0, -9.6, P.steel);
+  box(2, 2.4, 2, -16.6, 0, 2.5, 0xbac3c8);
+  put(UNIT.cone, M(P.steel), -16.6, 3.0, 2.5, .9, 1.0, .9, 0, Math.PI);
+  box(.3, .3, 10.4, -16.6, 3.25, -2.6, P.steel2);
+  conveyorStatic(-15.4, 5, 2.5, 0x6b767c);
+  box(1.0, 1.0, 1.5, -3, .85, 2.5, 0x3d6fb0);
+  box(3, 2.1, 2.2, 6.5, 0, 2.5, P.steel); box(2.2, .9, .05, 6.5, 1.0, 3.62, GLASS);
+  box(1.6, .02, 1.6, 9.5, .02, 8.6, P.yellow);
+  for (const [x, z] of [[-10.4, -5.3], [-3.1, -5.3], [-14.6, 4.2], [-6, 3.9], [1, 3.9], [6.4, 4.4]]) personS(x, z, 'suit');
+  lineItems(n, -15.2, 4.8, 2.5, 0xf4f3ee, 0xd9a93e);
+}
+function sauceFloor(n) {
+  for (const x of [-17, -12.5, -8, -3.5]) {
+    for (let i = 0; i < 3; i++) { const a = i * 2.09 + .5; box(.16, .6, .16, x + Math.cos(a) * 1.1, 0, -7.6 + Math.sin(a) * 1.1, P.steel2); }
+    cyl(1.5, 1.8, x, .6, -7.6, M(0xd4dbde, { metalness: .35, roughness: .4 }));
+    ball(1.5, x, 2.4, -7.6, M(0xdfe5e8, { metalness: .35, roughness: .4 }), .42);
+    cyl(.28, .45, x, 3.0, -7.6, 0x7f8b91);
+    const stir = group(floors[n].dyn, x, 3.48, -7.6);
+    stir.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1.1, .1, .16), M(P.red)), { castShadow: true }));
+    SPINNERS.push({ n, obj: stir, axis: 'y', speed: 2.4 });
+    box(.9, 1.5, .25, x + 1.3, .2, -5.6, 0xe6eaec);
+    box(.16, .16, .03, x + 1.15, 1.3, -5.46, 0x4caf6a); box(.16, .16, .03, x + 1.45, 1.3, -5.46, P.red);
+    const puffs = [];
+    for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.SphereGeometry(.4, 8, 6), new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false })); floors[n].dyn.add(m); puffs.push(m); }
+    STEAM.push({ n, puffs, x: x - .5, y: 3.2, z: -7.6 });
+  }
+  box(18, .25, .25, -10.2, 3.35, -5.0, P.steel2);
+  box(.25, .25, 7.5, -16.6, 3.35, -1.2, P.steel2);
+  cyl(1.25, 1.1, -16.6, .5, 2.5, P.steel); box(2.6, .5, 2.6, -16.6, 0, 2.5, 0xbac3c8);
+  const rot = group(floors[n].dyn, -16.6, 1.62, 2.5);
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; const c = new THREE.Mesh(new THREE.BoxGeometry(.3, .25, .3), M(P.white)); c.position.set(Math.cos(a), 0, Math.sin(a)); rot.add(c); }
+  SPINNERS.push({ n, obj: rot, axis: 'y', speed: 1.4 });
+  conveyorStatic(-15.4, 5, 2.5, P.belt);
+  conveyorStatic(-11, 3, 5.8, P.belt);
+  box(2.2, 1.8, 1.6, -4, .6, 5.8, P.steel);
+  box(3, 2.1, 2.2, 6.5, 0, 2.5, P.steel); box(2.2, .9, .05, 6.5, 1.0, 3.62, GLASS);
+  box(1.6, .02, 1.6, 9.5, .02, 8.6, P.yellow);
+  for (const [x, z] of [[-14.7, -5.0], [-6.2, -5.0], [-14.2, 4.2], [-7, 3.9], [-1, 7.1], [6.4, 4.4]]) personS(x, z, 'suit');
+  lineItems(n, -15.2, 4.8, 2.5, 0xf4f3ee, 0xe7802f);
+  lineItems(n, -10.8, 2.8, 5.8, 0xf6f4ee, 0xd2232a);
+}
+function devFloor() {
+  const n = 7;
+  for (const px of [-16, -11.2, -6.4]) for (const pz of [-1.6, 4.4]) {
+    for (const dx of [-.85, .85]) for (const dz of [-.45, .45]) {
+      box(1.6, .06, .85, px + dx, .74, pz + dz, P.white);
+      box(.6, .4, .05, px + dx, .8, pz + dz * 1.5, P.black);
+      box(.5, .5, .5, px + dx, 0, pz + dz * 2.6, 0x3d4b52);
+    }
+    box(.08, .74, 1.8, px, 0, pz, 0xdfe2e2);
+    if (rnd() > .25) personS(px - .85, pz + 1.2, 'office', true);
+    if (rnd() > .35) personS(px + .85, pz - 1.2, 'office', true);
+  }
+  box(8.4, 2.9, .08, -15.3, 0, -5.5, GLASS); box(.08, 2.9, 5.2, -11.1, 0, -8.1, GLASS);
+  box(5, .08, 1.6, -15.3, .74, -8.2, P.wood);
+  for (let i = 0; i < 4; i++) { personS(-17 + i * 1.2, -9.3, 'office', true); personS(-17 + i * 1.2, -7.1, 'office', true); }
+  for (const [x, z] of [[-19, 9.6], [-3.4, 9.6], [-3.4, -10]]) { cyl(.35, .6, x, 0, z, P.white); cone(.6, 1.4, x, .6, z, P.tree); }
+  box(.08, 2.9, 14, -2.4, 0, -3.8, GLASS);
+  // test kitchen
+  box(17, .95, 1.2, 8.5, 0, -10.1, P.steel);
+  for (const x of [2, 4.5, 7, 9.5]) box(1.4, .03, .9, x, .95, -10.1, P.black);
+  box(7, .8, 1.3, 5.75, 2.8, -10.1, P.steel);
+  for (const y of [1.6, 2.3]) box(5.6, .07, .45, 14.6, y, -10.55, P.teal);
+  for (let i = 0; i < 9; i++) cyl(.13, .32, 12.2 + i * .6, i % 2 ? 1.67 : 2.37, -10.55, i % 3 ? 0xf3f1ea : 0xd8c39b);
+  box(1.6, 2.6, 1.4, 18.4, 0, -9.8, P.steel); box(1.6, 2.6, 1.4, 18.4, 0, -8.2, P.steel);
+  for (const ix of [3.5, 11.5]) {
+    box(6, .92, 1.9, ix, 0, -1.6, P.black); box(6.1, .06, 2.0, ix, .92, -1.6, 0x434a50);
+    for (let i = 0; i < 4; i++) ball(.24, ix - 2 + i * 1.3, 1.05, -1.6, P.steel, .45);
+    for (let i = 0; i < 3; i++) cyl(.09, .3, ix - 1.4 + i * 1.4, .98, -1.1, i === 1 ? P.red : 0xf2efe6);
+  }
+  for (const [x, z] of [[2, -.2], [5, -.2], [11, -.2], [13.8, -3.0], [6.5, -9.0]]) personS(x, z, 'chef');
+  box(4.8, .08, 1.6, 9, .74, 6.2, P.wood);
+  for (const dx of [-1.5, 0, 1.5]) { personS(9 + dx, 5.0, 'office', true); personS(9 + dx, 7.4, 'office', true); }
+  for (let i = 0; i < 5; i++) ball(.18, 7.2 + i * .9, .86, 6.2, P.white, .35);
+}
+function labFloor() {
+  const n = 2;
+  box(.08, 3.0, 19.8, -1.6, 0, -.9, GLASS);
+  box(16, .95, 1.1, -11, 0, -10.1, P.black);
+  for (const y of [1.55, 2.25]) box(15, .07, .4, -11, y, -10.5, P.teal);
+  for (const x of [-18.5, -3.5]) box(.1, 1.7, .4, x, .95, -10.5, P.teal);
+  for (const ix of [-14, -6.5]) {
+    box(6.2, .95, 1.6, ix, 0, -3.4, P.black);
+    for (const dx of [-3, 3]) box(.1, 1.4, .1, ix + dx, .95, -3.4, P.teal);
+    box(6.2, .07, .45, ix, 2.0, -3.4, P.teal);
+    for (let i = 0; i < 4; i++) box(.55, .38, .45, ix - 2.2 + i * 1.5, .95, -3.4, i % 2 ? 0xf2f2ee : 0xd8dee0);
+  }
+  for (let i = 0; i < 4; i++) box(.55, .4, .45, -16 + i * 3, .95, -10.1, 0xf2f2ee);
+  for (let i = 0; i < 10; i++) cyl(.07, .25, -12 + i * .3, .95, -9.8, i % 2 ? P.cold : 0xf2f2ee);
+  box(1.3, 2.5, 3.2, -19.2, 0, 3, P.steel); box(.05, 1.2, 3, -18.53, 1.0, 3, GLASS);
+  for (const [x, z] of [[-14.5, -1.9], [-6, -1.9], [-12, -9], [-18, 5.6]]) personS(x, z, 'lab');
+  rack(1, 15, -9.6, 2, .9); rack(1, 15, -5.6, 2, .8); rack(1, 12, -1.6, 2, .7);
+  personS(14, 3, 'vest');
+}
+function shipFloor() {
+  rack(-19, 3.2, -9.6, 2, .9); rack(-19, 3.2, -5.6, 2, .85);
+  for (let x = -19; x <= -1; x += 2.6) for (const dz of [-.55, .55]) box(.12, 3.3, .12, x, 0, -1.4 + dz, 0x3f6ea8);
+  for (const y of [0, 1.7]) for (const dz of [-.55, .55]) box(18, .14, .12, -10, y + .05, -1.4 + dz, P.orange);
+  for (const x of [8, 10.5, 13]) box(1.5, .02, 1.5, x, .02, -6, P.yellow);
+  for (const z of [-1.5, 1.5]) box(1.5, .02, 1.5, 18.2, .02, z, P.yellow);
+  box(3.2, 1.05, 1, -15, 0, 8.4, P.white); box(3.2, .06, 1.1, -15, 1.05, 8.4, P.wood);
+  personS(-15, 7.4, 'office'); personS(-17.5, 9.6, 'office'); personS(-12.2, 9.8, 'office');
+  box(2.6, .45, .9, -18.3, 0, 6.2, 0x55636b);
+  personS(2.5, 2, 'vest'); personS(-2.5, 9.6, 'vest');
+}
+function buildInteriors() {
+  for (const n of [6, 5, 4, 3]) {
+    LAYER = 'f' + n; OY = fy(n);
+    box(39.4, .03, 21.4, 0, 0, 0, 0xe2e7e8);                            // epoxy floor finish
+    storageRooms(n); airShower(n); partition();
+    if (n >= 5) powderFloor(n); else sauceFloor(n);
+  }
+  LAYER = 'f7'; OY = fy(7); devFloor();
+  LAYER = 'f2'; OY = fy(2); labFloor();
+  LAYER = 'f1'; OY = fy(1); shipFloor();
+  LAYER = 'world'; OY = 0;
+}
+
+/* ================================================================
+   build everything
+   ================================================================ */
+const hqRoot = group(scene);
+for (let n = 1; n <= 7; n++) { const g = group(hqRoot); g.userData.floor = n; floors[n] = { group: g, dyn: group(g, 0, fy(n), 0), y: fy(n) }; }
+buildGround(); buildBackdrop(); buildHQShell(); buildGate(); buildSites(); buildInteriors();
+for (let n = 1; n <= 7; n++) bake('f' + n, floors[n].group);
+const FACADE = {}; for (let n = 1; n <= 7; n++) FACADE[n] = bake('ff' + n, floors[n].group);
+const roofGroup = bake('roof', hqRoot);
+const roofSlab = bake('roofslab', hqRoot);
+const towerGroup = bake('tower', scene);
+const towerSkin = bake('tskin', scene);
+bake('world', scene);
+buildInstanced();
+// signs and logos (unmerged)
+const signs = group(scene);
+const floorNames = { 7: '7F  제품 개발', 6: '6F  파우더·시즈닝', 5: '5F  파우더·시즈닝', 4: '4F  소스·육수', 3: '3F  소스·육수', 2: '2F  실험실·창고', 1: '1F  창고·출고' };
+const FLOOR_SIGNS = []; for (let n = 1; n <= 7; n++) FLOOR_SIGNS.push(floorSign(n, floorNames[n], floors[n].group));
+sign(roofGroup, '(주)에프앤에스식품', 13.6, 2.2, -6.6, fy(8) + 2.7, -10.87, { bg: null });
+logo(roofGroup, 2.3, -14.9, fy(8) + 2.7, -10.86);
+const towerCap = group(scene);
+logo(towerCap, 4.2, TOWER_X, fy(8) + 2.3, 3.8);
+logo(towerCap, 4.2, 26.72, fy(8) + 2.3, 0, Math.PI / 2);
+logo(towerSkin, 4.2, TOWER_X, fy(8) + 2.3, 12.08);
+logo(towerSkin, 4.2, 26.48, fy(8) + 2.3, 8.4, Math.PI / 2);
+for (const [bx, t] of [[-6, '입고'], [8, '출고 1'], [13, '출고 2'], [18, '출고 3']]) sign(floors[1].group, t, 2.4, .5, bx, fy(1) + 3.42, 11.4, { bg: t === '입고' ? '#2d4a6b' : '#d2232a' });
+logo(FACADE[1], 1.4, -13.45, fy(1) + 4.78, 11.5);
+// dock shutters open while a truck is docked
+const SHUTTERS = [-6, 8, 13, 18].map(bx => { const m = new THREE.Mesh(new THREE.BoxGeometry(4, 3.0, .1), MAT.ribs); m.position.set(bx, fy(1) + 1.5, 11.28); m.castShadow = true; FACADE[1].add(m); return m; });
+sign(signs, 'F&S 오산 HQ', 5.2, 1.1, 38.5, 3.6, 43.45, { bg: '#d2232a' });
+sign(signs, '에프앤에스식품 평택공장', 34, 3.4, SITES.pyeongtaek.x - 14, 13.6, SITES.pyeongtaek.z + 23.2, { bg: null });
+logo(signs, 4.6, SITES.pyeongtaek.x - 36, 13.6, SITES.pyeongtaek.z + 23.2);
+sign(signs, '에프앤에스식품 서울', 16, 2, SITES.seoul.x + 1, 20.8, SITES.seoul.z + 9.4, { bg: null, ry: -.06 });
+for (const [bx, t] of [[-6, '입고'], [8, '1'], [13, '2'], [18, '3']]) sign(signs, t, 2.6, 1.3, bx, .14, 19.5, { rx: -Math.PI / 2, bg: null, fg: '#f3efe4' });
+
+/* ================================================================
+   4. simulation: batches → elevator → forklifts → trucks → road
+   ================================================================ */
+const SIM_RATE = 12;                                   // simulated seconds per real second
+const sim = { t: 0, clock: 15 * 3600 + 40 * 60, shipped: [], events: [], batches: [], batchSeq: 120, truckSeq: 10, unread: 0, qHist: [], lastRaw: -999, lastSpawn: 0, nextCar: 0 };
+const hhmm = sec => { const m = Math.floor(sec / 60) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+function logEvent(text, kind = 'info') { sim.events.unshift({ time: sim.clock, text, kind }); if (sim.events.length > 40) sim.events.pop(); sim.unread++; }
+
+class Route {
+  constructor(curve) { this.curve = curve; this.len = curve.getLength(); }
+  static pts(points, y = 0) {
+    const clean = [points[0]];
+    for (const p of points.slice(1)) { const q = clean.at(-1); if (Math.hypot(p[0] - q[0], p[1] - q[1]) > .25) clean.push(p); }
+    if (clean.length < 2) clean.push([clean[0][0] + .01, clean[0][1] + .01]);
+    return new Route(new THREE.CatmullRomCurve3(clean.map(([x, z]) => V(x, y, z)), false, 'centripetal'));
+  }
+  static bezier(a, c, b) { return new Route(new THREE.QuadraticBezierCurve3(V(a[0], 0, a[1]), V(c[0], 0, c[1]), V(b[0], 0, b[1]))); }
+  pose(s, out) { const u = clamp(s / this.len, 0, 1); this.curve.getPointAt(u, out.p); this.curve.getTangentAt(u, out.t); return out; }
+}
+const _pose = { p: V(), t: V() };
+// drive an object along a route with smooth start / stop
+function drive(obj, route, { vmax = 5, acc = 2.5, reverse = false, turn = 9 } = {}) { return { obj, route, s: 0, v: 0, vmax, acc, reverse, turn }; }
+function stepDrive(d, dt) {
+  const rem = d.route.len - d.s;
+  d.v = Math.min(d.vmax, d.v + d.acc * dt, Math.sqrt(2 * d.acc * Math.max(0, rem)) + .15);
+  d.s = Math.min(d.route.len, d.s + d.v * dt);
+  d.route.pose(d.s, _pose);
+  d.obj.position.x = _pose.p.x; d.obj.position.z = _pose.p.z;
+  const h = Math.atan2(_pose.t.x, _pose.t.z) + (d.reverse ? Math.PI : 0);
+  d.obj.rotation.y += angleDelta(d.obj.rotation.y, h) * (d.turn ? Math.min(1, d.turn * dt) : 1);
+  return d.s >= d.route.len - 1e-3;
+}
+
+// ---------- models ----------
+const RB = (w, h, d, r) => new RoundedBoxGeometry(w, h, d, 2, r);
+function rmesh(parent, geo, mat, x, y, z) { const m = new THREE.Mesh(geo, mat.isMaterial ? mat : M(mat)); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; }
+function makeCar(color) {
+  const g = group(scene);
+  rmesh(g, RB(1.86, .78, 4.4, .26), M(color, { roughness: .32, metalness: .45 }), 0, .7, 0);
+  rmesh(g, RB(1.64, .66, 2.3, .22), WIN, 0, 1.36, -.25);
+  rmesh(g, RB(1.5, .08, 1.9, .04), M(color, { roughness: .32, metalness: .45 }), 0, 1.7, -.3);
+  for (const x of [-.62, .62]) { mbox(g, .38, .16, .06, x, .7, 2.16, HEAD); mbox(g, .38, .16, .06, x, .7, -2.16, TAIL); }
+  for (const x of [-.86, .86]) for (const z of [-1.35, 1.35]) { const w = mcyl(g, .34, .26, 0, 0, 0, P.black, 10); w.rotation.z = Math.PI / 2; w.position.set(x, .34, z); }
+  return g;
+}
+function makeTruck(kind) {
+  const g = group(scene);
+  const cab = kind === 'in' ? M(0x2d4f86, { roughness: .35, metalness: .4 }) : M(0xf1f2f0, { roughness: .35, metalness: .3 });
+  mbox(g, 2.3, .3, 9.8, 0, .62, -.2, P.black);
+  rmesh(g, RB(2.5, 2.75, 7.2, .06), kind === 'in' ? M(0xe9ebec, { roughness: .45, metalness: .2 }) : M(0xcfd4d8, { roughness: .32, metalness: .6 }), 0, 2.375, -1.4);
+  for (let z = -4.6; z < 2.2; z += .9) mbox(g, 2.54, 2.7, .05, 0, 1.03, z, kind === 'in' ? 0xd5d8da : 0xb7bdc2);
+  mbox(g, 2.52, .3, 7.22, 0, 1.0, -1.4, kind === 'in' ? 0x2d4f86 : P.red);
+  rmesh(g, RB(2.42, 2.45, 2.4, .32), cab, 0, 1.9, 3.6);
+  mbox(g, 2.15, 1.0, .06, 0, 1.95, 4.82, WIN);
+  mbox(g, 2.44, .32, .3, 0, .62, 4.75, P.black);
+  for (const x of [-1.32, 1.32]) mbox(g, .08, .5, .3, x, 2.1, 4.2, P.black);
+  for (const x of [-.85, .85]) { mbox(g, .4, .22, .06, x, .95, 4.83, HEAD); mbox(g, .3, .22, .06, x, 1.15, -5.04, TAIL); }
+  for (const x of [-1.05, 1.05]) for (const z of [-3.7, -2.5, 3.5]) { const w = mcyl(g, .5, .38, 0, 0, 0, P.black, 12); w.rotation.z = Math.PI / 2; w.position.set(x, .5, z); }
+  const door = mbox(g, 2.3, 2.55, .08, 0, 1.12, -5.03, 0xd6dadc);
+  g.userData.door = door;
+  return g;
+}
+const TRUCK_SLOTS = [[-.62, 1.4], [.62, 1.4], [-.62, 0], [.62, 0], [-.62, -1.4], [.62, -1.4]];
+function makePallet(kind = 'goods') {
+  const g = new THREE.Group();
+  mbox(g, 1.2, .14, 1.2, 0, 0, 0, P.wood);
+  const items = [];
+  if (kind === 'goods') {
+    for (let l = 0; l < 2; l++) for (let i = 0; i < 4; i++) items.push(mbox(g, .56, .5, .56, i % 2 ? .29 : -.29, .14 + l * .5, i < 2 ? -.29 : .29, P.kraft));
+  } else {
+    for (let l = 0; l < 2; l++) for (let i = 0; i < 3; i++) items.push(mbox(g, 1.1, .3, .36, 0, .14 + l * .32, -.38 + i * .38, P.sack));
+  }
+  g.userData.setCount = k => items.forEach((b, i) => { b.visible = i < k; });
+  return g;
+}
+function makePerson(kind = 'suit') {
+  const [shirt, cap, pants] = KIND[kind];
+  const g = new THREE.Group();
+  mbox(g, .36, .8, .24, 0, 0, 0, pants);
+  mcyl(g, .24, .7, 0, .8, 0, shirt, 8);
+  const h = new THREE.Mesh(new THREE.SphereGeometry(.15, 10, 8), M(P.skin)); h.position.y = 1.66; g.add(h);
+  const c = new THREE.Mesh(new THREE.SphereGeometry(.158, 10, 8), M(cap)); c.position.y = 1.72; c.scale.y = .62; g.add(c);
+  return g;
+}
+function makeForklift(parent) {
+  const g = group(parent);
+  mbox(g, 1.2, .7, 1.9, 0, .25, -.15, 0xf2b632);
+  mbox(g, 1.2, .6, .5, 0, .35, -1.1, 0x5a6168);
+  for (const x of [-.52, .52]) for (const z of [-.95, .4]) mbox(g, .07, 1.25, .07, x, .95, z, P.black);
+  mbox(g, 1.2, .06, 1.5, 0, 2.2, -.28, P.black);
+  for (const x of [-.45, .45]) mbox(g, .1, 2.3, .1, x, .1, .85, P.black);
+  for (const x of [-.48, .48]) for (const z of [-.75, .55]) { const w = mcyl(g, .28, .22, 0, 0, 0, P.black, 10); w.rotation.z = Math.PI / 2; w.position.set(x, .28, z); }
+  const carriage = group(g, 0, .05, 0);
+  mbox(carriage, 1.0, .5, .08, 0, 0, .95, P.black);
+  for (const x of [-.32, .32]) mbox(carriage, .12, .05, 1.25, x, 0, 1.55, 0x3c4347);
+  const driver = makePerson('vest'); driver.scale.setScalar(.92); driver.position.set(0, .2, -.35); g.add(driver);
+  g.userData.carriage = carriage;
+  return g;
+}
+
+for (const i of [0, 2, 3, 5]) { const t = makeTruck(i % 2 ? 'in' : 'out'); t.position.set(SITES.pyeongtaek.x - 35 + i * 14, .12, SITES.pyeongtaek.z + 29.3); const dr = t.userData.door; dr.scale.y = .08; dr.position.y = 3.67 - 1.275 * .08; }
+// ---------- road lanes, signal ----------
+function laneRoute(sign) {
+  const pts = [];
+  for (let s = 0; s <= ROAD_LEN; s += 4) { const u = s / ROAD_LEN, p = roadCurve.getPointAt(u), t = roadCurve.getTangentAt(u); pts.push([p.x - t.z * 2.1 * sign, p.z + t.x * 2.1 * sign]); }
+  if (sign < 0) pts.reverse();
+  return Route.pts(pts);
+}
+const LANES = { E: laneRoute(1), W: laneRoute(-1) };
+function nearestS(route, x, z) {
+  let best = 0, bd = Infinity;
+  for (let s = 0; s <= route.len; s += 1) { route.pose(s, _pose); const d = (_pose.p.x - x) ** 2 + (_pose.p.z - z) ** 2; if (d < bd) { bd = d; best = s; } }
+  return best;
+}
+const STOP = { W: nearestS(LANES.W, 40, 48), E: nearestS(LANES.E, 21, 52) };
+const TURN_IN_S = nearestS(LANES.W, 38.5, 48);
+const JOIN_W_S = nearestS(LANES.W, 21, 48);
+function signal() { const p = sim.t % 32; return { road: p < 20, drive: p >= 22 && p < 30, left: 30 - p }; }
+const ROADV = [];
+const ROAD_COLORS = [0xf2f2f0, 0x2f3338, 0x9aa3aa, 0x7b1e24, 0x2d4a6b, 0xd7d3c8, 0x4b5157, 0x5d7f6e];
+function spawnCar(lane, s) {
+  const obj = makeCar(ROAD_COLORS[Math.floor(rnd() * ROAD_COLORS.length)]);
+  ROADV.push({ obj, lane, s, v: 8, vmax: 9 + rnd() * 4, len: 4.3, kind: 'car' });
+}
+function laneFree(lane, s0, s1) { return !ROADV.some(v => v.lane === lane && v.s > s0 && v.s < s1); }
+function stepRoad(dt) {
+  const sg = signal();
+  for (const v of [...ROADV]) {
+    if (v.ghost) { if (sim.t > v.until) ROADV.splice(ROADV.indexOf(v), 1); continue; }
+    let gap = Infinity;
+    for (const o of ROADV) if (o !== v && o.lane === v.lane && o.s > v.s) gap = Math.min(gap, o.s - v.s - (o.len + v.len) / 2);
+    const stop = STOP[v.lane], toStop = stop - v.s - v.len / 2;
+    if (!sg.road && toStop > -.5 && toStop > v.v * v.v / 14 - 1) gap = Math.min(gap, toStop);
+    if (v.truck && v.truck.state === 'road' && v.truck.toGate) gap = Math.min(gap, TURN_IN_S - v.s + 2);
+    const want = Math.min(v.vmax, Math.max(0, gap - 2.2) * 1.3);
+    v.v += clamp(want - v.v, -9 * dt, 3 * dt);
+    v.s += v.v * dt;
+    const R = LANES[v.lane];
+    if (v.truck && v.truck.toGate && v.s >= TURN_IN_S - .3 && v.v < 1.5) { startArrival(v.truck); ROADV.splice(ROADV.indexOf(v), 1); ROADV.push({ ghost: true, lane: v.lane, s: TURN_IN_S, len: 10, until: sim.t + 2.5 }); continue; }
+    if (v.s > R.len + 6) { ROADV.splice(ROADV.indexOf(v), 1); if (v.truck) removeTruck(v.truck); else disposeTree(v.obj); continue; }
+    R.pose(clamp(v.s, 0, R.len), _pose);
+    v.obj.position.set(_pose.p.x, .12, _pose.p.z);
+    v.obj.rotation.y = Math.atan2(_pose.t.x, _pose.t.z);
+    v.obj.visible = v.s > -2 && v.s < R.len + 4;
+  }
+  if (sim.t > sim.nextCar) {
+    sim.nextCar = sim.t + 2.2 + rnd() * 3.5;
+    const lane = rnd() > .5 ? 'E' : 'W';
+    if (laneFree(lane, -20, 14)) spawnCar(lane, -6);
+  }
+}
+
+// ---------- yard: bays, gate queue, trucks ----------
+const BAYS = [{ x: -6, kind: 'in' }, { x: 8, kind: 'out' }, { x: 13, kind: 'out' }, { x: 18, kind: 'out' }].map(b => ({ ...b, truck: null }));
+const ARRIVE = Route.pts([[38.5, 47.9], [35.2, 47.5], [32.8, 45.8], [32, 43.6], [32, 40], [32, 29.5]]);
+const yard = { owner: null };
+const TRUCKS = [];
+function spawnTruck(kind) {
+  const obj = makeTruck(kind);
+  const id = (kind === 'in' ? '입고 ' : '출고 ') + String(++sim.truckSeq).padStart(2, '0');
+  const tr = { id, kind, obj, state: 'road', toGate: true, cargo: [], reserved: 0, drive: null, bay: null, t: 0 };
+  if (kind === 'in') for (let i = 0; i < 6; i++) { const p = makePallet('raw'); obj.add(p); const [sx, sz] = TRUCK_SLOTS[i]; p.position.set(sx, 1.0, sz); tr.cargo.push({ pallet: p }); }
+  TRUCKS.push(tr);
+  ROADV.push({ obj, lane: 'W', s: -10, v: 7, vmax: 8, len: 10, kind: 'truck', truck: tr });
+  return tr;
+}
+// vehicles and pallets own their geometries (materials are shared), so free them when they leave
+function disposeTree(o) { o.removeFromParent(); o.traverse(n => { if (n.isMesh) n.geometry.dispose(); }); }
+function removeTruck(tr) { TRUCKS.splice(TRUCKS.indexOf(tr), 1); disposeTree(tr.obj); }
+function startArrival(tr) { tr.state = 'arrive'; tr.toGate = false; tr.drive = drive(tr.obj, ARRIVE, { vmax: 4.5, acc: 2 }); logEvent(`${tr.id} 정문 진입`); }
+function bayToRoute(b) { return Route.pts([[32, 29.5], [31.6, 27.2], [29.4, 25.2], [26, 25], [b.x - 12, 25]]); }
+function bayInRoute(b) { return Route.bezier([b.x - 12, 25], [b.x, 25], [b.x, 16.3]); }
+function bayOutRoute(b) {
+  const pts = [[b.x, 16.3], [b.x, 25], [b.x + 3, 31.5], [b.x + 7, 34]];
+  if (b.x + 7 < 23) pts.push([23, 34]);
+  pts.push([27, 36.6], [28, 40.6]);
+  return Route.pts(pts);
+}
+const TURN_OUT = Route.pts([[28, 40.6], [28, 44.4], [27.2, 46.6], [25, 47.7], [21, 47.9]]);
+function trucksOnArrival() { return TRUCKS.filter(t => t.state === 'arrive' || t.state === 'queue'); }
+function stepTrucks(dt) {
+  for (const tr of [...TRUCKS]) {
+    tr.t += dt;
+    const door = tr.obj.userData.door;
+    if (tr.doorO !== undefined) { door.scale.y = 1 - .92 * tr.doorO; door.position.y = 3.67 - 1.275 * door.scale.y; }
+    switch (tr.state) {
+      case 'arrive': case 'queue': {
+        // follow the truck ahead on the gate lane
+        let gap = Infinity;
+        for (const o of trucksOnArrival()) if (o !== tr && o.drive.s > tr.drive.s) gap = Math.min(gap, o.drive.s - tr.drive.s - 10.5);
+        const d = tr.drive;
+        const want = Math.min(d.vmax, Math.max(0, gap - 1.5) * 1.2, Math.sqrt(2 * d.acc * Math.max(0, d.route.len - d.s)) + .1);
+        d.v += clamp(want - d.v, -6 * dt, 2 * dt); d.s = Math.min(d.route.len, d.s + Math.max(0, d.v) * dt);
+        d.route.pose(d.s, _pose); tr.obj.position.set(_pose.p.x, .12, _pose.p.z); tr.obj.rotation.y = Math.atan2(_pose.t.x, _pose.t.z);
+        if (d.s >= d.route.len - .05) {
+          tr.state = 'queue';
+          const bay = BAYS.find(b => b.kind === tr.kind && !b.truck);
+          if (bay && !yard.owner) { bay.truck = tr; tr.bay = bay; yard.owner = tr; tr.state = 'toBay'; tr.drive = drive(tr.obj, bayToRoute(bay), { vmax: 4, acc: 2, turn: 0 }); }
+        }
+        break;
+      }
+      case 'toBay':
+        if (stepDrive(tr.drive, dt)) { tr.state = 'dockIn'; tr.drive = drive(tr.obj, bayInRoute(tr.bay), { vmax: 2.2, acc: 1.2, reverse: true, turn: 0 }); }
+        tr.obj.position.y = .12; break;
+      case 'dockIn':
+        if (stepDrive(tr.drive, dt)) { tr.state = 'docked'; tr.t = 0; yard.owner = null; logEvent(`${tr.id} ${tr.kind === 'in' ? '입고 도크' : `출고 ${BAYS.indexOf(tr.bay)}번 도크`} 접안`); }
+        break;
+      case 'docked':
+        tr.doorO = lerp(tr.doorO || 0, 1, Math.min(1, dt * 2));
+        if (((tr.kind === 'out' && tr.cargo.length >= 6) || (tr.kind === 'in' && tr.cargo.length === 0)) && tr.reserved === 0 && tr.t > 2 && !yard.owner && liftClear(tr.bay)) {
+          yard.owner = tr; tr.state = 'depart'; tr.t = 0; tr.drive = drive(tr.obj, bayOutRoute(tr.bay), { vmax: 4, acc: 1.8, turn: 0 });
+        }
+        break;
+      case 'depart':
+        tr.doorO = lerp(tr.doorO || 0, 0, Math.min(1, dt * 3));
+        if (tr.t < 1.2) break;                                   // shutter closes first
+        if (tr.bay && tr.drive.s > 12) { tr.bay.truck = null; tr.bay = null; }
+        if (stepDrive(tr.drive, dt)) tr.state = 'gate';
+        break;
+      case 'gate': {
+        const sg = signal();
+        if (sg.drive && sg.left > 4) { tr.state = 'turnOut'; if (yard.owner === tr) yard.owner = null; tr.drive = drive(tr.obj, TURN_OUT, { vmax: 4, acc: 2.5, turn: 0 }); if (tr.kind === 'out') shipTruck(tr); }
+        break;
+      }
+      case 'turnOut':
+        if (stepDrive(tr.drive, dt)) { tr.state = 'road'; ROADV.push({ obj: tr.obj, lane: 'W', s: JOIN_W_S, v: 3, vmax: 8, len: 10, kind: 'truck', truck: tr }); }
+        break;
+    }
+  }
+  // keep trucks coming
+  if (sim.t - sim.lastSpawn > 7) {
+    sim.lastSpawn = sim.t;
+    const outCount = TRUCKS.filter(t => t.kind === 'out' && (t.toGate || ['arrive', 'queue', 'toBay', 'dockIn', 'docked'].includes(t.state))).length;
+    const rawFree = RACK.filter(s => !s.pallet && !s.res).length;
+    const inCount = TRUCKS.filter(t => t.kind === 'in' && t.state !== 'road' || (t.kind === 'in' && t.toGate)).length;
+    if (inCount === 0 && rawFree >= 6 && sim.t - sim.lastRaw > 50 && laneFree('W', -30, 10)) { sim.lastRaw = sim.t; spawnTruck('in'); }
+    else if (outCount < 4 && laneFree('W', -30, 10)) spawnTruck('out');
+  }
+  // barrier arms
+  const nearIn = TRUCKS.some(t => Math.abs(t.obj.position.x - 32) < 2.5 && Math.abs(t.obj.position.z - 43.2) < 6.5);
+  const nearOut = TRUCKS.some(t => Math.abs(t.obj.position.x - 28) < 2.5 && Math.abs(t.obj.position.z - 43.2) < 6.5);
+  for (const [i, open] of [[0, nearIn], [1, nearOut]]) { const a = gateArms[i]; a.rotation.z = lerp(a.rotation.z, open ? 1.35 * a.userData.dir : 0, Math.min(1, dt * 4)); }
+}
+function liftClear(bay) { return LIFTS.every(L => !(Math.abs(L.obj.position.x - bay.x) < 2.2 && L.obj.position.z > 10.4)); }
+function shipTruck(tr) {
+  const ids = tr.cargo.map(c => c.batch).filter(Boolean);
+  ids.forEach(b => { b.t.ship = sim.clock; b.truck = tr.id; b.stage = '출고'; });
+  sim.shipped.push({ time: sim.clock, pallets: tr.cargo.length, truck: tr.id });
+  logEvent(`${tr.id} 출고 출발 · 팔레트 ${tr.cargo.length}개`, 'ok');
+}
+
+// ---------- elevator ----------
+const car = group(scene, TOWER_X, fy(1), 0);
+mbox(car, 5, .25, 5.6, 0, -.25, 0, P.steel2);
+mbox(car, 5, 3.4, .15, 0, 0, -2.8, P.steel);
+mbox(car, .15, 3.4, 5.6, 2.5, 0, 0, P.steel);
+mbox(car, 5, .2, 5.6, 0, 3.4, 0, P.steel2);
+mbox(car, 5.02, .28, .12, 0, 3.12, 2.8, P.red);
+const cable = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 1, 6), M(P.black)); cable.position.set(TOWER_X, 0, 0); scene.add(cable);
+const ELEV = { y: fy(1), state: 'idle', queue: [], job: null, t: 0, dir: 0 };
+const DROP = [{ x: 18.2, z: -1.5, pallet: null }, { x: 18.2, z: 1.5, pallet: null }];
+const STAGE = [{ x: 8, z: -6, pallet: null }, { x: 10.5, z: -6, pallet: null }, { x: 13, z: -6, pallet: null }];
+function moveCar(target, dt) {
+  const dy = target - ELEV.y;
+  if (Math.abs(dy) < .01) { ELEV.y = target; ELEV.dir = 0; return true; }
+  const v = Math.min(6.5, Math.sqrt(2 * 3.5 * Math.abs(dy)) + .2);
+  ELEV.dir = Math.sign(dy);
+  ELEV.y += Math.sign(dy) * Math.min(Math.abs(dy), v * dt);
+  return false;
+}
+function stepElevator(dt) {
+  const E = ELEV;
+  switch (E.state) {
+    case 'idle': if (E.queue.length) { E.job = E.queue.shift(); E.state = 'up'; } break;
+    case 'up': if (moveCar(fy(E.job.n), dt)) { E.state = 'load'; E.t = 0; car.attach(E.job.pallet); E.from = E.job.pallet.position.clone(); } break;
+    case 'load': {
+      E.t += dt; E.job.pallet.position.lerpVectors(E.from, V(0, 0, 0), ease(Math.min(1, E.t / 1.3)));
+      if (E.t >= 1.3) { FLOOR_CTRL[E.job.n].lobby = null; E.job.batch.stage = '엘리베이터'; E.state = 'down'; }
+      break;
+    }
+    case 'down': if (moveCar(fy(1), dt)) E.state = 'drop'; break;
+    case 'drop': {
+      const slot = DROP.find(s => !s.pallet && !s.res);
+      if (slot) { slot.res = true; E.slot = slot; floors[1].dyn.attach(E.job.pallet); E.from = E.job.pallet.position.clone(); E.t = 0; E.state = 'unload'; }
+      break;
+    }
+    case 'unload': {
+      E.t += dt; E.job.pallet.position.lerpVectors(E.from, V(E.slot.x, 0, E.slot.z), ease(Math.min(1, E.t / 1.3)));
+      if (E.t >= 1.3) { E.slot.res = false; E.slot.pallet = E.job.pallet; E.slot.batch = E.job.batch; E.job.batch.stage = '1F 대기'; E.state = 'idle'; E.job = null; }
+      break;
+    }
+  }
+  car.position.y = E.y;
+  const capY = fy(8);
+  cable.scale.y = Math.max(.1, capY - (E.y + 3.6)); cable.position.y = (capY + E.y + 3.6) / 2;
+}
+
+// ---------- production floors ----------
+const PRODUCTS = { powder: ['파우더', '시즈닝'], sauce: ['소스', '육수'] };
+const DUR = { produce: 26, pack: 20, move: 6 };
+const SHOWER_IN = Route.pts([[17.3, 1.1], [15.4, 2.0], [12.5, 2.0]]);
+const SHOWER_OUT = Route.pts([[12.5, 2.0], [10.2, 2.0], [8.8, 5.0], [8.6, 6.5]]);
+const PUSH = Route.pts([[9.5, 8.6], [11.2, 8.6], [12.5, 8.6], [14.6, 7.4], [16.6, 3.0], [18.2, 0]]);
+const FLOOR_CTRL = {};
+for (const [i, n] of [6, 4, 5, 3].entries()) {
+  const dyn = floors[n].dyn;
+  const entrant = makePerson('suit'); entrant.position.set(17.3, 0, 1.1); dyn.add(entrant);
+  const flyer = mbox(dyn, .56, .5, .56, 0, 0, 0, P.kraft); flyer.visible = false;
+  const air = [];
+  for (let k = 0; k < 12; k++) { const s = new THREE.Mesh(new THREE.SphereGeometry(.05, 6, 4), new THREE.MeshBasicMaterial({ color: 0xd8f3ff })); s.visible = false; dyn.add(s); air.push(s); }
+  FLOOR_CTRL[n] = { n, kind: n >= 5 ? 'powder' : 'sauce', state: 'idle', t: -i * 14, batch: null, pallet: null, lobby: null, entrant, flyer, air, idx: i };
+}
+function newBatch(c) {
+  const id = `B-${c.n}${String(++sim.batchSeq).padStart(3, '0')}`;
+  const product = PRODUCTS[c.kind][(c.idx + sim.batchSeq) % PRODUCTS[c.kind].length];
+  const b = { id, n: c.n, product, stage: '위생 진입', t: { hyg: sim.clock }, truck: null };
+  sim.batches.unshift(b); if (sim.batches.length > 60) sim.batches.pop();
+  return b;
+}
+function stepFloor(c, dt) {
+  c.t += dt;
+  const e = c.entrant, dyn = floors[c.n].dyn;
+  NOZ[c.n].emissiveIntensity = 0; c.air.forEach(s => { s.visible = false; });
+  switch (c.state) {
+    case 'idle': if (c.t >= 0) { c.batch = newBatch(c); c.state = 'hygiene'; c.t = 0; } break;
+    case 'hygiene': {
+      const tIn = SHOWER_IN.len / 1.4, tOut = SHOWER_OUT.len / 1.4;
+      if (c.t < tIn) { SHOWER_IN.pose(c.t * 1.4, _pose); e.position.set(_pose.p.x, Math.abs(Math.sin(c.t * 9)) * .05, _pose.p.z); e.rotation.y = Math.atan2(_pose.t.x, _pose.t.z); }
+      else if (c.t < tIn + 2.6) {
+        e.position.set(12.5, 0, 2); e.rotation.y += dt * 2.5;
+        NOZ[c.n].emissiveIntensity = 1 + Math.sin(c.t * 20) * .6;
+        const k = (c.t - tIn) / 2.6;
+        c.air.forEach((s, i) => { const side = i % 2 ? 1 : -1, ph = (k * 4 + i * .17) % 1; s.visible = true; s.position.set(11.9 + (i % 3) * .6, .6 + (i % 4) * .45, 2 + side * (1.8 - ph * 1.6)); });
+      } else if (c.t < tIn + 2.6 + tOut) { const s = (c.t - tIn - 2.6) * 1.4; SHOWER_OUT.pose(s, _pose); e.position.set(_pose.p.x, Math.abs(Math.sin(c.t * 9)) * .05, _pose.p.z); e.rotation.y = Math.atan2(_pose.t.x, _pose.t.z); }
+      else { c.state = 'produce'; c.t = 0; c.batch.stage = '생산'; c.batch.t.prod = sim.clock; }
+      break;
+    }
+    case 'produce':
+      e.position.set(8.6, 0, 6.5); e.rotation.y += angleDelta(e.rotation.y, Math.PI) * Math.min(1, dt * 6);
+      if (c.t >= DUR.produce) { c.state = 'pack'; c.t = 0; c.batch.stage = '충전·포장'; c.batch.t.pack = sim.clock; c.pallet = makePallet('goods'); c.pallet.userData.setCount(0); c.pallet.position.set(9.5, 0, 8.6); dyn.add(c.pallet); }
+      break;
+    case 'pack': {
+      const per = DUR.pack / 8, k = Math.min(8, Math.floor(c.t / per));
+      c.pallet.userData.setCount(k);
+      if (k < 8) {
+        const f = c.t / per - k, slot = [k % 2 ? .29 : -.29, .14 + Math.floor(k / 4) * .5, k % 4 < 2 ? -.29 : .29];
+        c.flyer.visible = true;
+        c.flyer.position.set(lerp(8, 9.5 + slot[0], f), lerp(.95, slot[1], f) + Math.sin(f * Math.PI) * .8, lerp(2.5, 8.6 + slot[2], f));
+      }
+      e.position.set(8.6, 0, 6.5); e.rotation.y += angleDelta(e.rotation.y, Math.PI * .75) * Math.min(1, dt * 6);
+      if (c.t >= DUR.pack) { c.state = 'blocked'; c.t = 0; }
+      break;
+    }
+    case 'blocked': if (!c.lobby) { c.state = 'move'; c.t = 0; c.batch.stage = '층 이동'; } break;
+    case 'move': {
+      const k = ease(Math.min(1, c.t / DUR.move)); PUSH.pose(k * PUSH.len, _pose);
+      c.pallet.position.set(_pose.p.x, 0, _pose.p.z);
+      const h = Math.atan2(_pose.t.x, _pose.t.z);
+      e.position.set(_pose.p.x - Math.sin(h) * 1.25, Math.abs(Math.sin(c.t * 9)) * .04, _pose.p.z - Math.cos(h) * 1.25); e.rotation.y = h;
+      if (c.t >= DUR.move) {
+        c.lobby = c.pallet; ELEV.queue.push({ n: c.n, pallet: c.pallet, batch: c.batch, at: sim.t });
+        c.batch.stage = '엘리베이터 대기'; c.batch.t.lift = sim.clock;
+        c.pallet = null; c.state = 'idle'; c.t = -1.5;
+      }
+      break;
+    }
+  }
+}
+
+// ---------- forklifts on 1F ----------
+const RACK = [];
+for (const x of [-17.7, -15.1, -12.5, -9.9, -7.3, -4.7, -2.2]) for (const y of [.19, 1.89]) RACK.push({ x, y, z: -1.4, pallet: null, res: false });
+RACK.forEach((s, i) => { if (rnd() < .55) { s.pallet = makePallet('raw'); s.pallet.position.set(s.x, s.y, s.z); floors[1].dyn.add(s.pallet); } });
+function makeLift(home, heading) { const obj = makeForklift(floors[1].dyn); obj.position.set(home[0], 0, home[1]); obj.rotation.y = heading; return { obj, carriage: obj.userData.carriage, legs: [], leg: null, home, heading, cargo: null, busy: false }; }
+const LIFT_A = makeLift([13.5, 6.4], -Math.PI / 2), LIFT_B = makeLift([-9, 6], 0);
+const LIFTS = [LIFT_A, LIFT_B];
+function approach(L, cx, cz, ax, az, liftTo, onEnd) {
+  const fx = cx - ax * 1.5, fz = cz - az * 1.5;
+  L.legs.push({ build: () => Route.pts([[L.obj.position.x, L.obj.position.z], [fx - ax * 2.6, fz - az * 2.6], [fx, fz]]), reverse: false, liftTo, onEnd });
+}
+function backOut(L, dist, ax, az, liftTo, onEnd) { L.legs.push({ build: () => { const { x, z } = L.obj.position; return Route.pts([[x, z], [x - ax * dist, z - az * dist]]); }, reverse: true, liftTo, onEnd }); }
+function goHome(L) { L.legs.push({ build: () => Route.pts([[L.obj.position.x, L.obj.position.z], L.home]), reverse: false, liftTo: .05, home: true }); }
+function pick(L, pallet) { L.carriage.attach(pallet); pallet.position.set(0, .02, 1.5); pallet.rotation.set(0, 0, 0); L.cargo = pallet; }
+function decideA() {
+  const L = LIFT_A;
+  const truck = BAYS.filter(b => b.kind === 'out' && b.truck && b.truck.state === 'docked' && b.truck.cargo.length + b.truck.reserved < 6).map(b => b.truck).sort((a, b) => (b.cargo.length + b.reserved) - (a.cargo.length + a.reserved))[0];
+  const staged = STAGE.find(s => s.pallet && !s.res), drop = DROP.find(s => s.pallet && !s.res);
+  let src = null, srcA = null, dst = null;
+  if (truck && (staged || drop)) { src = staged || drop; dst = { truck }; }
+  else if (drop && STAGE.some(s => !s.pallet && !s.res)) { src = drop; dst = { stage: STAGE.find(s => !s.pallet && !s.res) }; }
+  if (!src) { if (Math.hypot(L.obj.position.x - L.home[0], L.obj.position.z - L.home[1]) > .5) goHome(L); return; }
+  srcA = src.x > 15 ? [1, 0] : [0, -1];
+  src.res = true; if (dst.truck) dst.truck.reserved++; else dst.stage.res = true;
+  const pallet = src.pallet, batch = src.batch;
+  approach(L, src.x, src.z, ...srcA, .05, () => { pick(L, pallet); src.pallet = null; src.batch = null; src.res = false; });
+  backOut(L, 2.6, ...srcA, .35);
+  if (dst.truck) {
+    const tr = dst.truck, k = tr.cargo.length + tr.reserved - 1, [sx, sz] = TRUCK_SLOTS[k];
+    const bx = tr.bay.x;
+    approach(L, bx + sx, 16.3 + sz, 0, 1, .2, () => { tr.obj.attach(pallet); pallet.position.set(sx, 1.0, sz); pallet.rotation.set(0, 0, 0); tr.cargo.push({ pallet, batch }); tr.reserved--; L.cargo = null; if (batch) { batch.stage = '상차 완료'; batch.t.load = sim.clock; } });
+    backOut(L, 0, 0, 1, .05);
+    L.legs.at(-1).build = () => { const { x, z } = L.obj.position; return Route.pts([[x, z], [x, 9.2]]); };
+  } else {
+    const st = dst.stage;
+    approach(L, st.x, st.z, 0, -1, .05, () => { floors[1].dyn.attach(pallet); pallet.position.set(st.x, 0, st.z); pallet.rotation.set(0, 0, 0); st.pallet = pallet; st.batch = batch; st.res = false; L.cargo = null; if (batch) batch.stage = '1F 대기'; });
+    backOut(L, 2.4, 0, -1, .05);
+  }
+}
+function decideB() {
+  const L = LIFT_B, bay = BAYS[0], tr = bay.truck;
+  const slot = RACK.find(s => !s.pallet && !s.res);
+  if (tr && tr.state === 'docked' && tr.cargo.length - tr.reserved > 0 && slot) {
+    const item = tr.cargo[tr.cargo.length - 1 - tr.reserved]; tr.reserved++;
+    const local = item.pallet.position, bx = bay.x;
+    slot.res = true;
+    approach(L, bx + local.x, 16.3 + local.z, 0, 1, .02, () => { pick(L, item.pallet); tr.cargo.splice(tr.cargo.indexOf(item), 1); tr.reserved--; });
+    L.legs.push({ build: () => { const { x, z } = L.obj.position; return Route.pts([[x, z], [x, 8.8]]); }, reverse: true, liftTo: .3 });
+    approach(L, slot.x, slot.z, 0, -1, slot.y - .02, () => { floors[1].dyn.attach(item.pallet); item.pallet.position.set(slot.x, slot.y, slot.z); item.pallet.rotation.set(0, 0, 0); slot.pallet = item.pallet; slot.res = false; L.cargo = null; });
+    backOut(L, 2.6, 0, -1, .05);
+    return;
+  }
+  if (Math.hypot(L.obj.position.x - L.home[0], L.obj.position.z - L.home[1]) > .5) goHome(L);
+}
+function stepLift(L, decide, dt) {
+  if (!L.leg) {
+    if (!L.legs.length) { decide(); if (!L.legs.length) { L.obj.rotation.y += angleDelta(L.obj.rotation.y, L.heading) * Math.min(1, dt * 4); return; } }
+    const def = L.legs.shift();
+    L.leg = { def, d: drive(L.obj, def.build(), { vmax: 4.2, acc: 3, reverse: def.reverse, turn: 8 }) };
+  }
+  const { def, d } = L.leg;
+  const done = stepDrive(d, dt);
+  const cy = L.carriage.position.y, ty = def.liftTo ?? cy;
+  L.carriage.position.y = cy + clamp(ty - cy, -2 * dt, 2 * dt);
+  if (done && Math.abs(L.carriage.position.y - ty) < .01) { def.onEnd?.(); L.leg = null; }
+}
+let consumeAt = 0;
+function stepRack() {
+  if (sim.t < consumeAt) return;
+  consumeAt = sim.t + 28;
+  const full = RACK.filter(s => s.pallet && !s.res);
+  if (full.length > 4) { const s = full[Math.floor(rnd() * full.length)]; disposeTree(s.pallet); s.pallet = null; }
+}
+
+// ---------- ambient motion ----------
+function stepAmbient(dt) {
+  const busy = n => FLOOR_CTRL[n] && ['produce', 'pack'].includes(FLOOR_CTRL[n].state);
+  for (const s of SPINNERS) s.obj.rotation[s.axis] += s.speed * (busy(s.n) ? 2.6 : .5) * dt;
+  for (const l of LINES) {
+    const run = busy(l.n) ? 1 : .25;
+    l.phase += l.speed * run * dt;
+    const span = l.x1 - l.x0;
+    l.items.forEach((it, i) => { it.position.x = l.x0 + ((i * span / l.items.length + l.phase) % span); });
+  }
+  for (const st of STEAM) {
+    const strong = FLOOR_CTRL[st.n]?.state === 'produce';
+    st.puffs.forEach((m, i) => {
+      const k = (sim.t * (strong ? .7 : .35) + i / 3) % 1;
+      m.position.set(st.x + Math.sin(k * 6 + i) * .25, st.y + k * .9, st.z);
+      m.scale.setScalar(.5 + k * 1.1);
+      m.material.opacity = (strong ? .55 : .2) * Math.sin(k * Math.PI);
+    });
+  }
+}
+
+function stepSim(dt) {
+  sim.t += dt; sim.clock += dt * SIM_RATE;
+  for (const c of Object.values(FLOOR_CTRL)) stepFloor(c, dt);
+  stepElevator(dt);
+  stepLift(LIFT_A, decideA, dt); stepLift(LIFT_B, decideB, dt);
+  stepTrucks(dt); stepRoad(dt); stepRack(); stepAmbient(dt);
+  if (!sim.qNext || sim.t > sim.qNext) { sim.qNext = sim.t + 1.5; sim.qHist.push(ELEV.queue.length + (ELEV.job ? 1 : 0)); if (sim.qHist.length > 24) sim.qHist.shift(); }
+}
+// seed road traffic and run the plant for a while before the first frame
+for (let s = 20; s < LANES.E.len; s += 70) { spawnCar('E', s); spawnCar('W', s + 35); }
+
+/* ================================================================
+   5. picking, camera, dashboard, weather, day / night, loop
+   ================================================================ */
+const PH = (f, cap, shown = true) => ({ src: `assets/photos/${f}.jpg`, cap, shown });
+const PHOTOS = {
+  hq: [PH('exterior', '오산 HQ 외관'), PH('kitchen', '7F 테스트키친'), PH('lab', '2F 실험실'), PH('warehouse-forklift', '창고 운반', false)],
+  7: [PH('kitchen', '조리실·테스트키친'), PH('mixing', '샘플 배합'), PH('office', '사무실'), PH('meeting', '회의실')],
+  powder: [PH('powder-mixing', '배합 설비', false), PH('powder-packing', '충전·포장 설비', false), PH('rotary-packing', '회전형 포장', false), PH('air-shower', '에어샤워')],
+  sauce: [PH('powder-vessels', '탱크 설비', false), PH('pouch-sealing', '파우치 실링', false), PH('cup-line', '컵 포장 라인', false), PH('finished-pouch', '완제품 파우치', false)],
+  2: [PH('lab', '분석·검증 실험실'), PH('lab-work', '실험실 작업'), PH('warehouse', '재고 창고', false)],
+  1: [PH('warehouse-forklift', '지게차 운반', false), PH('warehouse', '창고 통로', false), PH('boxing', '박스 포장', false), PH('carton-sealing', '박스 봉함', false)],
+  hygiene: [PH('air-shower', '에어샤워'), PH('hygiene-entry', '위생 진입 구역')],
+};
+const FLOOR_INFO = {
+  7: ['제품 개발', '사무실·조리실·테스트키친에서 고객이 원하는 맛을 정리하고 샘플을 만들어 조정합니다.'],
+  6: ['파우더·시즈닝 생산', '손 세척과 에어샤워를 거쳐 생산 구역에 들어가 파우더·시즈닝을 배합하고 충전·포장합니다. 같은 층에 냉장·냉동·재고 창고가 있습니다.'],
+  5: ['파우더·시즈닝 생산', '6층과 같은 파우더·시즈닝 생산층입니다. 위생 진입, 배합, 충전·포장, 층별 보관이 한 층에서 이어집니다.'],
+  4: ['소스·육수 생산', '위생 진입 후 소스·육수를 생산하고 충전·포장합니다. 같은 층에 냉장·냉동·재고 창고가 있습니다.'],
+  3: ['소스·육수 생산', '4층과 같은 소스·육수 생산층입니다. 위생 진입, 생산, 충전·포장, 층별 보관이 한 층에서 이어집니다.'],
+  2: ['실험실·창고', '개발한 제품의 온도 조건에 따른 변화와 품질·안전성을 분석합니다. 같은 층에 재고 창고가 있습니다.'],
+  1: ['창고·출고', '화물엘리베이터로 내려온 완제품을 지게차로 트럭에 실어 출고합니다.'],
+};
+const SIM_NOTE = '층별 기능은 회사 설명을 따랐습니다. 설비 배치와 동선, 화면의 수치와 번호는 공정 흐름을 보여주는 시뮬레이션입니다.';
+
+// ---------- pick registry ----------
+const PICKS = [];
+function proxy(def, w, h, d, x, y, z, parent = scene) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), HIDE); m.position.set(x, y, z); m.layers.set(1); parent.add(m);
+  m.userData.pick = def; def.proxy = m; PICKS.push(def); return def;
+}
+proxy({ id: 'hq', kind: 'hq', name: '오산 HQ', keys: '본사 오산 건물' }, 47, 35, 23, 3.3, 17.5, 0);
+for (let n = 1; n <= 7; n++) proxy({ id: 'f' + n, kind: 'floor', n, name: `${n}F ${FLOOR_INFO[n][0]}`, keys: `${n}층` }, 40, HQ.H, 22, 0, fy(n) + HQ.H / 2, 0, floors[n].group);
+for (const n of [6, 5, 4, 3]) {
+  proxy({ id: 'line' + n, kind: 'line', n, name: `${n}F ${n >= 5 ? '배합·충전 라인' : '소스·육수 라인'}`, keys: '라인 설비 생산' }, 32, 3.6, 22, -4, fy(n) + 1.8, 0, floors[n].group);
+  proxy({ id: 'shower' + n, kind: 'shower', n, name: `${n}F 에어샤워`, keys: '위생 에어샤워 손세척' }, 3.2, 2.8, 4.2, 12.5, fy(n) + 1.4, 2, floors[n].group);
+  proxy({ id: 'store' + n, kind: 'store', n, name: `${n}F 냉장·냉동·재고 창고`, keys: '창고 냉장 냉동 재고' }, 16, 3, 6.6, 11.9, fy(n) + 1.5, -7.7, floors[n].group);
+}
+proxy({ id: 'kitchen', kind: 'kitchen', n: 7, name: '7F 테스트키친', keys: '조리실 테스트키친 개발' }, 21, 3.6, 22, 9, fy(7) + 1.8, 0, floors[7].group);
+proxy({ id: 'office', kind: 'office', n: 7, name: '7F 사무실', keys: '사무실 회의실' }, 18, 3.6, 22, -11, fy(7) + 1.8, 0, floors[7].group);
+proxy({ id: 'lab', kind: 'lab', n: 2, name: '2F 분석·검증 실험실', keys: '실험실 연구 분석 검증' }, 18.5, 3.6, 22, -10.8, fy(2) + 1.8, 0, floors[2].group);
+proxy({ id: 'dock', kind: 'dock', n: 1, name: '1F 상차장', keys: '도크 상차 출고 입고' }, 30, 6, 14, 7, 3, 16);
+proxy({ id: 'gate', kind: 'gate', name: '정문', keys: '게이트 신호 정문' }, 16, 6, 8, 31, 3, 43);
+proxy({ id: 'pyeongtaek', kind: 'site', name: '평택 공장', keys: '평택 공장', desc: '생산이 늘면서 확장한 공장입니다. 오산 HQ와 같은 소스·육수·시즈닝·파우더를 생산합니다.' }, 100, 22, 50, SITES.pyeongtaek.x, 11, SITES.pyeongtaek.z);
+proxy({ id: 'seoul', kind: 'site', name: '서울 사옥', keys: '서울 사옥 연구 영업', desc: '연구와 영업을 맡는 거점입니다. 삼각형 모양의 4층 건물 전체를 회사 공간으로 씁니다.' }, 38, 22, 26, SITES.seoul.x, 11, SITES.seoul.z);
+const ELEV_DEF = { id: 'elevator', kind: 'elevator', name: '화물엘리베이터', keys: '엘리베이터 화물 승강기', obj: car };
+PICKS.push(ELEV_DEF);
+const LIFT_DEFS = [{ id: 'liftA', kind: 'lift', name: '지게차 1 (출고)', keys: '지게차 출고', lift: LIFT_A }, { id: 'liftB', kind: 'lift', name: '지게차 2 (입고)', keys: '지게차 입고 원료', lift: LIFT_B }];
+PICKS.push(...LIFT_DEFS);
+const truckDef = tr => (tr.def ||= { id: 'truck:' + tr.id, kind: 'truck', name: tr.id, truck: tr });
+const defById = id => PICKS.find(d => d.id === id) || (id.startsWith('truck:') ? (t => t && truckDef(t))(TRUCKS.find(t => 'truck:' + t.id === id)) : null);
+
+// ---------- camera: glide + follow ----------
+let glide = null, followGet = null, followPrev = null, cutFloor = null, selected = null;
+const easeIO = t => (t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+function sph() { const o = camera.position.clone().sub(controls.target); const r = o.length(); return { r, theta: Math.atan2(o.x, o.z), phi: Math.acos(clamp(o.y / r, -1, 1)) }; }
+function setView(t, dist, theta, phi) {
+  controls.target.copy(t);
+  camera.position.set(t.x + dist * Math.sin(phi) * Math.sin(theta), t.y + dist * Math.cos(phi), t.z + dist * Math.sin(phi) * Math.cos(theta));
+  camera.lookAt(t);
+}
+function flyTo(target, dist, theta, phi, dur = 1.5) {
+  const s = sph();
+  const to = { target, dist, theta: s.theta + angleDelta(s.theta, theta), phi };
+  if (REDUCE) { setView(target, dist, theta, phi); controls.update(); glide = null; return; }
+  glide = { from: { target: controls.target.clone(), dist: s.r, theta: s.theta, phi: s.phi }, to, t: 0, dur };
+}
+function stepGlide(dt) {
+  if (!glide) return;
+  glide.t += dt / glide.dur;
+  const k = easeIO(Math.min(1, glide.t)), { from, to } = glide;
+  const tgt = (followGet && followPos()) || to.target;
+  const dist = Math.exp(lerp(Math.log(from.dist), Math.log(to.dist), k));
+  setView(from.target.clone().lerp(tgt, k), dist, lerp(from.theta, to.theta, k), lerp(from.phi, to.phi, k));
+  if (glide.t >= 1) { glide = null; controls.update(); followPrev = followGet ? followPos() : null; }
+}
+function followPos() { const o = followGet?.(); return o && o.parent ? o.getWorldPosition(V()).add(V(0, 1.5, 0)) : null; }
+function setCut(n) {
+  cutFloor = n;
+  for (let k = 1; k <= 7; k++) floors[k].group.visible = n == null || k <= n;
+  roofGroup.visible = towerCap.visible = n == null || n >= 7;
+  facadeChanged();
+}
+// exterior (as built) vs section view; floors peel away from the top
+let facadeMode = 'ext', facadeT = 0, facadeWasCut = false;
+const sectionOn = () => facadeMode === 'cut' || cutFloor != null;
+function facadeChanged() { const c = sectionOn(); if (c !== facadeWasCut) { facadeWasCut = c; facadeT = REDUCE ? 9 : 0; } syncFacadeSeg(); }
+function setFacade(mode) { facadeMode = mode; if (mode === 'ext' && cutFloor != null) { select(defById('hq')); return; } facadeChanged(); }
+function stepFacade(dt) {
+  facadeT += dt;
+  const cut = sectionOn();
+  for (let n = 1; n <= 7; n++) FACADE[n].visible = cut ? facadeT < (7 - n) * .07 : facadeT > (n - 1) * .07;
+  roofSlab.visible = !cut; towerSkin.visible = !cut || facadeT < .5; towerCap.visible = cut && (cutFloor == null || cutFloor >= 7);
+  FLOOR_SIGNS.forEach((s, i) => { s.visible = cut && !FACADE[i + 1].visible; });
+}
+function syncFacadeSeg() { document.querySelectorAll('#facade-seg button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.f === 'cut') === sectionOn()))); }
+const VIEWS = {
+  map: () => [V(-10, 0, 40), 820, .5, .98],
+  street: () => [V(6, 15, 6), 100, .34, 1.42],
+  hq: () => [V(12, 8, 12), 205, .6, 1.13],
+  floor: n => [V(-2, fy(n) + 1, 1.5), 74, .42, .86],
+  gate: () => [V(31, 2, 39), 62, .52, .98],
+  dock: () => [V(6, 3, 15), 70, .46, .95],
+  site: d => [d.proxy.position.clone().setY(4), d.id === 'seoul' ? 150 : 220, .5, .98],
+};
+function select(def, { fly = true, sheet = true } = {}) {
+  selected = def; followGet = null; followPrev = null;
+  if (!def) { glide = null; setCut(null); ring.visible = false; renderDetail(); markRows(); syncArea(); return; }
+  const k = def.kind;
+  if (k === 'floor') { setCut(def.n); fly && flyTo(...VIEWS.floor(def.n)); }
+  else if (['line', 'shower', 'store', 'kitchen', 'office', 'lab'].includes(k)) {
+    setCut(def.n);
+    const c = def.proxy.getWorldPosition(V());
+    fly && flyTo(c.setY(fy(def.n) + 1), k === 'shower' ? 20 : 36, .4, .84);
+  } else if (k === 'dock') { setCut(1); fly && flyTo(...VIEWS.dock()); }
+  else if (k === 'gate') { setCut(null); fly && flyTo(...VIEWS.gate()); }
+  else if (k === 'site') { setCut(null); fly && flyTo(...VIEWS.site(def)); }
+  else if (k === 'hq') { setCut(null); fly && flyTo(...VIEWS.hq()); }
+  else if (k === 'map') { setCut(null); fly && flyTo(...VIEWS.map()); }
+  else {
+    const get = k === 'truck' ? () => (TRUCKS.includes(def.truck) ? def.truck.obj : null) : k === 'lift' ? () => def.lift.obj : () => car;
+    setCut(k === 'lift' ? 1 : null);
+    followGet = get;
+    const o = get();
+    if (o && fly) flyTo(o.getWorldPosition(V()).add(V(0, 1.5, 0)), k === 'lift' ? 22 : k === 'elevator' ? 48 : 44, .5, k === 'lift' ? .8 : .92);
+  }
+  renderDetail(); markRows(); syncArea();
+  if (mqMobile.matches && sheet) setMTab('detail');
+}
+
+// ---------- ring + labels ----------
+const ring = new THREE.Mesh(new THREE.RingGeometry(1, 1.14, 56), new THREE.MeshBasicMaterial({ color: 0xff3b44, transparent: true, opacity: .95, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+ring.rotation.x = -Math.PI / 2; ring.renderOrder = 10; ring.visible = false; scene.add(ring);
+function ringAnchor(def) {
+  if (!def) return null;
+  const k = def.kind;
+  if (k === 'truck') return TRUCKS.includes(def.truck) ? [def.truck.obj.getWorldPosition(V()).setY(.2), 6] : null;
+  if (k === 'lift') return [def.lift.obj.getWorldPosition(V()).setY(fy(1) + .05), 2.2];
+  if (k === 'elevator') return [car.getWorldPosition(V()).setY(car.position.y + .05), 3.6];
+  if (['line', 'shower', 'store', 'kitchen', 'office', 'lab'].includes(k)) { const p = def.proxy.getWorldPosition(V()); const g = def.proxy.geometry.parameters; return [p.setY(fy(def.n) + .05), Math.max(g.width, g.depth) * .45]; }
+  if (k === 'gate') return [V(31, .25, 43), 7];
+  if (k === 'dock') return [V(7, .25, 16), 15];
+  return null;
+}
+const labelsEl = $('#labels');
+const AREA_LABELS = [['오산 HQ', V(3, fy(8) + 9, 0), 'hq'], ['정문', V(31, 7, 43), 'gate'], ['상차장', V(8, 7, 20), 'dock'], ['평택 공장', V(SITES.pyeongtaek.x, 24, SITES.pyeongtaek.z), 'pyeongtaek'], ['서울 사옥', V(SITES.seoul.x, 26, SITES.seoul.z), 'seoul']]
+  .map(([text, pos, id]) => { const b = document.createElement('button'); b.className = 'wlabel'; b.textContent = text; b.addEventListener('click', () => select(defById(id))); labelsEl.append(b); return { b, pos, id }; });
+const selLabel = document.createElement('div'); selLabel.className = 'wlabel sel'; labelsEl.append(selLabel);
+const _v = V();
+function project(pos, el, dy = 0) {
+  _v.copy(pos).project(camera);
+  const x = (_v.x + 1) / 2 * innerWidth, y = (1 - _v.y) / 2 * innerHeight - dy;
+  const off = _v.z > 1 || x < 0 || x > innerWidth || y < 70 || y > innerHeight;
+  el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%) translateY(-12px)`;
+  el.style.visibility = off ? 'hidden' : 'visible';
+}
+
+// ---------- dashboard ----------
+const STAGES = ['위생 진입', '생산', '충전·포장', '엘리베이터', '상차', '출고'];
+function stageIndex(b) { return b.t.ship ? 5 : b.t.load ? 4 : b.stage === '엘리베이터' || b.stage === '1F 대기' ? 3 : b.t.lift ? 3 : b.t.pack ? 2 : b.t.prod ? 1 : 0; }
+function floorProgress(c) {
+  const tIn = SHOWER_IN.len / 1.4 + 2.6 + SHOWER_OUT.len / 1.4;
+  switch (c.state) { case 'hygiene': return c.t / tIn; case 'produce': return c.t / DUR.produce; case 'pack': return c.t / DUR.pack; case 'move': return c.t / DUR.move; default: return 1; }
+}
+function pillFor(stage) {
+  const map = { '위생 진입': 'info', '생산': 'ok', '충전·포장': 'ok', '층 이동': 'info', '엘리베이터 대기': 'warn', '엘리베이터': 'info', '1F 대기': 'warn', '상차 완료': 'ok', '출고': 'red' };
+  return `<span class="pill ${map[stage] || 'mute'}">${stage}</span>`;
+}
+function truckWhere(tr) {
+  return { road: tr.toGate ? '도로 → 정문' : '도로 출발', arrive: '정문 진입', queue: '정문 대기열', toBay: '도크로 이동', dockIn: '도크 접안 중', docked: tr.bay ? (tr.kind === 'in' ? '입고 도크' : `출고 ${BAYS.indexOf(tr.bay)}번 도크`) : '도크', depart: '도크 출발', gate: '정문 신호 대기', turnOut: '출차 중' }[tr.state] || tr.state;
+}
+function truckStatus(tr) {
+  if (tr.state === 'docked') return tr.kind === 'in' ? (tr.cargo.length ? '하차 중' : '하차 완료') : tr.cargo.length >= 6 ? '상차 완료' : '상차 중';
+  if (tr.state === 'road' && !tr.toGate) return '출고';
+  if (['queue', 'gate'].includes(tr.state)) return '대기';
+  return '이동 중';
+}
+function liftStatus(L) { return L.cargo ? '운반 중' : L.leg ? '이동 중' : '대기'; }
+const stat = (k, v) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`;
+function cams(list) {
+  if (!list?.length) return '';
+  return `<div class="cams-title">현장 사진<small>회사 홍보영상 장면</small></div><div class="cams">${list.map((p, i) => `<button class="cam" data-i="${i}"><img src="${p.src}" alt="${p.cap}" loading="lazy"><span>${p.cap}</span></button>`).join('')}</div>`;
+}
+let camList = [], detailKey = '';
+function renderDetail() {
+  const d = selected;
+  let kind = '오산 HQ', title = '개발부터 출고까지', live = '', fixed = '';
+  let photos = [];
+  if (!d || d.kind === 'hq' || d.kind === 'map') {
+    const active = Object.values(FLOOR_CTRL).filter(c => ['hygiene', 'produce', 'pack', 'move'].includes(c.state)).length;
+    const docked = BAYS.filter(b => b.kind === 'out' && b.truck?.state === 'docked').length;
+    if (d?.kind === 'map') { kind = '에프앤에스식품'; title = '세 거점 한눈에 보기'; }
+    fixed = `<div class="desc">${d?.kind === 'map' ? '서울 사옥은 연구와 영업을, 오산 HQ는 개발부터 출고까지를, 평택 공장은 같은 제품군의 생산을 맡습니다.' : '7층에서 제품을 개발하고 6~3층에서 생산합니다. 포장을 마친 제품은 화물엘리베이터로 1층에 내려와 트럭에 실려 출고됩니다.'}</div>`;
+    live = `<div class="stats">${stat('생산층', `<span class="pill ok">${active}개 층 가동</span>`)}${stat('화물엘리베이터', ELEV.job ? `<span class="pill info">${ELEV_FLOOR()}F 운행</span>` : '<span class="pill mute">대기</span>')}${stat('엘리베이터 대기', `${ELEV.queue.length}건`)}${stat('출고 도크', `${docked} / 3 사용`)}${stat('정문', signal().road ? '도로 진행 신호' : '차량 출차 신호')}</div>`;
+    photos = PHOTOS.hq;
+  } else if (d.kind === 'floor' || d.kind === 'line') {
+    const n = d.n, c = FLOOR_CTRL[n];
+    kind = `오산 HQ ${n}층`; title = d.kind === 'line' ? d.name.replace(/^\dF /, '') : FLOOR_INFO[n][0];
+    fixed = `<div class="desc">${FLOOR_INFO[n][1]}</div>`;
+    if (c && c.batch) {
+      const b = c.batch;
+      live = `<div class="stats">${stat('배치', `<span class="num">${b.id}</span>`)}${stat('품목군', b.product)}${stat('공정', pillFor(b.stage))}</div><div class="prog"><i style="width:${Math.round(clamp(floorProgress(c), 0, 1) * 100)}%"></i></div><div class="stats">${stat('엘리베이터 요청', c.lobby ? `대기 ${ELEV.queue.findIndex(j => j.n === n) + 1 || '탑승'}${ELEV.queue.findIndex(j => j.n === n) >= 0 ? '번째' : ''}` : '없음')}${stat('층별 창고', '냉장 · 냉동 · 재고')}</div>`;
+    } else if (n === 1) {
+      live = `<div class="stats">${stat('대기 팔레트', `${DROP.filter(s => s.pallet).length + STAGE.filter(s => s.pallet).length}개`)}${stat('출고 도크', `${BAYS.filter(b => b.kind === 'out' && b.truck?.state === 'docked').length} / 3 사용`)}${stat('지게차', `${liftStatus(LIFT_A)} · ${liftStatus(LIFT_B)}`)}</div>`;
+    }
+    photos = PHOTOS[n >= 5 && n <= 6 ? 'powder' : n >= 3 && n <= 4 ? 'sauce' : n];
+  } else if (['shower', 'store', 'kitchen', 'office', 'lab', 'dock'].includes(d.kind)) {
+    kind = `오산 HQ ${d.n}층`; title = d.name.replace(/^\dF /, '');
+    const text = { shower: '생산층마다 제조설비 바로 앞에 위생 구역이 있습니다. 생산 구역에 들어가는 사람은 손 세척과 에어샤워를 거칩니다.', store: '생산층마다 냉장 창고, 냉동 창고, 재고 창고를 두고 원료와 생산품을 보관합니다.', kitchen: '작업대와 조리설비를 갖춘 테스트키친에서 재료를 배합하고 직접 조리하며 샘플을 만듭니다.', office: '고객과 나눈 요구를 정리하고 제품 개발 방향을 구체화합니다.', lab: '온도 조건에 따른 제품의 변화와 품질·안전성을 분석합니다.', dock: '1층 도크에서 완제품을 트럭에 싣습니다.' }[d.kind];
+    fixed = `<div class="desc">${text}</div>`;
+    if (d.kind === 'dock') live = `<div class="stats">${BAYS.map((b, i) => stat(i ? `출고 ${i}번` : '입고', b.truck ? `${b.truck.id} · ${truckStatus(b.truck)}` : '비어 있음')).join('')}</div>`;
+    photos = { shower: PHOTOS.hygiene, store: [PH('warehouse', '재고 창고', false)], kitchen: PHOTOS[7].slice(0, 2), office: PHOTOS[7].slice(2), lab: PHOTOS[2].slice(0, 2), dock: PHOTOS[1] }[d.kind];
+  } else if (d.kind === 'truck') {
+    const tr = d.truck, alive = TRUCKS.includes(tr);
+    kind = tr.kind === 'in' ? '원료 입고 트럭' : '출고 트럭'; title = tr.id;
+    live = `<div class="stats">${stat('상태', alive ? `<span class="pill ${truckStatus(tr) === '대기' ? 'warn' : 'info'}">${truckStatus(tr)}</span>` : '<span class="pill mute">화면 밖으로 이동</span>')}${stat('위치', alive ? truckWhere(tr) : '-')}${stat(tr.kind === 'in' ? '원료 팔레트' : '적재', `${tr.cargo.length} / 6`)}</div><div class="prog"><i style="width:${tr.cargo.length / 6 * 100}%"></i></div>`;
+    if (tr.kind === 'out' && tr.cargo.length) live += `<div class="stats">${stat('실은 배치', tr.cargo.map(c => c.batch?.id).filter(Boolean).slice(-3).join(', ') + (tr.cargo.length > 3 ? ' 외' : ''))}</div>`;
+  } else if (d.kind === 'lift') {
+    const L = d.lift; kind = '1F 지게차'; title = d.name;
+    live = `<div class="stats">${stat('상태', `<span class="pill ${L.cargo ? 'info' : 'mute'}">${liftStatus(L)}</span>`)}${stat('담당', L === LIFT_A ? '엘리베이터 → 출고 트럭' : '입고 트럭 → 원료 랙')}${stat('화물', L.cargo ? '팔레트 1개' : '없음')}</div>`;
+    photos = [PHOTOS[1][0]];
+  } else if (d.kind === 'elevator') {
+    kind = '오산 HQ'; title = '대형 화물엘리베이터';
+    fixed = '<div class="desc">재고와 완제품을 층 사이로 옮깁니다. 생산층에서 포장한 제품이 이 엘리베이터로 1층까지 내려옵니다.</div>';
+    live = `<div class="stats">${stat('현재 층', `${ELEV_FLOOR()}F`)}${stat('방향', ELEV.dir > 0 ? '상승' : ELEV.dir < 0 ? '하강' : '정지')}${stat('적재', ELEV.job && ['load', 'down', 'drop', 'unload'].includes(ELEV.state) ? ELEV.job.batch.id : '없음')}${stat('대기 요청', ELEV.queue.length ? ELEV.queue.map(j => j.n + 'F').join(' · ') : '없음')}</div>`;
+  } else if (d.kind === 'gate') {
+    const sg = signal(); kind = '오산 HQ'; title = '정문';
+    live = `<div class="stats">${stat('신호', sg.road ? '<span class="pill ok">도로 진행</span>' : sg.drive ? '<span class="pill warn">차량 출차</span>' : '<span class="pill mute">전환 중</span>')}${stat('진입 대기 트럭', `${TRUCKS.filter(t => t.state === 'queue' || t.state === 'arrive').length}대`)}${stat('출차 대기 트럭', `${TRUCKS.filter(t => t.state === 'gate').length}대`)}</div>`;
+  } else if (d.kind === 'site') {
+    kind = '거점'; title = d.name;
+    fixed = `<div class="desc">${d.desc}</div>`;
+  }
+  const note = d?.kind === 'site' ? '<p class="note">건물 모양은 회사 설명을 바탕으로 단순하게 표현했습니다.</p>' : `<p class="note">${SIM_NOTE}</p>`;
+  const key = (d?.id || 'none') + kind + title;
+  if (key !== detailKey) {
+    detailKey = key; camList = photos || [];
+    $('#d-kind').textContent = kind; $('#d-title').textContent = title;
+    $('#d-body').innerHTML = `${fixed}<div id="d-live">${live}</div>${cams(camList)}${note}`;
+  } else {
+    const el = $('#d-live'); if (el && el.innerHTML !== live) el.innerHTML = live;
+  }
+}
+const ELEV_FLOOR = () => clamp(Math.round((ELEV.y - HQ.F1) / HQ.H) + 1, 1, 7);
+$('#d-body').addEventListener('click', e => { const b = e.target.closest('.cam'); if (!b) return; const p = camList[+b.dataset.i]; $('#lb-img').src = p.src; $('#lb-img').alt = p.cap; $('#lb-cap').textContent = p.cap + (p.shown ? ' · 회사 홍보영상 장면' : ' · 회사 홍보영상 장면, 촬영 층 미표시'); $('#lightbox').hidden = false; });
+$('#lightbox').addEventListener('click', () => { $('#lightbox').hidden = true; });
+$('#d-close').addEventListener('click', () => select(null));
+
+function spark(el, values, max) {
+  const m = Math.max(1, max ?? Math.max(...values, 1)), w = 64, h = 28, n = values.length;
+  const pts = values.map((v, i) => `${(i / Math.max(1, n - 1)) * w},${h - (v / m) * (h - 4) - 2}`).join(' ');
+  el.innerHTML = `<polyline points="${pts}" fill="none" stroke="#ff5a61" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+}
+function updateKpis() {
+  const since = sim.clock - 3600;
+  const recent = sim.shipped.filter(s => s.time > since);
+  $('#k1').textContent = recent.reduce((a, s) => a + s.pallets, 0);
+  $('#k1-sub').textContent = `트럭 ${recent.length}대 출발`;
+  const buckets = Array.from({ length: 6 }, (_, i) => sim.shipped.filter(s => s.time > since + i * 600 && s.time <= since + (i + 1) * 600).reduce((a, s) => a + s.pallets, 0));
+  spark($('#k1-spark'), buckets);
+  const ctrls = [6, 5, 4, 3].map(n => FLOOR_CTRL[n]);
+  $('#k2').textContent = ctrls.filter(c => ['hygiene', 'produce', 'pack', 'move'].includes(c.state)).length;
+  $('#k2-bars').querySelectorAll('i').forEach((el, i) => { el.style.height = `${8 + clamp(floorProgress(ctrls[i]), 0, 1) * 22}px`; });
+  $('#k3').textContent = ELEV.queue.length;
+  $('#k3-sub').textContent = `${ELEV_FLOOR()}F · ${ELEV.dir > 0 ? '상승' : ELEV.dir < 0 ? '하강' : '정지'}${ELEV.job ? ` · ${ELEV.job.batch.id}` : ''}`;
+  spark($('#k3-spark'), sim.qHist, 4);
+}
+function trackedBatch() {
+  const d = selected;
+  if (d && (d.kind === 'floor' || d.kind === 'line') && FLOOR_CTRL[d.n]?.batch) return FLOOR_CTRL[d.n].batch;
+  if (d?.kind === 'truck' && d.truck.cargo.length) return d.truck.cargo.at(-1).batch;
+  if (d?.kind === 'elevator' && ELEV.job) return ELEV.job.batch;
+  return sim.batches.filter(b => !b.t.ship).sort((a, b) => stageIndex(b) - stageIndex(a) || a.t.hyg - b.t.hyg)[0];
+}
+const trLine = $('#tr-line');
+trLine.insertAdjacentHTML('beforeend', STAGES.map(s => `<div class="tr-step"><div class="tr-dot"></div><time class="num">--:--</time><span>${s}</span></div>`).join(''));
+function updateTracker() {
+  const b = trackedBatch(); if (!b) return;
+  const idx = stageIndex(b), times = [b.t.hyg, b.t.prod, b.t.pack, b.t.lift, b.t.load, b.t.ship];
+  $('#tr-id').textContent = b.id; $('#tr-meta').textContent = `${b.n}F · ${b.product}`;
+  trLine.querySelectorAll('.tr-step').forEach((el, i) => {
+    el.classList.toggle('done', i < idx || (i === idx && i === 5));
+    el.classList.toggle('now', i === idx && i !== 5);
+    el.querySelector('.tr-dot').textContent = i < idx ? '✓' : '';
+    el.querySelector('time').textContent = times[i] ? hhmm(times[i]) : '--:--';
+  });
+  $('#tr-fill').style.width = `${idx / 5 * 84}%`;
+  const next = STAGES[Math.min(5, idx + 1)];
+  $('#tr-eta').textContent = idx >= 5 ? hhmm(b.t.ship) : '진행 중';
+  $('#tr-eta-l').textContent = idx >= 5 ? `${b.truck} 출고` : `다음: ${next}`;
+}
+let tableTab = 'floors';
+function updateTable() {
+  let head = '', rows = '';
+  if (tableTab === 'floors') {
+    head = '<tr><th>층</th><th>기능</th><th>배치</th><th>품목군</th><th>공정</th><th>진행</th></tr>';
+    for (let n = 7; n >= 1; n--) {
+      const c = FLOOR_CTRL[n];
+      if (c?.batch) rows += `<tr data-id="f${n}"><td>${n}F</td><td>${FLOOR_INFO[n][0]}</td><td class="num">${c.batch.id}</td><td>${c.batch.product}</td><td>${pillFor(c.batch.stage)}</td><td><span class="mini"><i style="width:${Math.round(clamp(floorProgress(c), 0, 1) * 100)}%"></i></span></td></tr>`;
+      else rows += `<tr data-id="f${n}"><td>${n}F</td><td>${FLOOR_INFO[n][0]}</td><td>-</td><td>-</td><td>${n === 1 ? `<span class="pill warn">대기 팔레트 ${DROP.filter(s => s.pallet).length + STAGE.filter(s => s.pallet).length}</span>` : '<span class="pill mute">상시 운영</span>'}</td><td></td></tr>`;
+    }
+  } else if (tableTab === 'vehicles') {
+    head = '<tr><th>차량</th><th>구분</th><th>위치</th><th>상태</th><th>적재</th></tr>';
+    for (const tr of TRUCKS) if (tr.state !== 'road' || tr.toGate) rows += `<tr data-id="truck:${tr.id}"><td class="num">${tr.id}</td><td>${tr.kind === 'in' ? '원료 입고' : '출고'}</td><td>${truckWhere(tr)}</td><td>${pillFor({ '대기': '1F 대기', '이동 중': '층 이동', '상차 중': '충전·포장', '상차 완료': '상차 완료', '하차 중': '충전·포장', '하차 완료': '상차 완료', '출고': '출고' }[truckStatus(tr)]).replace(/>[^<]+<\/span>$/, `>${truckStatus(tr)}</span>`)}</td><td class="num">${tr.cargo.length} / 6</td></tr>`;
+    for (const d of LIFT_DEFS) rows += `<tr data-id="${d.id}"><td>${d.name}</td><td>지게차</td><td>1F</td><td><span class="pill ${d.lift.cargo ? 'info' : 'mute'}">${liftStatus(d.lift)}</span></td><td>${d.lift.cargo ? 1 : 0}</td></tr>`;
+    rows += `<tr data-id="elevator"><td>화물엘리베이터</td><td>승강기</td><td>${ELEV_FLOOR()}F</td><td><span class="pill ${ELEV.job ? 'info' : 'mute'}">${ELEV.job ? '운행' : '대기'}</span></td><td>${ELEV.job && ['load', 'down', 'drop', 'unload'].includes(ELEV.state) ? 1 : 0}</td></tr>`;
+  } else {
+    head = '<tr><th>배치</th><th>품목군</th><th>생산층</th><th>상차</th><th>출발</th><th>트럭</th></tr>';
+    for (const b of sim.batches.filter(b => b.t.load).slice(0, 20)) rows += `<tr data-id="${b.truck ? '' : 'dock'}"><td class="num">${b.id}</td><td>${b.product}</td><td>${b.n}F</td><td class="num">${hhmm(b.t.load)}</td><td class="num">${b.t.ship ? hhmm(b.t.ship) : '-'}</td><td>${b.truck || pillFor('상차 완료')}</td></tr>`;
+  }
+  $('#t-head').innerHTML = head; $('#t-body').innerHTML = rows;
+  $('#t-c1').textContent = '7'; $('#t-c2').textContent = TRUCKS.filter(t => t.state !== 'road' || t.toGate).length + 3; $('#t-c3').textContent = sim.batches.filter(b => b.t.load).length;
+  markRows();
+}
+function markRows() { $('#t-body').querySelectorAll('tr').forEach(r => r.classList.toggle('sel', !!selected && r.dataset.id === selected.id)); }
+$('#t-body').addEventListener('click', e => { const r = e.target.closest('tr'); const d = r && r.dataset.id && defById(r.dataset.id); if (d) select(d); });
+document.querySelectorAll('.tabs [role=tab]').forEach(b => b.addEventListener('click', () => { tableTab = b.dataset.tab; document.querySelectorAll('.tabs [role=tab]').forEach(x => x.setAttribute('aria-selected', String(x === b))); updateTable(); }));
+function updateAlerts() {
+  $('#alert-count').textContent = Math.min(99, sim.unread); $('#alert-count').hidden = sim.unread === 0;
+  if (!$('#alert-menu').hidden) $('#alert-menu').innerHTML = sim.events.slice(0, 14).map(e => `<div class="alert-row"><time class="num">${hhmm(e.time)}</time><span>${e.text}</span></div>`).join('') || '<div class="alert-row">새 알림이 없습니다</div>';
+}
+function updateClock() {
+  $('#clock').textContent = hhmm(sim.clock);
+  const day = sunUp(); document.querySelectorAll('#time-seg button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.time === 'day') === day)));
+}
+
+// ---------- menus: area, search, weather, alerts ----------
+const AREAS = [['map', '전체 지도', '3개 거점'], ['hq', '오산 HQ 전체', '7개 층'], ['f7', '7F 제품 개발', '테스트키친'], ['f6', '생산층 6~3F', '파우더·소스'], ['f2', '2F 실험실·창고', '분석·검증'], ['dock', '1F 상차장', '도크 4개'], ['gate', '정문', '신호·대기열'], ['pyeongtaek', '평택 공장', '확장 생산'], ['seoul', '서울 사옥', '연구·영업']];
+const MAP_DEF = { id: 'map', kind: 'map', name: '전체 지도' };
+function toggleMenu(btn, menu, open) {
+  const willOpen = open ?? menu.hidden;
+  document.querySelectorAll('.menu').forEach(m => { if (m !== menu) m.hidden = true; });
+  document.querySelectorAll('[aria-haspopup]').forEach(b => { if (b !== btn) b.setAttribute('aria-expanded', 'false'); });
+  menu.hidden = !willOpen; btn?.setAttribute('aria-expanded', String(willOpen));
+}
+$('#area-menu').innerHTML = AREAS.map(([id, name, sub]) => `<button data-id="${id}">${name}<small>${sub}</small></button>`).join('');
+$('#area-btn').addEventListener('click', e => { e.stopPropagation(); toggleMenu($('#area-btn'), $('#area-menu')); });
+$('#area-menu').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; toggleMenu($('#area-btn'), $('#area-menu'), false); select(b.dataset.id === 'map' ? MAP_DEF : defById(b.dataset.id)); });
+function syncArea() {
+  const d = selected; let name = '오산 HQ 전체';
+  if (!d) name = '오산 HQ 전체'; else if (d.kind === 'map') name = '전체 지도'; else if (d.kind === 'site') name = d.name; else if (d.kind === 'gate') name = '정문'; else if (d.kind === 'dock' || d.kind === 'lift') name = '1F 상차장'; else if (d.n) name = `${d.n}F ${FLOOR_INFO[d.n][0]}`;
+  $('#area-name').textContent = name;
+}
+$('#search').addEventListener('input', () => {
+  const q = $('#search').value.trim();
+  const menu = $('#search-menu');
+  if (!q) { menu.hidden = true; return; }
+  const all = [...PICKS, ...TRUCKS.filter(t => t.state !== 'road' || t.toGate).map(truckDef)];
+  const hits = all.filter(d => (d.name + ' ' + (d.keys || '')).toLowerCase().includes(q.toLowerCase())).slice(0, 8);
+  const batch = sim.batches.find(b => b.id.toLowerCase() === q.toLowerCase());
+  menu.innerHTML = (batch ? `<button data-batch="${batch.id}">${batch.id}<small>${batch.n}F · ${batch.stage}</small></button>` : '') + (hits.map(d => `<button data-id="${d.id}">${d.name}<small>${{ floor: '층', line: '설비', shower: '위생', store: '창고', truck: '트럭', lift: '지게차', elevator: '승강기', site: '거점', gate: '정문', dock: '상차장', kitchen: '7F', office: '7F', lab: '2F', hq: '건물' }[d.kind] || ''}</small></button>`).join('') || '<div class="alert-row">찾는 항목이 없습니다</div>');
+  toggleMenu(null, menu, true);
+});
+$('#search-menu').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $('#search-menu').hidden = true; $('#search').value = '';
+  if (b.dataset.batch) { const bt = sim.batches.find(x => x.id === b.dataset.batch); const tr = TRUCKS.find(t => t.cargo.some(c => c.batch === bt)); select(tr ? truckDef(tr) : bt.t.lift ? ELEV_DEF : defById('f' + bt.n)); return; }
+  select(defById(b.dataset.id));
+});
+const WEATHERS = { clear: ['맑음', 17], rain: ['비', 13], snow: ['눈', -2], fog: ['안개', 9] };
+const WICON = {
+  clear: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#f6b94a" stroke-width="2"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  rain: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#62a8ff" stroke-width="2"><path d="M7 15a5 5 0 1 1 9.6-2H17a3.5 3.5 0 0 1 0 7H7"/><path d="M9 20l-1 2M13 20l-1 2"/></svg>',
+  snow: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#dbeafe" stroke-width="2"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg>',
+  fog: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#c7cdd4" stroke-width="2"><path d="M4 9h16M2 13h20M5 17h14"/></svg>',
+};
+$('#weather-menu').innerHTML = Object.entries(WEATHERS).map(([k, [name, temp]]) => `<button data-w="${k}">${WICON[k]}${name}<small class="num">${temp}°C</small></button>`).join('');
+$('#weather-btn').addEventListener('click', e => { e.stopPropagation(); toggleMenu($('#weather-btn'), $('#weather-menu')); });
+$('#weather-menu').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; toggleMenu($('#weather-btn'), $('#weather-menu'), false); setWeather(b.dataset.w); });
+$('#alert-btn').addEventListener('click', e => { e.stopPropagation(); toggleMenu($('#alert-btn'), $('#alert-menu')); sim.unread = 0; updateAlerts(); });
+document.addEventListener('click', e => { if (!e.target.closest('.dd, .search')) document.querySelectorAll('.menu').forEach(m => { m.hidden = true; }); });
+addEventListener('keydown', e => { if (e.key === 'Escape') { document.querySelectorAll('.menu').forEach(m => { m.hidden = true; }); $('#lightbox').hidden = true; } });
+document.querySelectorAll('#time-seg button').forEach(b => b.addEventListener('click', () => warpTo(b.dataset.time === 'day' ? 13.5 : 20.5)));
+document.querySelectorAll('#facade-seg button').forEach(b => b.addEventListener('click', () => setFacade(b.dataset.f)));
+function setMTab(t) { document.body.dataset.mtab = document.body.dataset.mtab === t && t !== 'detail' ? 'none' : t; document.querySelectorAll('.mtabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === document.body.dataset.mtab))); }
+document.querySelectorAll('.mtabs button').forEach(b => b.addEventListener('click', () => { if (document.body.dataset.mtab === b.dataset.m) { document.body.dataset.mtab = 'none'; document.querySelectorAll('.mtabs button').forEach(x => x.setAttribute('aria-pressed', 'false')); } else setMTab(b.dataset.m); }));
+
+// ---------- picking ----------
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+ray.layers.enable(1);
+const shown = o => { for (let p = o; p; p = p.parent) if (!p.visible) return false; return true; };
+let down = null;
+canvas.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
+canvas.addEventListener('pointerup', e => {
+  if (!down || e.button !== 0 || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) { down = null; return; }
+  down = null;
+  ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const d = pickAt(); if (d) select(d);
+});
+function pickAt() {
+  const cands = [];
+  const dyn = [car, LIFT_A.obj, LIFT_B.obj, ...TRUCKS.map(t => t.obj)];
+  for (const h of ray.intersectObjects(dyn, true)) {
+    let o = h.object; while (o && !dyn.includes(o)) o = o.parent;
+    if (!o || !shown(o)) continue;
+    const def = o === car ? ELEV_DEF : o === LIFT_A.obj ? LIFT_DEFS[0] : o === LIFT_B.obj ? LIFT_DEFS[1] : truckDef(TRUCKS.find(t => t.obj === o));
+    cands.push({ def, pr: 4, d: h.distance }); break;
+  }
+  const focusN = cutFloor;
+  for (const h of ray.intersectObjects(PICKS.filter(p => p.proxy && shown(p.proxy)).map(p => p.proxy), false)) {
+    const def = h.object.userData.pick;
+    if (['line', 'shower', 'store', 'kitchen', 'office', 'lab'].includes(def.kind)) { if (focusN === def.n) cands.push({ def, pr: 3, d: h.distance }); }
+    else if (def.kind === 'floor') { if (selected && selected.kind !== 'map' && selected.kind !== 'site') cands.push({ def, pr: 2, d: h.distance }); }
+    else cands.push({ def, pr: def.kind === 'hq' ? 1 : 2, d: h.distance });
+  }
+  cands.sort((a, b) => b.pr - a.pr || a.d - b.d);
+  return cands[0]?.def;
+}
+controls.addEventListener('start', () => { glide = null; followGet = null; });
+
+// ---------- weather ----------
+let weather = 'clear', snowK = 0, wetK = 0, flash = 0;
+const PCOUNT = mqMobile.matches ? 2500 : 6000;
+const rainGeo = new THREE.BufferGeometry(), rainPos = new Float32Array(PCOUNT * 6);
+rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+const rain = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0xaecbe6, transparent: true, opacity: .55 }));
+const snowGeo = new THREE.BufferGeometry(), snowPos = new Float32Array(PCOUNT * 3);
+snowGeo.setAttribute('position', new THREE.BufferAttribute(snowPos, 3));
+const snow = new THREE.Points(snowGeo, new THREE.PointsMaterial({ color: 0xffffff, size: .7, transparent: true, opacity: .9, depthWrite: false }));
+rain.frustumCulled = snow.frustumCulled = false; rain.visible = snow.visible = false; scene.add(rain, snow);
+const BOX = 260, BOXH = 140;
+for (let i = 0; i < PCOUNT; i++) { const x = (rnd() - .5) * BOX, y = rnd() * BOXH, z = (rnd() - .5) * BOX; rainPos.set([x, y, z, x + .3, y + 2.2, z], i * 6); snowPos.set([x, y, z], i * 3); }
+function setWeather(w) {
+  weather = w; const [name, temp] = WEATHERS[w];
+  $('#weather-ic').innerHTML = WICON[w]; $('#weather-name').textContent = name; $('#weather-temp').textContent = `${temp}°C`;
+  rain.visible = w === 'rain'; snow.visible = w === 'snow';
+  logEvent(`날씨 변경: ${name}`);
+}
+for (const c of [P.roofGrey, P.blueRoof]) groundMat(c);
+function stepWeather(dt) {
+  snowK = clamp(snowK + (weather === 'snow' ? dt / 8 : -dt / 5), 0, 1);
+  wetK = clamp(wetK + (weather === 'rain' ? dt / 4 : -dt / 6), 0, 1);
+  const c = controls.target;
+  if (rain.visible) {
+    for (let i = 0; i < PCOUNT; i++) { let y = rainPos[i * 6 + 1] - 60 * dt; if (y < 0) y += BOXH; rainPos[i * 6 + 1] = y; rainPos[i * 6 + 4] = y + 2.2; }
+    rain.position.set(c.x, 0, c.z); rainGeo.attributes.position.needsUpdate = true;
+    if (rnd() < dt * .08) flash = 1;
+  }
+  if (snow.visible) {
+    for (let i = 0; i < PCOUNT; i++) { let y = snowPos[i * 3 + 1] - 6 * dt; if (y < 0) y += BOXH; snowPos[i * 3 + 1] = y; snowPos[i * 3] += Math.sin(sim.t + i) * dt * .6; }
+    snow.position.set(c.x, 0, c.z); snowGeo.attributes.position.needsUpdate = true;
+  }
+  flash = Math.max(0, flash - dt * 6);
+  const white = new THREE.Color(0xf4f6f8);
+  for (const m of GROUND_MATS) {
+    if (m.userData.crown) { m.emissive.setScalar(.32 * snowK); continue; }
+    m.color.copy(m.userData.base).multiplyScalar(1 - .28 * wetK).lerp(white, .82 * snowK);
+    m.roughness = .82 - .45 * wetK;
+  }
+}
+
+// ---------- time of day ----------
+const C3 = c => new THREE.Color(c);
+const SKY = { day: [C3('#6fa3d8'), C3('#b9d4ea'), C3('#e8eef2')], gold: [C3('#3f5c8e'), C3('#e09d74'), C3('#f8c08c')], night: [C3('#060a14'), C3('#111c33'), C3('#26324d')] };
+const RISE = 6.6, SET = 17.95;
+const sunUp = () => { const h = (sim.clock / 3600) % 24; return h > RISE + .1 && h < SET - .05; };
+let warp = 0;
+function warpTo(hour) { let d = hour * 3600 - (sim.clock % 86400); if (d < 0) d += 86400; warp = d; }
+function stepWarp(dt) {
+  if (warp <= 0) return;
+  const s = Math.min(warp, Math.max(600, warp * dt * 2.2));
+  warp -= s; sim.clock += s;
+  for (const r of sim.shipped) r.time += s;
+  for (const e of sim.events) e.time += s;
+  for (const b of sim.batches) for (const k in b.t) b.t[k] += s;
+}
+const _c1 = new THREE.Color(), _c2 = new THREE.Color(), _c3 = new THREE.Color();
+function stepTime() {
+  const h = (sim.clock / 3600) % 24;
+  const a = (h - RISE) / (SET - RISE);
+  const se = Math.sin(Math.PI * clamp(a, -.15, 1.15));             // sun height proxy
+  const day = clamp((se + .08) / .3, 0, 1), gold = 1 - clamp((se - .1) / .6, 0, 1);
+  const hor = _c3.copy(SKY.day[2]).lerp(SKY.gold[2], gold * day).lerp(SKY.night[2], 1 - day);
+  const azS = Math.PI * clamp(a, -.15, 1.15);
+  skyU.sunPosition.value.set(Math.cos(azS), se * .75, Math.sin(azS) * .7 + .35).normalize();
+  skyU.turbidity.value = weather === 'clear' ? 6.5 : 14; skyU.rayleigh.value = weather === 'clear' ? 1.5 : .5;
+  sky.visible = weather !== 'fog';
+  scene.background = sky.visible ? null : scene.fog.color;
+  scene.environmentIntensity = lerp(.08, .32, day);
+  const fogCol = weather === 'fog' ? _c1.set(0xc9ced3).lerp(hor, .3) : weather === 'rain' ? _c1.copy(hor).lerp(C3(0x8a96a3), .5) : hor;
+  scene.fog.color.copy(fogCol);
+  scene.fog.near = weather === 'fog' ? 60 : weather === 'rain' ? 300 : 900;
+  scene.fog.far = weather === 'fog' ? 520 : weather === 'rain' ? 1400 : 2600;
+  const az = Math.PI * clamp(a, 0, 1), elev = Math.max(.12, se) * .85;
+  const dir = day > 0 ? V(Math.cos(az), Math.sin(elev) + .15, Math.sin(az) * .7 + .35).normalize() : V(-.4, .9, .3).normalize();
+  sun.userData.dir = dir;
+  const overcast = weather === 'clear' ? 1 : weather === 'snow' ? .55 : .45;
+  sun.color.copy(_c1.set(0xfff4e6).lerp(C3(0xff9d55), gold)).lerp(C3(0x9fb4e0), 1 - day);
+  sun.intensity = (lerp(.35, lerp(3.2, 2.5, gold), day)) * overcast;
+  hemi.color.copy(_c1.set(0xd6e2ff).lerp(C3(0xffcfa8), gold * .85)).lerp(C3(0x34507e), 1 - day);
+  hemi.groundColor.set(0x8f7b63).lerp(C3(0x1c2028), 1 - day);
+  hemi.intensity = lerp(.35, .55, day) * (weather === 'clear' ? 1 : 1.3) + flash * 2.5;
+  const night = 1 - day;
+  WIN.emissiveIntensity = night * 1.1; BLUEGLASS.emissiveIntensity = night * .8; LIGHTP.emissiveIntensity = .55 + night * 1.6;
+  LAMP.emissiveIntensity = .15 + night * 3; HEAD.emissiveIntensity = .2 + night * 3; TAIL.emissiveIntensity = .2 + night * 2.2;
+  renderer.toneMappingExposure = lerp(.95, 1.0, day);
+}
+
+// ---------- layout-aware framing ----------
+function hudInsets() {
+  if (mqMobile.matches) { const top = $('.topbar').getBoundingClientRect().bottom + 80; const bot = document.body.dataset.mtab === 'none' ? 60 : innerHeight * .46 + 60; return { l: 0, r: 0, t: top, b: bot }; }
+  const r = $('#detail').getBoundingClientRect();
+  return { l: 0, r: innerWidth - r.left, t: 150, b: 230 };
+}
+function resize() {
+  document.documentElement.style.setProperty('--top', `${Math.round($('.topbar').getBoundingClientRect().bottom + 8)}px`);
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight;
+  const i = hudInsets();
+  camera.setViewOffset(innerWidth, innerHeight, (i.r - i.l) / 2, (i.b - i.t) / 2, innerWidth, innerHeight);
+  camera.updateProjectionMatrix();
+  composer?.setSize(innerWidth, innerHeight);
+}
+addEventListener('resize', resize);
+
+// ---------- loop ----------
+let hudT = 0;
+const limits = new THREE.Box3(V(-420, 0, -260), V(420, 60, 300));
+function step(dt) {
+  stepSim(dt); stepWarp(dt); stepWeather(dt); stepTime(); stepFacade(dt);
+  SHUTTERS.forEach((m, i) => { const tr = BAYS[i].truck; const o = tr && tr.state === 'docked' ? tr.doorO || 0 : 0; m.scale.y = 1 - .9 * o; m.position.y = fy(1) + 3.0 - 1.5 * m.scale.y; });
+  stepGlide(dt);
+  if (!glide && followGet) { const p = followPos(); if (p && followPrev) { const d = p.clone().sub(followPrev); controls.target.add(d); camera.position.add(d); } followPrev = p; if (!p) followGet = null; }
+  if (!glide) {
+    controls.update();
+    const c = V().copy(controls.target).clamp(limits.min, limits.max).sub(controls.target);
+    if (c.lengthSq()) { controls.target.add(c); camera.position.add(c); }
+  }
+  const t = controls.target, dist = camera.position.distanceTo(t), half = clamp(dist * .42, 45, 460);
+  sun.target.position.copy(t); sun.position.copy(t).addScaledVector(sun.userData.dir || V(0, 1, 0), 520);
+  const sc = sun.shadow.camera;
+  if (Math.abs(sc.right - half) > 2) { sc.left = -half; sc.right = half; sc.top = half; sc.bottom = -half; sc.near = 20; sc.far = 1200; sc.updateProjectionMatrix(); }
+  const ra = ringAnchor(selected);
+  ring.visible = !!ra;
+  if (ra) { ring.position.copy(ra[0]); ring.scale.setScalar(ra[1] * (1 + Math.sin(sim.t * 5) * .07)); }
+  const far = dist > 140;
+  for (const l of AREA_LABELS) { l.b.hidden = !far || (selected && selected.id === l.id); if (!l.b.hidden) project(l.pos, l.b); }
+  if (selected && selected.kind !== 'map') {
+    const a = ra ? ra[0].clone().add(V(0, selected.kind === 'truck' ? 4.4 : selected.kind === 'lift' ? 3 : selected.kind === 'elevator' ? 4.2 : 3.4, 0)) : selected.proxy ? selected.proxy.getWorldPosition(V()).add(V(0, (selected.proxy.geometry.parameters.height || 4) / 2 + 2, 0)) : null;
+    selLabel.hidden = !a;
+    if (a) { selLabel.innerHTML = `${selected.kind === 'truck' ? selected.truck.id : selected.name}<small>${selected.kind === 'truck' ? truckStatus(selected.truck) : selected.kind === 'lift' ? liftStatus(selected.lift) : selected.kind === 'elevator' ? `${ELEV_FLOOR()}F` : ''}</small>`; project(a, selLabel); }
+  } else selLabel.hidden = true;
+  hudT -= dt;
+  if (hudT <= 0) { hudT = .4; updateKpis(); updateTracker(); updateTable(); updateAlerts(); updateClock(); if (selected || !$('#d-body').innerHTML) renderDetail(); }
+  if (composer) composer.render(); else renderer.render(scene, camera);
+}
+const timer = new THREE.Clock();
+function frame() { requestAnimationFrame(frame); const dt = Math.min(.05, timer.getDelta()); if (document.hidden) return; step(dt); }
+
+// warm up: run the plant before the first frame so the yard and KPIs are already busy
+const warm0 = performance.now();
+for (let i = 0; i < 4200; i++) stepSim(.1);
+if (DEBUG) console.info('warm-up ms', Math.round(performance.now() - warm0));
+sim.unread = Math.min(sim.unread, 3);
+$('#date').textContent = new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' }).format(new Date());
+setWeather('clear'); sim.events.shift(); sim.unread = 3;
+resize();
+setView(...VIEWS.street());
+renderDetail(); updateKpis(); updateTracker(); updateTable(); updateClock();
+if (DEBUG) window.__sim = { setView, VIEWS, setFacade, step: (n = 1, dt = 1 / 30) => { for (let i = 0; i < n; i++) step(dt); }, select, defById, sim, TRUCKS, ELEV, FLOOR_CTRL, LIFT_A, LIFT_B, ROADV, camera, controls, renderer, scene, setWeather, warpTo, floors, V, get selected() { return selected; } };
+$('#loading').hidden = true;
+frame();
+setTimeout(() => select(defById('hq'), { sheet: false }), REDUCE ? 0 : 1800);
+
+</script>
+</body>
+</html>

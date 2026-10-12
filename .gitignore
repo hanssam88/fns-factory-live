@@ -1,0 +1,7 @@
+# 내부 작업 문서·참고 자료 (공개 저장소에 올리지 않음)
+AGENTS.md
+TODO.md
+reference/
+preview/*
+!preview/1-exterior.jpg
+.DS_Store
