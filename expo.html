@@ -1,0 +1,2042 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>FNS 엑스포 | 해외 식품박람회 부스 바이어 상담 라이브</title>
+<meta name="description" content="가상의 해외 식품박람회(예시)에서 에프앤에스식품 부스의 시식·바이어 상담·샘플 요청 흐름을 움직이는 3D 화면" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+:root {
+  --glass: rgba(17, 20, 27, .74);
+  --glass-hi: rgba(255, 255, 255, .07);
+  --glass-hi2: rgba(255, 255, 255, .13);
+  --line: rgba(255, 255, 255, .10);
+  --text: #f4f5f7;
+  --muted: #9aa3ae;
+  --accent: #4338ca;
+  --accent-soft: rgba(67, 56, 202, .28);
+  --ok: #37d399;
+  --warn: #f6b94a;
+  --info: #62a8ff;
+  --radius: 14px;
+  font-family: Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #20232b; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible { outline: 2px solid #ffffffcc; outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+#scene:active { cursor: grabbing; }
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .28);
+}
+
+/* top bar */
+.topbar { position: fixed; z-index: 30; top: 10px; left: 10px; right: 10px; height: 58px; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 12px; }
+.brand { display: flex; align-items: center; gap: 10px; padding-right: 6px; white-space: nowrap; }
+.logo { width: 34px; height: 34px; border-radius: 50%; background: #d2232a; display: grid; place-items: center; font: italic 700 12.5px/1 Georgia, serif; color: #fff; box-shadow: inset 0 0 0 2px #d2232a, inset 0 0 0 3.5px #fff; }
+.brand b { display: block; font-size: 15px; letter-spacing: -.2px; }
+.brand small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.search { position: relative; flex: 0 1 300px; min-width: 150px; }
+.search input { width: 100%; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--glass-hi); padding: 0 12px 0 34px; font-size: 13.5px; outline: none; }
+.search input::placeholder { color: var(--muted); }
+.search svg { position: absolute; left: 11px; top: 11px; width: 16px; height: 16px; opacity: .6; }
+.chip { height: 38px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--glass-hi); font-size: 13.5px; white-space: nowrap; }
+.chip:hover { background: var(--glass-hi2); }
+.chip.accent { background: var(--accent); border-color: transparent; font-weight: 600; }
+.chip.accent:hover { background: #4f46e5; }
+.chip small { color: var(--muted); font-size: 12px; }
+.chip .caret { opacity: .7; font-size: 10px; }
+.spacer { flex: 1; }
+.dd { position: relative; }
+.menu { position: absolute; top: 46px; right: 0; min-width: 210px; padding: 6px; z-index: 40; }
+.menu.left { left: 0; right: auto; }
+.menu button { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 10px; border: 0; border-radius: 8px; background: transparent; font-size: 13.5px; }
+.menu button:hover, .menu button[aria-selected='true'] { background: var(--glass-hi2); }
+.menu small { color: var(--muted); margin-left: auto; font-size: 12px; }
+.menu .sep { height: 1px; background: var(--line); margin: 4px 6px; }
+.clock { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; white-space: nowrap; }
+.clock b { font-size: 16px; }
+.clock small { color: var(--muted); font-size: 11.5px; }
+.sim { font-size: 11px; font-weight: 700; color: #fff; background: var(--accent); padding: 3px 7px; border-radius: 6px; letter-spacing: .2px; white-space: nowrap; }
+.icon-btn { position: relative; width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--glass-hi); display: grid; place-items: center; }
+.icon-btn svg { width: 18px; height: 18px; }
+.badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #e8333c; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.alerts-menu { width: 300px; max-height: 340px; overflow: auto; }
+.alert-row { display: flex; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; line-height: 1.4; }
+.alert-row + .alert-row { border-top: 1px solid var(--line); border-radius: 0; }
+.alert-row time { color: var(--muted); font-size: 12px; flex: 0 0 38px; }
+.seg { display: flex; padding: 3px; border-radius: 10px; background: var(--glass-hi); border: 1px solid var(--line); }
+.seg button { border: 0; background: transparent; padding: 0 13px; height: 30px; border-radius: 7px; font-size: 13px; color: var(--muted); }
+.seg button[aria-pressed='true'] { background: #fff; color: #15171c; font-weight: 600; }
+.user { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4b5563, #1f2937); display: grid; place-items: center; font-size: 12px; font-weight: 700; border: 1px solid var(--line); }
+
+/* KPI cards */
+.kpis { position: fixed; z-index: 20; top: 78px; left: 10px; display: flex; gap: 10px; }
+.kpi { width: 232px; padding: 13px 14px 12px; display: grid; grid-template-columns: 34px 1fr auto; column-gap: 11px; align-items: center; }
+.kpi .ic { width: 34px; height: 34px; border-radius: 10px; background: var(--accent-soft); display: grid; place-items: center; color: #c7d2fe; }
+.kpi .ic svg { width: 18px; height: 18px; }
+.kpi h3 { margin: 0; font-size: 12px; font-weight: 500; color: var(--muted); }
+.kpi .val { font-size: 23px; font-weight: 700; letter-spacing: -.4px; margin-top: 2px; }
+.kpi .val small { font-size: 12.5px; font-weight: 500; color: var(--muted); margin-left: 3px; }
+.kpi .sub { grid-column: 2 / 4; font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+.kpi .spark { width: 64px; height: 30px; }
+.bars { display: flex; gap: 3px; align-items: flex-end; height: 30px; }
+.bars i { width: 9px; border-radius: 2px; background: var(--accent); opacity: .9; }
+
+/* detail panel */
+.detail { position: fixed; z-index: 20; top: 78px; right: 10px; width: 340px; max-height: calc(100% - 300px); display: flex; flex-direction: column; overflow: hidden; }
+.detail-head { padding: 14px 14px 10px; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--line); }
+.detail-head .kind { font-size: 12px; color: var(--muted); }
+.detail-head h2 { margin: 2px 0 0; font-size: 19px; letter-spacing: -.3px; line-height: 1.3; }
+.detail-head .x { margin-left: auto; width: 30px; height: 30px; border-radius: 8px; border: 0; background: var(--glass-hi); font-size: 18px; line-height: 1; flex: 0 0 30px; }
+.detail-body { padding: 10px 14px 14px; overflow-y: auto; }
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--ok); background: rgba(55, 211, 153, .12); }
+.pill.warn { color: var(--warn); background: rgba(246, 185, 74, .13); }
+.pill.info { color: var(--info); background: rgba(98, 168, 255, .13); }
+.pill.red { color: #ff7b80; background: rgba(232, 51, 60, .2); }
+.pill.mute { color: var(--muted); background: var(--glass-hi); }
+.stats { display: grid; gap: 0; margin: 4px 0 6px; }
+.stat { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.stat span:first-child { color: var(--muted); }
+.stat b { font-weight: 600; text-align: right; }
+.prog { height: 6px; border-radius: 3px; background: var(--glass-hi2); overflow: hidden; margin: 6px 0 2px; }
+.prog i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.desc { font-size: 13.5px; line-height: 1.65; color: #d9dde2; margin: 10px 0 4px; word-break: keep-all; }
+.note { font-size: 11.5px; line-height: 1.55; color: var(--muted); margin: 10px 0 0; word-break: keep-all; }
+.cams-title { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 600; margin: 14px 0 8px; }
+.cams-title small { color: var(--muted); font-weight: 400; }
+.cams { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.cam { position: relative; padding: 0; border: 0; border-radius: 8px; overflow: hidden; aspect-ratio: 16 / 10; background: #000; }
+.cam img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .92; }
+.cam span { position: absolute; left: 6px; bottom: 5px; font-size: 11px; font-weight: 600; text-shadow: 0 1px 3px #000; }
+.cam:hover img { opacity: 1; }
+
+/* batch tracker */
+.tracker { position: fixed; z-index: 20; left: 10px; bottom: 10px; width: 440px; padding: 13px 16px 14px; }
+.tr-head { display: flex; align-items: center; gap: 8px; }
+.tr-head h3 { margin: 0; font-size: 14px; }
+.tr-id { font-size: 12px; font-weight: 700; background: var(--accent); padding: 3px 8px; border-radius: 6px; }
+.tr-meta { font-size: 12px; color: var(--muted); }
+.tr-eta { margin-left: auto; text-align: right; }
+.tr-eta b { display: block; font-size: 17px; color: var(--ok); }
+.tr-eta small { font-size: 11px; color: var(--muted); }
+.tr-line { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 14px; }
+.tr-line::before { content: ''; position: absolute; left: 8%; right: 8%; top: 9px; height: 2px; background: var(--glass-hi2); }
+.tr-fill { position: absolute; left: 8%; top: 9px; height: 2px; background: var(--accent); width: 0; transition: width .4s; }
+.tr-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 5px; }
+.tr-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--glass-hi2); background: #22262f; display: grid; place-items: center; font-size: 11px; }
+.tr-step.done .tr-dot { background: var(--accent); border-color: var(--accent); }
+.tr-step.now .tr-dot { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.tr-step time { font-size: 12px; font-weight: 600; }
+.tr-step span { font-size: 11px; color: var(--muted); line-height: 1.25; word-break: keep-all; }
+
+/* table */
+.table { position: fixed; z-index: 20; left: 460px; right: 360px; bottom: 10px; height: 214px; padding: 10px 12px; display: flex; flex-direction: column; }
+.tabs { display: flex; gap: 4px; align-items: center; }
+.tabs button { border: 0; background: transparent; color: var(--muted); padding: 7px 12px; border-radius: 8px; font-size: 13px; }
+.tabs button[aria-selected='true'] { background: var(--accent); color: #fff; font-weight: 600; }
+.tabs .live { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.tabs .live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(55, 211, 153, .2); }
+.tbl-wrap { overflow: auto; margin-top: 6px; flex: 1; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th { text-align: left; font-weight: 500; color: var(--muted); padding: 6px 8px; position: sticky; top: 0; background: rgba(22, 25, 32, .96); }
+td { padding: 6px 8px; border-top: 1px solid var(--line); white-space: nowrap; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--glass-hi); }
+tbody tr.sel td { background: var(--accent-soft); }
+.mini { display: inline-block; width: 70px; height: 5px; border-radius: 3px; background: var(--glass-hi2); vertical-align: middle; overflow: hidden; }
+.mini i { display: block; height: 100%; background: var(--accent); }
+
+/* world labels, selection label */
+#labels { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+.wlabel { position: absolute; left: 0; top: 0; pointer-events: auto; border: 0; padding: 5px 10px; border-radius: 8px; background: rgba(17, 20, 27, .82); font-size: 12.5px; font-weight: 600; white-space: nowrap; transform-origin: 50% 100%; }
+.wlabel::after { content: ''; position: absolute; left: 50%; top: 100%; width: 2px; height: 12px; margin-left: -1px; background: rgba(17, 20, 27, .82); }
+.wlabel.sel { background: var(--accent); pointer-events: none; }
+.wlabel.sel::after { background: var(--accent); }
+.wlabel small { display: block; font-size: 11px; font-weight: 500; opacity: .85; }
+
+.lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, .78); display: grid; place-items: center; padding: 30px; }
+.lightbox figure { margin: 0; max-width: min(1100px, 100%); }
+.lightbox img { width: 100%; border-radius: 12px; display: block; }
+.lightbox figcaption { margin-top: 10px; font-size: 13px; color: #d9dde2; }
+.loading { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: #20232b; font-size: 14px; color: var(--muted); }
+.mtabs { display: none; }
+
+@media (max-width: 1320px) { .table { display: none; } }
+@media (max-width: 1080px) { .kpi:nth-child(3) { display: none; } }
+@media (max-width: 820px) {
+  .topbar { top: 8px; left: 8px; right: 8px; height: auto; flex-wrap: wrap; padding: 8px; gap: 8px; }
+  .brand small, .clock small, .user, .search, .brand div, .chip .caret, #weather-name { display: none; }
+  .chip { padding: 0 9px; }
+  .sim { font-size: 10.5px; padding: 3px 5px; }
+  .seg button { padding: 0 9px; }
+  .brand { padding-right: 0; }
+  #area { order: 5; flex: 1 1 100%; }
+  #area .chip { width: 100%; justify-content: space-between; }
+  .chip#weather-btn small { display: none; }
+  .kpis { top: var(--top, 112px); left: 8px; right: 8px; overflow-x: auto; scrollbar-width: none; }
+  .kpi { flex: 0 0 200px; padding: 10px 12px; }
+  .kpi:nth-child(3) { display: grid; }
+  .kpi .val { font-size: 19px; }
+  .kpi .spark, .kpi .bars { display: none; }
+  .detail, .tracker, .table { left: 8px; right: 8px; width: auto; bottom: 62px; top: auto; max-height: 46vh; height: auto; display: none; }
+  body[data-mtab='detail'] .detail { display: flex; }
+  body[data-mtab='tracker'] .tracker { display: block; }
+  body[data-mtab='table'] .table { display: flex; height: 46vh; }
+  .mtabs { position: fixed; z-index: 25; left: 8px; right: 8px; bottom: 8px; display: flex; gap: 4px; padding: 5px; }
+  .mtabs button { flex: 1; border: 0; background: transparent; color: var(--muted); height: 38px; border-radius: 9px; font-size: 13px; }
+  .mtabs button[aria-pressed='true'] { background: var(--accent); color: #fff; font-weight: 600; }
+  .tr-step span { font-size: 10.5px; }
+}
+@media (prefers-reduced-motion: reduce) { .tr-fill { transition: none; } }
+
+/* sauce101 run additions */
+.menu a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; color: inherit; text-decoration: none; }
+.menu a:hover { background: var(--glass-hi2); }
+#area-menu { max-height: calc(100vh - 140px); overflow: auto; }
+.menu a small { color: var(--muted); margin-left: auto; font-size: 12px; }
+.bars i { width: 9px; }
+.tr-head h3 { white-space: nowrap; }
+.ch { display: inline-flex; align-items: center; gap: 6px; }
+.ch::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.legend { position: fixed; z-index: 20; top: 182px; left: 10px; display: flex; gap: 12px; padding: 7px 12px; font-size: 12px; color: var(--muted); }
+@media (max-width: 820px) { .legend { display: none; } }
+.seg#lang-seg button { padding: 0 10px; white-space: nowrap; }
+.tr-eta b { white-space: nowrap; }
+.user, .icon-btn { flex: 0 0 auto; }
+.facts { margin: 8px 0 2px; padding: 0; list-style: none; font-size: 12.5px; line-height: 1.55; color: #d9dde2; }
+.facts li { display: flex; gap: 8px; padding: 3px 0; }
+.facts time { color: var(--muted); flex: 0 0 52px; }
+.cc { display: inline-block; min-width: 26px; padding: 1px 5px; border-radius: 5px; background: var(--glass-hi2); font-size: 11px; font-weight: 700; text-align: center; }
+</style>
+<script>
+// early error capture for ?debug&selftest (module errors would otherwise leave no output)
+window.__errs = [];
+addEventListener('error', e => { __errs.push(String(e.message || e.error || e)); const p = document.getElementById('selftest'); if (p && /selftest/.test(location.search) && !p.dataset.done) p.textContent = JSON.stringify({ fatal: true, errors: __errs }); });
+addEventListener('unhandledrejection', e => { __errs.push('rejection: ' + (e.reason && e.reason.message || e.reason)); });
+</script>
+</head>
+<body data-mtab="none">
+<canvas id="scene" aria-label="가상의 해외 식품박람회 전시장에서 참관객이 입장 게이트를 지나 에프앤에스식품 부스에서 시식하고 상담 테이블에 앉아 명함을 교환하고 샘플을 요청하는 3D 화면"></canvas>
+<div id="labels"></div>
+
+<header class="topbar glass">
+  <div class="brand"><span class="logo" aria-hidden="true">F&amp;S</span><div><b>FNS 엑스포</b><small data-i="brandSub">해외 식품박람회 부스 상담</small></div></div>
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="search" type="search" placeholder="바이어, 국가, 구역 검색" autocomplete="off" aria-label="바이어, 국가, 구역 검색" />
+    <div class="menu left glass" id="search-menu" hidden></div>
+  </div>
+  <div class="dd" id="area">
+    <button class="chip accent" id="area-btn" aria-haspopup="true" aria-expanded="false"><span id="area-name">전체 지도</span><span class="caret">▼</span></button>
+    <div class="menu left glass" id="area-menu" hidden></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="dd">
+    <button class="chip" id="weather-btn" aria-haspopup="true" aria-expanded="false" aria-label="박람회 일정 모드"><span id="weather-ic"></span><b id="weather-temp">D1 오픈</b><small id="weather-name">방문 ×1.0</small><span class="caret">▼</span></button>
+    <div class="menu glass" id="weather-menu" hidden></div>
+  </div>
+  <div class="clock"><b class="num" id="clock">14:00</b><small id="date"></small></div>
+  <span class="sim" data-i="sim">시뮬레이션</span>
+  <div class="dd">
+    <button class="icon-btn" id="alert-btn" aria-label="알림" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="badge num" id="alert-count">0</span>
+    </button>
+    <div class="menu glass alerts-menu" id="alert-menu" hidden></div>
+  </div>
+  <div class="seg" id="facade-seg" role="group" aria-label="건물 보기"><button data-f="ext" aria-pressed="true" data-i="ext">외관</button><button data-f="cut" aria-pressed="false" data-i="cut">단면</button></div>
+  <div class="seg" id="time-seg" role="group" aria-label="낮과 밤"><button data-time="day" aria-pressed="true" data-i="day">낮</button><button data-time="night" aria-pressed="false" data-i="night">밤</button></div>
+  <div class="seg" id="lang-seg" role="group" aria-label="언어"><button data-l="ko" aria-pressed="true">한국어</button><button data-l="en" aria-pressed="false">EN</button></div>
+  <div class="user" title="운영실" data-i="user">운영</div>
+</header>
+
+<section class="kpis" aria-label="주요 지표">
+  <article class="kpi glass">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.5a3 3 0 0 1 0 6M21 20c0-2.8-1.8-5-4.2-5.8"/></svg></span>
+    <div><h3 data-i="k1">부스 방문자</h3><div class="val num"><span id="k1">0</span><small data-i="unitPpl">명</small></div></div>
+    <svg class="spark" id="k1-spark" viewBox="0 0 64 30"></svg>
+    <div class="sub num" id="k1-sub">-</div>
+  </article>
+  <article class="kpi glass">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span>
+    <div><h3 data-i="k2">상담 건수</h3><div class="val num"><span id="k2">0</span><small data-i="unitCase">건</small></div></div>
+    <svg class="spark" id="k2-spark" viewBox="0 0 64 30"></svg>
+    <div class="sub num" id="k2-sub">-</div>
+  </article>
+  <article class="kpi glass">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span>
+    <div><h3 data-i="k3">샘플 요청</h3><div class="val num"><span id="k3">0</span><small data-i="unitCase">건</small></div></div>
+    <div class="bars" id="k3-bars"><i></i><i></i><i></i><i></i></div>
+    <div class="sub" id="k3-sub">-</div>
+  </article>
+</section>
+
+<aside class="detail glass" id="detail" aria-live="polite">
+  <div class="detail-head">
+    <div><div class="kind" id="d-kind">FNS 엑스포</div><h2 id="d-title">박람회 부스 흐름</h2></div>
+    <button class="x" id="d-close" aria-label="선택 해제">×</button>
+  </div>
+  <div class="detail-body" id="d-body"></div>
+</aside>
+
+<section class="tracker glass" id="tracker" aria-label="바이어 트래커">
+  <div class="tr-head">
+    <h3 data-i="tracker">바이어 트래커</h3><span class="tr-id num" id="tr-id">-</span><span class="tr-meta" id="tr-meta"></span>
+    <div class="tr-eta"><b class="num" id="tr-eta">--:--</b><small id="tr-eta-l"></small></div>
+  </div>
+  <div class="tr-line" id="tr-line"><div class="tr-fill" id="tr-fill"></div></div>
+</section>
+
+<section class="table glass" id="table" aria-label="실시간 현황표">
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="buyers" aria-selected="true"><span data-i="tabBuyers">바이어</span> <span class="num" id="t-c1"></span></button>
+    <button role="tab" data-tab="samples" aria-selected="false"><span data-i="tabSamples">샘플</span> <span class="num" id="t-c2"></span></button>
+    <button role="tab" data-tab="sched" aria-selected="false"><span data-i="tabSched">일정</span> <span class="num" id="t-c3"></span></button>
+    <span class="live" data-i="live">실시간 시뮬레이션</span>
+  </div>
+  <div class="tbl-wrap"><table><thead id="t-head"></thead><tbody id="t-body"></tbody></table></div>
+</section>
+
+<nav class="mtabs glass" aria-label="정보 보기">
+  <button data-m="detail" aria-pressed="false" data-i="mDetail">상세</button>
+  <button data-m="tracker" aria-pressed="false" data-i="mTracker">트래커</button>
+  <button data-m="table" aria-pressed="false" data-i="mTable">현황표</button>
+</nav>
+
+<div class="loading" id="loading">전시장 문을 열고 있습니다</div>
+<pre id="selftest" hidden></pre>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+/* ================================================================
+   0. basics
+   ================================================================ */
+const DEBUG = new URLSearchParams(location.search).has('debug');
+const $ = s => document.querySelector(s);
+const mqMobile = matchMedia('(max-width: 820px)');
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => (t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+let seed = 20261014;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const angleDelta = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
+
+const canvas = $('#scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.AgXToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(28, innerWidth / innerHeight, 2, 5000);
+const controls = new OrbitControls(camera, canvas);
+controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE };
+controls.screenSpacePanning = false;
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.minDistance = 22; controls.maxDistance = 1100;
+controls.minPolarAngle = .3; controls.maxPolarAngle = 1.45;
+
+// physical sky, image-based reflections, fog for aerial perspective
+const sky = new Sky(); sky.scale.setScalar(2200); scene.add(sky);
+const skyU = sky.material.uniforms;
+skyU.turbidity.value = 6.5; skyU.rayleigh.value = 1.5; skyU.mieCoefficient.value = .006; skyU.mieDirectionalG.value = .83;
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .5;
+scene.fog = new THREE.Fog(0xf3b58c, 900, 2600);
+// desktop: ambient occlusion pass for contact shadows
+const USE_POST = !mqMobile.matches;
+let composer = null, gtao = null;
+if (USE_POST) {
+  composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType, samples: 4 }));
+  composer.addPass(new RenderPass(scene, camera));
+  gtao = new GTAOPass(scene, camera, innerWidth, innerHeight);
+  gtao.blendIntensity = .9;
+  gtao.updateGtaoMaterial({ radius: 1.4, distanceExponent: 1.4, thickness: 1.2, scale: 1, samples: 12, distanceFallOff: 1, screenSpaceRadius: false });
+  gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 5, radiusExponent: 1, rings: 2, samples: 12 });
+  composer.addPass(gtao);
+  composer.addPass(new OutputPass());
+}
+const hemi = new THREE.HemisphereLight(0xd6e2ff, 0x8f7b63, 1.0);
+const sun = new THREE.DirectionalLight(0xffc690, 3.0);
+sun.castShadow = true;
+sun.shadow.mapSize.set(mqMobile.matches ? 1024 : 4096, mqMobile.matches ? 1024 : 4096);
+sun.shadow.bias = -.0004; sun.shadow.normalBias = .5;
+scene.add(hemi, sun, sun.target);
+
+/* ================================================================
+   1. palette, materials, static geometry baking
+   ================================================================ */
+const P = {
+  ground: 0xe6ddcd, lawn: 0xb3c495, lawn2: 0x9db480, field: 0xcfc39a, asphalt: 0x5b6169, asphalt2: 0x6c727a,
+  line: 0xf3efe4, yellow: 0xf1bf4c, concrete: 0xd8d3c9, pave: 0xcfc8bb,
+  facade: 0xdcdedc, facade2: 0xb8bdbf, white: 0xf7f6f2, steel: 0xcdd3d6, steel2: 0x8c969c,
+  black: 0x2b2f34, red: 0xd2232a, red2: 0x9c1a20, wood: 0xc99f6c, kraft: 0xcfa874, sack: 0xeae2cf,
+  teal: 0x3fa3a0, blueRoof: 0x4f80b6, roofGrey: 0xa9afb3, belt: 0x3e8e5a, cold: 0x8ec5de, frozen: 0x4f86b8,
+  tree: 0x6f9a57, tree2: 0x547f45, trunk: 0x86664b, skin: 0xe2bb98, suit: 0xf3f3ef, navy: 0x34495e, orange: 0xf08a24,
+};
+const matCache = new Map();
+function M(color, o = {}) {
+  const key = color + JSON.stringify(o);
+  if (!matCache.has(key)) matCache.set(key, new THREE.MeshStandardMaterial({ color, roughness: .82, metalness: 0, ...o }));
+  return matCache.get(key);
+}
+const GLASS = new THREE.MeshStandardMaterial({ color: 0xa9cbd8, transparent: true, opacity: .3, roughness: .08, metalness: .2, depthWrite: false });
+const WIN = new THREE.MeshStandardMaterial({ color: 0x1c2832, roughness: .1, metalness: .65, emissive: 0xffc27a, emissiveIntensity: 0 });
+const ENTRY_GLASS = new THREE.MeshStandardMaterial({ color: 0x6f8798, transparent: true, opacity: .42, roughness: .05, metalness: .5, depthWrite: false });
+const BLUEGLASS = new THREE.MeshStandardMaterial({ color: 0x2c5d97, roughness: .05, metalness: .75, emissive: 0xffd9a0, emissiveIntensity: 0 });
+const LIGHTP = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff2dc, emissiveIntensity: .6 });
+const LAMP = new THREE.MeshStandardMaterial({ color: 0xfff1d0, emissive: 0xffd590, emissiveIntensity: .2 });
+const HEAD = new THREE.MeshStandardMaterial({ color: 0xfffbe8, emissive: 0xfff2c4, emissiveIntensity: .2 });
+const TAIL = new THREE.MeshStandardMaterial({ color: 0xc0262c, emissive: 0xff2a2a, emissiveIntensity: .2 });
+const HIDE = new THREE.MeshBasicMaterial({ visible: false });
+// materials whose colour shifts with snow / rain
+const GROUND_MATS = [];
+function groundMat(color) { const m = M(color); if (!GROUND_MATS.includes(m)) { m.userData.base = m.color.clone(); GROUND_MATS.push(m); } return m; }
+function canvasTex(size, draw) {
+  const c = document.createElement('canvas'); c.width = c.height = size; draw(c.getContext('2d'), size);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+}
+function speckle(g, s, base, amp, n, rmax = 2) {
+  g.fillStyle = base; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < n; i++) { const v = (rnd() - .5) * amp; g.fillStyle = v > 0 ? `rgba(255,255,255,${v})` : `rgba(0,0,0,${-v})`; const r = .6 + rnd() * rmax; g.fillRect(rnd() * s, rnd() * s, r, r); }
+}
+const TEX = {
+  asphalt: canvasTex(512, (g, s) => speckle(g, s, '#62676e', .28, 30000, 1.6)),
+  concrete: canvasTex(512, (g, s) => { speckle(g, s, '#cdc8bd', .14, 16000, 2); g.strokeStyle = 'rgba(80,75,68,.35)'; g.lineWidth = 3; g.strokeRect(0, 0, s, s); }),
+  grass: canvasTex(512, (g, s) => { speckle(g, s, '#8ea56c', .3, 36000, 2.2); for (let i = 0; i < 70; i++) { g.fillStyle = rnd() > .5 ? 'rgba(70,90,40,.10)' : 'rgba(190,190,120,.10)'; g.beginPath(); g.arc(rnd() * s, rnd() * s, 12 + rnd() * 50, 0, 7); g.fill(); } }),
+  panel: canvasTex(512, (g, s) => {               // composite metal panels, 1.2 m x 0.6 m, light joints
+    const cw = s / 2, ch = s / 4;
+    for (let i = 0; i < 2; i++) for (let j = 0; j < 4; j++) {
+      g.fillStyle = `hsl(214, 14%, ${33 + rnd() * 4}%)`; g.fillRect(i * cw, j * ch, cw, ch);
+      const gr = g.createLinearGradient(0, j * ch, 0, (j + 1) * ch); gr.addColorStop(0, 'rgba(255,255,255,.07)'); gr.addColorStop(1, 'rgba(0,0,0,.07)'); g.fillStyle = gr; g.fillRect(i * cw, j * ch, cw, ch);
+    }
+    g.fillStyle = '#8b95a0'; for (let i = 0; i <= 2; i++) g.fillRect(i * cw - 2, 0, 4, s); for (let j = 0; j <= 4; j++) g.fillRect(0, j * ch - 2, s, 4);
+  }),
+  ribs: canvasTex(256, (g, s) => { g.fillStyle = '#dcdfe0'; g.fillRect(0, 0, s, s); for (let x = 0; x < s; x += 16) { g.fillStyle = '#c1c6c9'; g.fillRect(x, 0, 3, s); g.fillStyle = '#f1f2f3'; g.fillRect(x + 3, 0, 2, s); } }),
+  apt: canvasTex(256, (g, s) => {
+    g.fillStyle = '#ecebe6'; g.fillRect(0, 0, s, s);
+    g.fillStyle = '#74879a'; g.fillRect(s * .08, s * .16, s * .84, s * .56);
+    g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(s * .08, s * .16, s * .84, s * .1);
+    g.fillStyle = '#cfcdc6'; g.fillRect(s * .49, s * .16, s * .02, s * .56); g.fillRect(0, s * .76, s, s * .07);
+  }),
+  roof: canvasTex(256, (g, s) => speckle(g, s, '#a4a8a6', .2, 9000, 1.5)),
+};
+function tiled(tex, tile, o = {}) { const m = new THREE.MeshStandardMaterial({ map: tex, roughness: .9, ...o }); m.userData.tile = tile; return m; }
+const MAT = {
+  asphalt: tiled(TEX.asphalt, 7, { roughness: .95 }),
+  yard: tiled(TEX.asphalt, 7, { color: 0xd8d8d8, roughness: .95 }),
+  concrete: tiled(TEX.concrete, 4),
+  grass: tiled(TEX.grass, 12, { roughness: .98 }),
+  field: tiled(TEX.grass, 16, { color: 0xf6f1e7, roughness: .98 }),
+  panel: tiled(TEX.panel, 2.4, { roughness: .4, metalness: .35 }),
+  panelDark: tiled(TEX.panel, 2.4, { color: 0x9aa2ab, roughness: .4, metalness: .35 }),
+  ribs: tiled(TEX.ribs, 2.4, { roughness: .6, metalness: .15 }),
+  apt: tiled(TEX.apt, 3.0, { roughness: .8 }),
+  roof: tiled(TEX.roof, 6),
+};
+for (const m of [MAT.asphalt, MAT.yard, MAT.concrete, MAT.grass, MAT.field, MAT.roof]) { m.userData.base = m.color.clone(); GROUND_MATS.push(m); }
+// layered ground surfaces sit a few cm apart; bias the upper ones so distant views do not flicker
+[[MAT.concrete, 1], [MAT.yard, 2], [MAT.asphalt, 3]].forEach(([m, k]) => Object.assign(m, { polygonOffset: true, polygonOffsetFactor: -k, polygonOffsetUnits: -k * 2 }));
+function planarUV(g, t) {
+  const p = g.attributes.position, n = g.attributes.normal, uv = g.attributes.uv;
+  for (let i = 0; i < p.count; i++) {
+    const ax = Math.abs(n.getX(i)), ay = Math.abs(n.getY(i)), az = Math.abs(n.getZ(i));
+    if (ay >= ax && ay >= az) uv.setXY(i, p.getX(i) / t, p.getZ(i) / t);
+    else if (ax >= az) uv.setXY(i, p.getZ(i) / t, p.getY(i) / t);
+    else uv.setXY(i, p.getX(i) / t, p.getY(i) / t);
+  }
+}
+
+const UNIT = {
+  box: new THREE.BoxGeometry(1, 1, 1).toNonIndexed(),
+  cyl: new THREE.CylinderGeometry(1, 1, 1, 14).toNonIndexed(),
+  cyl8: new THREE.CylinderGeometry(1, 1, 1, 8).toNonIndexed(),
+  cone: new THREE.CylinderGeometry(0, 1, 1, 9).toNonIndexed(),
+  sph: new THREE.SphereGeometry(1, 14, 10).toNonIndexed(),
+};
+const layers = new Map();
+let LAYER = 'world', OY = 0;
+const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = V(), _s = V();
+function put(geo, mat, x, y, z, sx, sy, sz, ry = 0, rx = 0, rz = 0) {
+  const g = geo.clone();
+  g.applyMatrix4(_m4.compose(_p.set(x, y + OY, z), _q.setFromEuler(_e.set(rx, ry, rz)), _s.set(sx, sy, sz)));
+  if (mat.userData.tile) planarUV(g, mat.userData.tile);
+  let L = layers.get(LAYER); if (!L) layers.set(LAYER, L = new Map());
+  let list = L.get(mat); if (!list) L.set(mat, list = []);
+  list.push(g);
+}
+// base-anchored primitives: y is the bottom
+const box = (w, h, d, x, y, z, c, ry = 0) => put(UNIT.box, c.isMaterial ? c : M(c), x, y + h / 2, z, w, h, d, ry);
+const cyl = (r, h, x, y, z, c, seg = 'cyl') => put(UNIT[seg], c.isMaterial ? c : M(c), x, y + h / 2, z, r, h, r);
+const cone = (r, h, x, y, z, c) => put(UNIT.cone, c.isMaterial ? c : M(c), x, y + h / 2, z, r, h, r);
+const ball = (r, x, y, z, c, sy = 1) => put(UNIT.sph, c.isMaterial ? c : M(c), x, y, z, r, r * sy, r);
+function bake(name, parent = scene, { shadow = true } = {}) {
+  const L = layers.get(name); const g = new THREE.Group(); g.name = name;
+  if (L) for (const [mat, list] of L) {
+    const geo = mergeGeometries(list, false); list.forEach(x => x.dispose());
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = shadow && !mat.transparent; mesh.receiveShadow = true;
+    g.add(mesh);
+  }
+  layers.delete(name); parent.add(g); return g;
+}
+// dynamic-mesh helpers (individual meshes inside a group)
+function mbox(parent, w, h, d, x, y, z, c, ry = 0) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), c.isMaterial ? c : M(c));
+  m.position.set(x, y + h / 2, z); m.rotation.y = ry; m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+function mcyl(parent, r, h, x, y, z, c, seg = 14) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), c.isMaterial ? c : M(c));
+  m.position.set(x, y + h / 2, z); m.castShadow = true; parent.add(m); return m;
+}
+function group(parent = scene, x = 0, y = 0, z = 0, ry = 0) { const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; parent.add(g); return g; }
+
+// text planes (signs) and the F&S mark
+function textTexture(text, { w = 1024, h = 256, bg = null, fg = '#fff', size = 150, weight = 700, font = 'Pretendard, "Apple SD Gothic Neo", sans-serif', italic = false } = {}) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d');
+  if (bg) { x.fillStyle = bg; x.fillRect(0, 0, w, h); }
+  x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${font}`; x.fillText(text, w / 2, h / 2 + size * .04);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function sign(parent, text, w, h, x, y, z, { ry = 0, rx = 0, bg = '#d2232a', fg = '#fff', size } = {}) {
+  const px = 1024, ph = Math.round(1024 * h / w);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: textTexture(text, { w: px, h: ph, bg, fg, size: size ?? Math.round(ph * .62) }), transparent: !bg, toneMapped: false }));
+  m.position.set(x, y, z); m.rotation.set(rx, ry, 0); parent.add(m); return m;
+}
+let logoMat;
+function logo(parent, d, x, y, z, ry = 0) {
+  if (!logoMat) {
+    const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+    g.fillStyle = '#d2232a'; g.beginPath(); g.arc(256, 256, 252, 0, 7); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 12; g.beginPath(); g.arc(256, 256, 222, 0, 7); g.stroke();
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = 'italic 700 196px Georgia, serif'; g.fillText('F&S', 256, 268);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    logoMat = new THREE.MeshBasicMaterial({ map: t, transparent: true, toneMapped: false });
+  }
+  const m = new THREE.Mesh(new THREE.CircleGeometry(d / 2, 48), logoMat); m.position.set(x, y, z); m.rotation.y = ry; parent.add(m); return m;
+}
+
+
+/* ================================================================
+   2. world: exhibition hall (cut-away roof), entrance plaza, shuttle stops and parking on one loop road
+   ================================================================ */
+Object.assign(P, { indigo: 0x4338ca, indigo2: 0x312e81, warm: 0xf4efe6, hallFloor: 0xe7e2d8, carpet: 0x59606b, plaza: 0xe6ded0, chair: 0x3f4652, table: 0xf5f3ee });
+const _col = new THREE.Color();
+const PAINT = c => M(c, { polygonOffset: true, polygonOffsetFactor: -8, polygonOffsetUnits: -16 });
+const paintSign = m => { Object.assign(m.material, { polygonOffset: true, polygonOffsetFactor: -8, polygonOffsetUnits: -16 }); return m; };
+const LOOP_R = { x0: -150, x1: 150, z0: -84, z1: 92, r: 24 };
+// warm white ground for the backdrop and a pale lawn inside the loop
+const TEX_WARM = canvasTex(512, (g, s) => speckle(g, s, '#efeadf', .1, 22000, 2));
+MAT.field.map = TEX_WARM; MAT.field.color.set(0xfbf7ef);
+MAT.grass.map = TEX_WARM; MAT.grass.color.set(0xe6ead7);
+function rrect({ x0, x1, z0, z1, r }, step = 4) {
+  const pts = [], arc = (cx, cz, a0) => { for (let k = 1; k < 8; k++) { const a = a0 + k / 8 * Math.PI / 2; pts.push([cx + Math.cos(a) * r, cz + Math.sin(a) * r]); } };
+  for (let x = x0 + r; x <= x1 - r + .01; x += step) pts.push([x, z0]);          // top, eastbound
+  arc(x1 - r, z0 + r, -Math.PI / 2);
+  for (let z = z0 + r; z <= z1 - r + .01; z += step) pts.push([x1, z]);           // right, southbound
+  arc(x1 - r, z1 - r, 0);
+  for (let x = x1 - r; x >= x0 + r - .01; x -= step) pts.push([x, z1]);           // bottom, westbound
+  arc(x0 + r, z1 - r, Math.PI / 2);
+  for (let z = z1 - r; z >= z0 + r - .01; z -= step) pts.push([x0, z]);           // left, northbound
+  arc(x0 + r, z0 + r, Math.PI);
+  return pts;
+}
+const roadCurve = new THREE.CatmullRomCurve3(rrect(LOOP_R).map(([x, z]) => V(x, 0, z)), true, 'centripetal');
+const ROAD_LEN = roadCurve.getLength();
+// lanes: one-way paths that vehicles follow with gap keeping
+class Lane {
+  constructor(points, { closed = false, vmax = 7, name = '' } = {}) {
+    const clean = [points[0]];
+    for (const p of points.slice(1)) { const q = clean.at(-1); if (Math.hypot(p[0] - q[0], p[1] - q[1]) > .25) clean.push(p); }
+    this.closed = closed; this.vmax = vmax; this.name = name;
+    this.curve = new THREE.CatmullRomCurve3(clean.map(([x, z]) => V(x, 0, z)), closed, 'centripetal');
+    this.len = this.curve.getLength();
+  }
+  wrap(s) { return this.closed ? ((s % this.len) + this.len) % this.len : s; }
+  ahead(from, to) { return this.closed ? (((to - from) % this.len) + this.len) % this.len : to - from; }
+  pose(s, out) { const u = this.closed ? this.wrap(s) / this.len : clamp(s / this.len, 0, 1); this.curve.getPointAt(u, out.p); this.curve.getTangentAt(u, out.t); return out; }
+  at(s) { this.pose(s, _pose); return [_pose.p.x, _pose.p.z, _pose.t.x, _pose.t.z]; }
+}
+const _pose = { p: V(), t: V() };
+function nearestS(lane, x, z) { let best = 0, bd = Infinity; for (let s = 0; s <= lane.len; s += .5) { lane.pose(s, _pose); const d = (_pose.p.x - x) ** 2 + (_pose.p.z - z) ** 2; if (d < bd) { bd = d; best = s; } } return best; }
+function roundPts(pts, r = 1.6) {
+  const out = [pts[0]];
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [ax, az] = pts[i - 1], [px, pz] = pts[i], [bx, bz] = pts[i + 1];
+    const la = Math.hypot(px - ax, pz - az), lb = Math.hypot(bx - px, bz - pz);
+    if (la < .05 || lb < .05) continue;
+    const ra = Math.min(r, la / 2), rb = Math.min(r, lb / 2);
+    out.push([px - (px - ax) / la * ra, pz - (pz - az) / la * ra], [px + (bx - px) / lb * rb, pz + (bz - pz) / lb * rb]);
+  }
+  out.push(pts.at(-1)); return out;
+}
+// the loop lane runs 1.9 m to the right of the road centre (inside of the loop)
+const LOOP = new Lane(Array.from({ length: Math.ceil(ROAD_LEN / 2) }, (_, i) => { const u = i * 2 / ROAD_LEN, p = roadCurve.getPointAt(u), t = roadCurve.getTangentAt(u); return [p.x - t.z * 1.9, p.z + t.x * 1.9]; }), { closed: true, vmax: 10, name: '순환 도로' });
+
+// service roads of each zone: they leave the loop (right turn) and rejoin further on
+// each service road leaves the loop with a short taper, runs its own course and tapers back in;
+// vehicles wait at a stop line 4 m clear of the loop lane before joining
+const inward = (s, d) => { const [x, z, tx, tz] = LOOP.at(s); return [x - tz * d, z + tx * d]; };
+function zone(id, name, exitXZ, interior, joinXZ, r, laneName) {
+  const exitS = nearestS(LOOP, ...exitXZ), joinS = nearestS(LOOP, ...joinXZ);
+  const lane = new Lane([LOOP.at(exitS).slice(0, 2), inward(exitS + 5, 1.2), inward(exitS + 9, 3.8), ...roundPts(interior, r), inward(joinS - 10, 4.2), inward(joinS - 5, 1.6), LOOP.at(joinS).slice(0, 2)], { vmax: 6, name: laneName });
+  return { id, name, lane, exitS, joinS, stopS: nearestS(lane, ...inward(joinS - 10, 4.2)) };
+}
+// parking: leaves the south road westbound, runs north past three bays and rejoins further west
+const ZONES = { park: zone('park', '주차장', [-58, 90.1], [[-74, 84.5], [-86, 76], [-86, 6], [-104, 6], [-104, 76], [-110, 82.5]], [-125, 90.1], 6, '주차장 진입로') };
+// pockets: bays beside a lane where a vehicle can stop while others pass
+const POCKETS = [];
+function mkPocket(host, x0, z0, x1, z1, side, name, stopFrac = .5) {
+  const s0 = nearestS(host, x0, z0), s1 = nearestS(host, x1, z1);
+  const span = host.ahead(s0, s1), pts = [host.at(s0).slice(0, 2)];
+  for (let d = 5; d <= span - 5; d += 1.5) { const [x, z, tx, tz] = host.at(s0 + d); pts.push([x - tz * 3.4 * side, z + tx * 3.4 * side]); }
+  pts.push(host.at(s0 + span).slice(0, 2));
+  const P = { host, s0, s1: host.wrap(s0 + span), side, name, lane: new Lane(pts, { vmax: 4, name }), veh: null };
+  const [mx, mz] = host.at(s0 + span * stopFrac), [, , tx, tz] = host.at(s0 + span * stopFrac);
+  P.stop = [mx - tz * 3.4 * side, mz + tx * 3.4 * side];
+  P.stopS = nearestS(P.lane, P.stop[0], P.stop[1]);
+  POCKETS.push(P); return P;
+}
+const PARK = ZONES.park;
+PARK.bays = [[68, 52], [49, 33], [30, 14]].map(([a, b], i) => mkPocket(PARK.lane, -86, a, -86, b, 1, `주차 ${i + 1}번 칸`));
+// shuttle stops: two bays on the inner side of the south road, one per bus
+const STOPS = [[50, 18], [6, -28]].map(([a, b], i) => mkPocket(LOOP, a, 90.1, b, 90.1, 1, `셔틀 정류장 ${'AB'[i]}`));
+const HALL = { x0: -72, x1: 72, z0: -52, z1: 20, H: 13 };
+
+/* ---------- static geometry ---------- */
+function ribbon(curve, width, y, mat, seg = 400, closed = false) {
+  const pos = [], uv = [], pts = [];
+  for (let i = 0; i <= seg; i++) {
+    const u = i / seg, p = curve.getPointAt(closed ? u % 1 : u), t = curve.getTangentAt(closed ? u % 1 : u), nx = -t.z, nz = t.x;
+    pts.push([p.x + nx * width / 2, p.z + nz * width / 2, p.x - nx * width / 2, p.z - nz * width / 2]);
+  }
+  const tl = mat.userData.tile;
+  for (let i = 0; i < seg; i++) {
+    const [ax, az, bx, bz] = pts[i], [cx, cz, dx, dz] = pts[i + 1];
+    pos.push(ax, y, az, cx, y, cz, bx, y, bz, bx, y, bz, cx, y, cz, dx, y, dz);   // counter-clockwise seen from above, so the road faces up
+    if (tl) uv.push(ax / tl, az / tl, cx / tl, cz / tl, bx / tl, bz / tl, bx / tl, bz / tl, cx / tl, cz / tl, dx / tl, dz / tl);
+    else uv.push(0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.computeVertexNormals();
+  const n = g.attributes.normal; for (let i = 0; i < n.count; i++) n.setXYZ(i, 0, 1, 0);
+  let L = layers.get(LAYER); if (!L) layers.set(LAYER, L = new Map());
+  let list = L.get(mat); if (!list) L.set(mat, list = []); list.push(g);
+}
+function dashes(curve, y, every, len, w, offset, mat) {
+  const L0 = curve.getLength();
+  for (let s = 0; s < L0; s += every) { const u = s / L0, p = curve.getPointAt(u), t = curve.getTangentAt(u); put(UNIT.box, mat, p.x - t.z * offset, y, p.z + t.x * offset, w, .02, len, Math.atan2(t.x, t.z)); }
+}
+const TREES = [], LAMPS = [];
+const SERVICE_MAT = tiled(TEX.asphalt, 7, { color: 0xc9c9c9, roughness: .95 });
+Object.assign(SERVICE_MAT, { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }); SERVICE_MAT.userData.base = SERVICE_MAT.color.clone(); GROUND_MATS.push(SERVICE_MAT);
+const BAY_MAT = tiled(TEX.asphalt, 7, { color: 0xb8b8bc, roughness: .95 });
+Object.assign(BAY_MAT, { polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }); BAY_MAT.userData.base = BAY_MAT.color.clone(); GROUND_MATS.push(BAY_MAT);
+const inLoop = (x, z, m = 0) => x > LOOP_R.x0 - m && x < LOOP_R.x1 + m && z > LOOP_R.z0 - m && z < LOOP_R.z1 + m;
+const PLAZA_MAT = tiled(TEX.concrete, 4, { color: 0xf1ebe0 });
+Object.assign(PLAZA_MAT, { polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }); PLAZA_MAT.userData.base = PLAZA_MAT.color.clone(); GROUND_MATS.push(PLAZA_MAT);
+function buildGround() {
+  LAYER = 'world'; OY = 0;
+  box(4200, .2, 4200, 0, -.2, 0, MAT.field);
+  box(LOOP_R.x1 - LOOP_R.x0 + 8, .05, LOOP_R.z1 - LOOP_R.z0 + 8, 0, 0, (LOOP_R.z0 + LOOP_R.z1) / 2, MAT.grass);
+  ribbon(roadCurve, 13.6, .1, MAT.concrete, 600, true);
+  ribbon(roadCurve, 8.4, .12, MAT.asphalt, 600, true);
+  dashes(roadCurve, .14, 6, 3, .14, 0, PAINT(P.line));
+  for (const off of [-3.9, 3.9]) dashes(roadCurve, .14, 2.0, 2.05, .1, off, PAINT(P.line));
+  for (const Z of Object.values(ZONES)) ribbon(Z.lane.curve, 6.2, .11, SERVICE_MAT, 300);
+  for (const pk of POCKETS) ribbon(pk.lane.curve, 3.4, .105, BAY_MAT, 80);
+  for (const pk of POCKETS) { const [, , tx, tz] = pk.lane.at(pk.stopS); put(UNIT.box, PAINT(pk.host === LOOP ? P.indigo : 0xf3efe4), pk.stop[0], .13, pk.stop[1], 2.8, .02, pk.host === LOOP ? 10.5 : 5.2, Math.atan2(tx, tz)); }
+  // plaza, hall apron and walkways
+  box(124, .06, 66, 0, 0, 52, PLAZA_MAT);
+  box(160, .06, 8, 0, 0, 23, PLAZA_MAT);
+  box(26, .06, 10, -73, 0, 22, PLAZA_MAT);
+  box(20, .06, 70, -71, 0, 46, PLAZA_MAT);
+  box(HALL.x1 - HALL.x0 + 10, .06, 22, 0, 0, HALL.z0 - 11, MAT.yard);          // loading yard behind the hall
+  // street lamps on the outer side of the loop, trees outside the loop and around the hall
+  for (let s = 0; s < ROAD_LEN; s += 32) { const u = s / ROAD_LEN, p = roadCurve.getPointAt(u), t = roadCurve.getTangentAt(u); LAMPS.push([p.x + t.z * 6.6, p.z - t.x * 6.6, -t.z, t.x]); }
+  for (let s = 8; s < ROAD_LEN; s += 12) { const u = s / ROAD_LEN, p = roadCurve.getPointAt(u), t = roadCurve.getTangentAt(u); TREES.push([p.x + t.z * 10, p.z - t.x * 10, .9 + rnd() * .5]); }
+  for (let i = 0; i < 240; i++) { const x = (rnd() - .5) * 1000, z = (rnd() - .5) * 760; if (inLoop(x, z, 18)) continue; TREES.push([x, z, .8 + rnd() * .9]); }
+  for (let i = 0; i < 26; i++) TREES.push([84 + rnd() * 52, -66 + rnd() * 140, .7 + rnd() * .5]);
+  for (const x of [-56, -40, 40, 56]) for (const z of [30, 66]) TREES.push([x, z, .7]);
+}
+const APT_NIGHT = canvasTex(768, (g, s) => {
+  const c = s / 6; g.fillStyle = '#000'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 6; i++) for (let j = 0; j < 6; j++) { const r = rnd(); if (r < .45) continue; g.fillStyle = r < .85 ? '#ffd29a' : '#cfe3ff'; g.fillRect(i * c + c * .08, j * c + c * .16, c * .84, c * .56); }
+});
+APT_NIGHT.repeat.set(1 / 6, 1 / 6);
+const APT = tiled(TEX.apt, 3.0, { roughness: .8, emissive: 0xffffff, emissiveMap: APT_NIGHT, emissiveIntensity: 0 });
+function buildBackdrop() {
+  LAYER = 'world'; OY = 0;
+  const apt = (x, z, w, h) => { box(w, h, 16, x, 0, z, APT); box(w + .6, 1.6, 16.6, x, h, z, MAT.roof); };
+  for (let i = 0; i < 12; i++) apt(-430 + i * 72 + rnd() * 20, -330 - rnd() * 60, 30, 45 + rnd() * 50);
+  for (let i = 0; i < 9; i++) apt(-330 + i * 80, 330 + rnd() * 40, 34, 40 + rnd() * 40);
+  const sheds = [[-270, -40, 70, 12, 40, P.blueRoof], [260, 20, 60, 13, 44, P.roofGrey], [250, -170, 80, 12, 50, P.roofGrey], [-240, 170, 60, 11, 40, P.blueRoof]];
+  for (const [x, z, w, h, d, roof] of sheds) { box(w, h, d, x, 0, z, MAT.ribs); box(w + .6, .6, d + .6, x, h, z, roof); box(w - 4, 1.2, .1, x, h * .6, z + d / 2 + .05, WIN); }
+  for (const [x, z, r, h] of [[-560, -460, 260, 90], [-60, -540, 300, 120], [440, -480, 280, 100], [660, 140, 220, 70], [-680, 220, 240, 80]]) put(UNIT.cone, M(0x9fae8a), x, h / 2, z, r, h, r);
+}
+// low-poly parked car for static lots
+function staticCar(x, z, ry, c) { box(1.8, .7, 4.2, x, .1, z, M(c, { roughness: .35, metalness: .4 }), ry); box(1.55, .55, 2.1, x, .8, z, CAR_GLASS, ry); }
+const CAR_GLASS = M(0x1c2832, { roughness: .15, metalness: .6 });
+const CAR_COLS = [0xf2f2f0, 0x2f3338, 0x9aa3aa, 0x7b1e24, 0x2d4a6b, 0xd7d3c8, 0x4b5157, 0x5d7f6e];
+function buildOutside() {
+  LAYER = 'world'; OY = 0;
+  // entrance gate: arch, four scanner lanes, exit corridor to the east
+  for (const x of [-11, 11]) box(1.2, 6, 1.2, x, 0, 44, P.indigo2);
+  box(23.2, 1.4, 1.4, 0, 6, 44, P.indigo);
+  for (const x of GATE_POSTS) { box(.35, 1.05, 1.6, x, 0, 44, P.steel2); box(.36, .08, .5, x, 1.05, 44.6, 0x1f2937); }
+  for (const z of [44]) for (const x of [12.2, 19.8]) box(.12, 1.0, 22, x, 0, z + 10, P.steel);       // exit corridor rails
+  box(.12, 1.0, 12, -8.8, 0, 51, P.steel); box(.12, 1.0, 12, 8.8, 0, 51, P.steel);                     // queue rails
+  for (const x of [-4, 0, 4]) box(.06, .9, 10, x, 0, 50, 0xc7cbd1);
+  // registration desk with two staff
+  box(10, 1.05, .9, -21, 0, 49.8, P.white); box(10.2, .08, 1.0, -21, 1.05, 49.8, P.indigo);
+  for (const x of [-24, -21, -18]) box(.5, .4, .35, x, 1.1, 49.6, 0x1f2937);
+  box(.2, 2.6, .2, -26.2, 0, 49.4, P.steel2); box(.2, 2.6, .2, -15.8, 0, 49.4, P.steel2);
+  // flags (plain colours, no national flags)
+  const FLAG = [0x4338ca, 0xd2232a, 0x0ea5e9, 0xf59e0b, 0x10b981, 0x8b5cf6];
+  for (let i = 0; i < 12; i++) { const x = i < 6 ? -58 : 58, z = 30 + (i % 6) * 9; box(.12, 7, .12, x, 0, z, P.steel); box(.05, 2.2, 1.6, x, 4.6, z + .85, FLAG[i % FLAG.length]); }
+  // shuttle shelter and the boarding queue rail
+  box(16, .25, 3.4, 17, 3, 82.6, P.indigo2); for (const x of [9.2, 24.8]) box(.2, 3, .2, x, 0, 81.2, P.steel2);
+  // parking lot: static cars between the parking lane loops and in the west lot
+  for (let z = 12; z <= 70; z += 2.7) if (rnd() < .82) staticCar(-95, z, Math.PI / 2, CAR_COLS[Math.floor(rnd() * 8)]);
+  for (let r = 0; r < 4; r++) for (let z = -64; z <= 18; z += 2.7) if (rnd() < .7) staticCar(-138 + r * 8, z, Math.PI / 2, CAR_COLS[Math.floor(rnd() * 8)]);
+  box(34, .05, 86, -127, 0, -23, MAT.yard);
+  box(32, .05, 80, -95, 0, 42, MAT.yard);                                              // parking lot surface
+  // loading yard behind the hall: parked exhibitor trucks
+  for (let i = 0; i < 5; i++) { const x = -50 + i * 22; box(2.4, 2.8, 7, x, .5, -62, 0xeceff1); box(2.3, 2.2, 2.2, x, .4, -57.4, i % 2 ? P.indigo : 0x64748b); }
+}
+
+
+/* ---------- hall layout: aisle graph and one-person spots ---------- */
+const GATE_LANES = [-6, -2, 2, 6], GATE_POSTS = [-8, -4, 0, 4, 8];
+const BOOTH = { x0: -38, x1: -14, z0: -30, z1: -6 };
+// country pavilions: generic region names (examples)
+const PAVS = [['eu', '유럽관', 12, -42, 0x5b7fb8], ['na', '북미관', 34, -42, 0x5f9e8a], ['sea', '동남아관', 56, -42, 0xc0874c], ['me', '중동관', 12, -20, 0xb5835a], ['oc', '오세아니아관', 34, -20, 0x4f9bb0], ['la', '중남미관', 56, -20, 0xa86a8e]]
+  .map(([id, name, x, z, col]) => ({ id, name, x, z, col, viewers: 0, visits: 0 }));
+const TABLES = [[-31, -24], [-23.5, -24], [-31, -17], [-23.5, -17]].map(([x, z], i) => ({ i, x, z, buyer: null }));
+const FOOD_TABLES = [28, 37, 46, 55, 64].map(x => [x, 10]);
+const HIGH_TABLES = [32.5, 41.5, 50.5, 59.5].map(x => [x, 16]);
+const SEM_ROWS = [-40, -38.2, -36.4, -34.6, -32.8, -31], SEM_COLS = [-64, -62.8, -61.6, -60.4, -59.2, -54.8, -53.6, -52.4, -51.2, -50];
+const NODES = {
+  IN: [-8, 14], OUT: [8, 14], WD: [-37, 12], LOB: [0, 6],
+  A: [-41, -2], B: [-26, -2], C: [-5, -2], E: [12, -2], F: [23, -2], G: [34, -2], H: [45, -2], I: [56, -2],
+  R0: [-5, -30.5], R1: [12, -30.5], R2: [23, -30.5], R3: [34, -30.5], R4: [45, -30.5], R5: [56, -30.5],
+  W1: [-41, -34], N0: [-26, -34], BK: [-15.2, -34], N1: [-5, -34], SE: [-57, -8], ST: [-36, -40],
+  BE: [-9, -12], BI: [-18, -12], BC: [-19.5, -20.5], BM: [-27.2, -20.5],
+  FC0: [28, 4], FC1: [46, 4], FC2: [64, 4],
+};
+const EDGES = 'IN-LOB OUT-LOB WD-A WD-LOB LOB-C LOB-E LOB-FC0 FC0-FC1 FC1-FC2 A-B B-C C-E E-F F-G G-H H-I C-R0 R0-N1 F-R2 H-R4 R0-R1 R1-R2 R2-R3 R3-R4 R4-R5 A-W1 W1-N0 N0-BK BK-N1 A-SE W1-ST N0-ST C-BE BE-BI BI-BC BC-BM'.split(' ').map(e => e.split('-'));
+// all-pairs next hop (Floyd-Warshall on ~32 nodes)
+const NK = Object.keys(NODES), NI = Object.fromEntries(NK.map((k, i) => [k, i]));
+const NDIST = NK.map(() => NK.map(() => Infinity)), NNEXT = NK.map(() => NK.map(() => -1));
+NK.forEach((_, i) => { NDIST[i][i] = 0; NNEXT[i][i] = i; });
+for (const [a, b] of EDGES) { const i = NI[a], j = NI[b], d = Math.hypot(NODES[a][0] - NODES[b][0], NODES[a][1] - NODES[b][1]); NDIST[i][j] = NDIST[j][i] = d; NNEXT[i][j] = j; NNEXT[j][i] = i; }
+for (let k = 0; k < NK.length; k++) for (let i = 0; i < NK.length; i++) for (let j = 0; j < NK.length; j++) if (NDIST[i][k] + NDIST[k][j] < NDIST[i][j]) { NDIST[i][j] = NDIST[i][k] + NDIST[k][j]; NNEXT[i][j] = NNEXT[i][k]; }
+function route(a, b) { const out = []; let i = NI[a]; const j = NI[b]; if (i == null || j == null || NNEXT[i][j] < 0) return out; while (i !== j) { i = NNEXT[i][j]; out.push(NODES[NK[i]]); } return out; }
+const nearestNode = (x, keys) => keys.reduce((b, k) => (Math.abs(NODES[k][0] - x) < Math.abs(NODES[b][0] - x) ? k : b), keys[0]);
+// spots hold exactly one person; `appr` points are walked through on the way in (reversed on the way out)
+const SPOTS = {}, spot = (group, pos, via, appr = [], face = 0, o = {}) => { const s = { group, pos, via, appr, face, occ: null, ...o }; (SPOTS[group] ??= []).push(s); return s; };
+const N_ = Math.PI, E_ = Math.PI / 2, W_ = -Math.PI / 2, S_ = 0;                 // facing: north (-z), east, west, south (+z)
+PAVS.forEach(p => { for (const dx of [-4, 0, 4]) spot('pav', [p.x + dx, p.z + 6.4], p.z < -30 ? nearestNode(p.x, ['R1', 'R3', 'R5']) : nearestNode(p.x, ['E', 'G', 'I']), [], N_, { pav: p }); });
+for (const z of [-22.2, -20.5, -18.8]) spot('display', [-35.4, z], 'BM', [], W_);
+for (const x of [-32, -28.5, -25]) spot('taste', [x, -6.8], 'B', [], N_);
+const TASTE_Q = Array.from({ length: 8 }, (_, k) => [-21 + k, -4.6]);
+TABLES.forEach(T => { T.seat = spot('meet', [T.x + 1.05, T.z], T.i % 2 ? 'BC' : 'BM', [], W_, { table: T }); T.staffPos = [T.x - 1.05, T.z]; });
+for (const z of SEM_ROWS) for (const x of SEM_COLS) spot('seminar', [x, z], 'SE', [[-57, z + .9], [x, z + .9]], N_);
+FOOD_TABLES.forEach(([tx, tz]) => {
+  const via = nearestNode(tx, ['FC0', 'FC1', 'FC2']);
+  spot('food', [tx, tz - 1.1], via, [[tx, tz - 3.6]], S_);
+  spot('food', [tx + 1.1, tz], via, [[tx + 2.5, tz]], W_);
+  spot('food', [tx - 1.1, tz], via, [[tx - 2.5, tz]], E_);
+});
+HIGH_TABLES.forEach(([hx, hz]) => { const via = nearestNode(hx, ['FC0', 'FC1', 'FC2']); spot('recep', [hx - .9, hz], via, [[hx - .9, hz - 2.8]], E_); spot('recep', [hx + .9, hz], via, [[hx + .9, hz - 2.8]], W_); });
+for (const x of [-24, -21, -18]) spot('reg', [x, 51.4], null, [[x, 56]], N_);
+const GATE_Q = GATE_LANES.map(lx => Array.from({ length: 10 }, (_, k) => [lx, 45.6 + k]));
+const BUS_Q = Array.from({ length: 15 }, (_, k) => [24 - k, 82.6]);
+const BUS_DOOR = [[30.5, 84.5], [-14.5, 84.5]];
+const EAST_WALK = [58, 84];
+const SPEAKER_POS = [-53.5, -46.6], SPEAKER_IN = [-46, -47];
+// staff that stay at their posts (they count for spacing like everybody else)
+const STAFF_POS = [
+  ...[[-31.5, -9.6], [-25.5, -9.6]].map(p => ({ p, face: S_, role: 'taste' })),
+  ...TABLES.map(T => ({ p: T.staffPos, face: E_, role: 'meet', table: T, sit: true })),
+  ...PAVS.map(pv => ({ p: [pv.x, pv.z + 2.2], face: S_, role: 'pav' })),
+  ...[[69.2, 7], [69.2, 13]].map(p => ({ p, face: W_, role: 'food' })),
+  ...[[-23, 48.6], [-19, 48.6]].map(p => ({ p, face: S_, role: 'reg' })),
+];
+const CART_ROUTES = [
+  { name: '샘플 카트', home: [-36, -47], path: [[-36, -40], NODES.N0, NODES.BK, [-15.2, -28.4]] },
+  { name: '케이터링 카트', home: [67, 1], path: [[26, 1]] },
+];
+// layout check: every fixed spot must be at least the minimum spacing from every other
+const R_PERSON = .3, R_CART = 1.0, GAP = .15, MIN_PP = 2 * R_PERSON + GAP;
+const LAYOUT_ERRORS = [];
+{
+  const pts = [...Object.values(SPOTS).flat().map(s => [s.group, s.pos]), ...TASTE_Q.map(p => ['tasteQ', p]), ...GATE_Q.flat().map(p => ['gateQ', p]), ...BUS_Q.map(p => ['busQ', p]), ...STAFF_POS.map(s => ['staff:' + s.role, s.p]), ['speaker', SPEAKER_POS], ...BUS_DOOR.map(p => ['door', p])];
+  for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const d = Math.hypot(pts[i][1][0] - pts[j][1][0], pts[i][1][1] - pts[j][1][1]); if (d < MIN_PP) LAYOUT_ERRORS.push(`${pts[i][0]}~${pts[j][0]} ${d.toFixed(2)}m`); }
+}
+
+
+/* ---------- the hall: shell, FNS booth, pavilions, seminar hall, food court ---------- */
+function shell(b, wallMat, band, doors) {
+  const { x0, x1, z0, z1, H } = b, W = x1 - x0, D = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, low = 3.2;
+  LAYER = 'shell';
+  box(W, .15, D, cx, 0, cz, 0xdcdfdc);
+  // lower walls with door gaps: doors = [{side:'e'|'w'|'n'|'s', at, w}]
+  const wall = (side, a0, a1) => {
+    const segs = [[a0, a1]];
+    for (const d of doors.filter(d => d.side === side)) { const i = segs.findIndex(([p, q]) => d.at > p && d.at < q); if (i < 0) continue; const [p, q] = segs[i]; segs.splice(i, 1, [p, d.at - d.w / 2], [d.at + d.w / 2, q]); }
+    for (const [p, q] of segs) {
+      if (q - p < .05) continue;
+      if (side === 'n') box(q - p, low, .3, (p + q) / 2, 0, z0, wallMat); else if (side === 's') box(q - p, low, .3, (p + q) / 2, 0, z1, wallMat);
+      else if (side === 'w') box(.3, low, q - p, x0, 0, (p + q) / 2, wallMat); else box(.3, low, q - p, x1, 0, (p + q) / 2, wallMat);
+    }
+  };
+  wall('n', x0, x1); wall('s', x0, x1); wall('w', z0, z1); wall('e', z0, z1);
+  LAYER = 'upper';
+  box(W + .3, H - low, .3, cx, low, z0, wallMat); box(W + .3, H - low, .3, cx, low, z1, wallMat);
+  box(.3, H - low, D, x0, low, cz, wallMat); box(.3, H - low, D, x1, low, cz, wallMat);
+  box(W + .5, .8, .45, cx, H - 1.4, z1 + .05, band); box(.45, .8, D + .5, x1 + .05, H - 1.4, cz, band);
+  LAYER = 'roof';
+  box(W + .8, .4, D + .8, cx, H, cz, MAT.roof);
+  for (let x = x0 + 6; x < x1 - 4; x += 10) box(3, .06, D - 4, x, H - .35, cz, LIGHTP);
+}
+const FLOOR = .15;
+const chair = (x, z, ry) => { box(.46, .44, .46, x, 0, z, P.chair, ry); const bx = x - Math.sin(ry) * .21, bz = z - Math.cos(ry) * .21; box(.46, .55, .07, bx, .44, bz, P.chair, ry); };
+function buildHall() {
+  shell(HALL, P.white, P.indigo, [{ side: 's', at: -8, w: 12 }, { side: 's', at: 8, w: 8 }, { side: 's', at: -37, w: 6 }]);
+  LAYER = 'upper';
+  for (let x = HALL.x0 + 6; x < HALL.x1 - 2; x += 8) box(.5, HALL.H - 3.2, .6, x, 3.2, HALL.z1 + .2, P.indigo2);   // facade fins
+  box(30, 3.2, .4, 0, 3.2, HALL.z1 + .1, ENTRY_GLASS);
+  LAYER = 'inside'; OY = FLOOR;
+  // aisle floor accents
+  box(HALL.x1 - HALL.x0 - 2, .02, 3, 0, 0, -2, PAINT(0xd9d3c7));
+  box(78, .02, 3, 25.5, 0, -30.5, PAINT(0xd9d3c7));
+  // ---- FNS booth ----
+  box(24, .03, 24, -26, 0, -18, PAINT(0x3a3e45));
+  box(24, .035, .35, -26, 0, -6.2, PAINT(P.red));
+  box(21.5, 4.5, .4, -27.25, 0, -30, P.red);                                   // red back wall (back door at the east end)
+  box(.3, 2.6, 18, -38, 0, -21, P.white);                                      // display wall
+  box(.3, 1.2, 14, -14, 0, -23, P.white);                                      // low east partition
+  [[-26, 0xb5452f], [-21, 0xd9a441], [-16, 0xc9b38a]].forEach(([z, c], k) => {
+    box(.8, 2.2, 4.4, -37.4, 0, z, P.white);
+    for (const y of [.5, 1.1, 1.7]) { box(.82, .05, 4.3, -37.4, y, z, P.steel); for (let j = 0; j < 6; j++) { const pz = z - 1.75 + j * .7; if (k === 0) cyl(.09, .32, -37.4, y + .05, pz, c); else if (k === 1) box(.08, .36, .3, -37.2, y + .05, pz, c); else cyl(.12, .26, -37.4, y + .05, pz, j % 2 ? c : 0xf4f1ea); } }
+  });
+  box(11, 1.0, .8, -28.5, 0, -8.2, P.white); box(11.1, .06, .9, -28.5, 1.0, -8.2, 0x2b2f34); box(11, .26, .05, -28.5, .55, -7.78, P.red);
+  for (let i = 0; i < 14; i++) cyl(.05, .08, -33.4 + i * .7, 1.06, -8.0, 0xf4f1ea);
+  for (const T of TABLES) { cyl(.55, .05, T.x, .72, T.z, P.table); cyl(.07, .72, T.x, 0, T.z, P.steel2); chair(T.seat.pos[0], T.z, W_); chair(T.staffPos[0], T.z, E_); }
+  box(.9, 1.3, .45, -15.6, 0, -7.6, P.white); for (let i = 0; i < 3; i++) box(.24, .32, .04, -15.9 + i * .3, 1.0, -7.35, [0xd2232a, 0xf59e0b, 0x4338ca][i]);
+  box(.5, 1.2, 1.4, -14.6, 0, -25, P.steel2);                                  // sample request shelf
+  // ---- country pavilions ----
+  for (const p of PAVS) {
+    box(16, .03, 10, p.x, 0, p.z, PAINT(_col.set(p.col).lerp(new THREE.Color(0xffffff), .55).getHex()));
+    box(16, 3, .3, p.x, 0, p.z - 5, p.col);
+    box(4, 1.0, .7, p.x, 0, p.z + 3.4, P.white);
+    for (const dx of [-5.2, 5.2]) { box(3, .8, 1.6, p.x + dx, 0, p.z + .6, P.white); for (let j = 0; j < 4; j++) box(.4, .3, .4, p.x + dx - 1.05 + j * .7, .8, p.z + .6, [p.col, 0xf4f1ea, 0xcfa874, 0x8c969c][j]); }
+  }
+  // ---- seminar hall ----
+  box(26, .03, 40, -57, 0, -31, PAINT(0x4b4f6b));
+  box(18, .6, 5, -57, 0, -47.5, 0x2f3542);
+  box(11, 4.0, .25, -57, 1.3, -51.6, 0x16181d);
+  box(.8, 1.1, .6, -52, .6, -46.2, P.indigo2);
+  box(.3, 2.4, 38, -44, 0, -31, P.white);
+  box(10, 2.4, .3, -65, 0, -12, P.white); box(10, 2.4, .3, -49, 0, -12, P.white);
+  for (const z of SEM_ROWS) for (const x of SEM_COLS) chair(x, z, N_);
+  // ---- food court ----
+  box(48, .03, 18, 46, 0, 10, PAINT(0xe9dcc6));
+  box(.9, 1.0, 16, 70.3, 0, 10, P.white); box(.95, .06, 16.1, 70.3, 1.0, 10, P.orange);
+  for (const [tx, tz] of FOOD_TABLES) { cyl(.7, .05, tx, .72, tz, P.table); cyl(.08, .72, tx, 0, tz, P.steel2); chair(tx, tz - 1.1, S_); chair(tx + 1.1, tz, W_); chair(tx - 1.1, tz, E_); }
+  for (const [hx, hz] of HIGH_TABLES) { cyl(.38, .05, hx, 1.08, hz, P.table); cyl(.06, 1.08, hx, 0, hz, P.steel2); }
+  // ---- booth storage ----
+  box(.3, 2.6, 10, -42, 0, -47, P.white); box(.3, 2.6, 10, -30, 0, -47, P.white);
+  box(5, 2.6, .3, -39.5, 0, -42, P.white); box(5, 2.6, .3, -32.5, 0, -42, P.white);
+  for (let i = 0; i < 8; i++) box(.7, .5, .6, -40.6 + (i % 4) * .8, Math.floor(i / 4) * .5, -50.8, P.kraft);
+  // ceiling light panels that stay with the cut-away view
+  for (const [x, z] of [[-26, -18], [12, -42], [34, -42], [56, -42], [12, -20], [34, -20], [56, -20], [-57, -31], [46, 10]]) box(5, .08, 1.2, x, 9.2, z, LIGHTP);
+  OY = 0; LAYER = 'world';
+}
+
+
+/* ---------- people and carts ---------- */
+const PGEO = { legs: new THREE.BoxGeometry(.36, .8, .24), body: new THREE.CylinderGeometry(.24, .24, .7, 8), head: new THREE.SphereGeometry(.15, 10, 8), hair: new THREE.SphereGeometry(.158, 10, 8), cup: new THREE.CylinderGeometry(.05, .04, .1, 8), card: new THREE.PlaneGeometry(.11, .07), sbox: new THREE.BoxGeometry(.3, .22, .24) };
+const LOOK = {
+  visitor: [[0x6b8fb3, 0x2f3338], [0xc98b5e, 0x3a3f46], [0x7f9a6a, 0x2b2f34], [0xd9c7a4, 0x4b5157], [0x9b6a8a, 0x2b2f34], [0x5f7f8f, 0x34495e], [0xe0e0dc, 0x2b2f34], [0xb5452f, 0x3a3f46]],
+  buyer: [[0x34495e, 0x2b2f34], [0x4b5157, 0x2b2f34], [0x1f2a3a, 0x1f2a3a], [0x8c969c, 0x34495e], [0xe9ebe8, 0x34495e]],
+  staff: [[0xd2232a, 0x2b2f34]], crew: [[0x4338ca, 0x2b2f34]], speaker: [[0x1f2937, 0x1f2937]],
+};
+const HAIR = [0x2b2f34, 0x4a3a2e, 0x6b5640, 0xd9c7a4, 0x1f1f1f];
+function makePerson(kind) {
+  const [shirt, pants] = LOOK[kind][Math.floor(rnd() * LOOK[kind].length)], g = new THREE.Group();
+  const l = new THREE.Mesh(PGEO.legs, M(pants)); l.position.y = .4; g.add(l);
+  const b = new THREE.Mesh(PGEO.body, M(shirt)); b.position.y = 1.15; b.castShadow = true; g.add(b);
+  const h = new THREE.Mesh(PGEO.head, M(P.skin)); h.position.y = 1.66; g.add(h);
+  const c = new THREE.Mesh(PGEO.hair, M(HAIR[Math.floor(rnd() * HAIR.length)])); c.position.y = 1.72; c.scale.y = .62; g.add(c);
+  const cup = new THREE.Mesh(PGEO.cup, M(0xf4f1ea)); cup.position.set(.2, 1.0, .26); cup.visible = false; g.add(cup); g.userData.cup = cup;
+  scene.add(g); return g;
+}
+function makeCart(kind) {
+  const g = new THREE.Group();
+  const p = makePerson('crew'); scene.remove(p); p.position.z = -.62; g.add(p);
+  mbox(g, .8, .08, 1.1, 0, .35, .3, P.steel2); mbox(g, .06, .7, .06, -.36, .35, -.2, P.steel2); mbox(g, .06, .7, .06, .36, .35, -.2, P.steel2); mbox(g, .78, .05, .05, 0, 1.0, -.2, P.steel2);
+  const load = [];
+  for (let i = 0; i < 4; i++) { const m = mbox(g, .34, .26, .4, (i % 2 - .5) * .38, .43 + Math.floor(i / 2) * .27, .3, kind ? 0xf08a24 : P.kraft); load.push(m); }
+  for (const x of [-.32, .32]) for (const z of [-.15, .75]) { const w = mcyl(g, .08, .06, 0, 0, 0, P.black, 8); w.rotation.z = Math.PI / 2; w.position.set(x, .08, z); }
+  g.userData.load = load; scene.add(g); return g;
+}
+
+/* ---------- vehicles ---------- */
+const RB = (w, h, d, r) => new RoundedBoxGeometry(w, h, d, 2, r);
+function rmesh(parent, geo, mat, x, y, z) { const m = new THREE.Mesh(geo, mat.isMaterial ? mat : M(mat)); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; }
+const TT = {
+  '1t': { name: '1톤 탑차', rear: 2.65, boxL: 3.15, boxW: 1.86, boxH: 1.95, cabL: 1.75, cabW: 1.78, cabH: 1.95, wheels: [-1.9, 1.35], r: .36 },
+  '5t': { name: '5톤 탑차', rear: 5.04, boxL: 7.2, boxW: 2.5, boxH: 2.75, cabL: 2.4, cabW: 2.42, cabH: 2.45, wheels: [-3.7, -2.5, 3.5], r: .5 },
+};
+Object.values(TT).forEach(T => { T.front = -T.rear + T.boxL + .15 + T.cabL; T.len = T.rear + T.front; });
+function makeTruck(type, band, cab) {
+  const T = TT[type], g = group(scene);
+  const bz = -T.rear + T.boxL / 2, cz = -T.rear + T.boxL + .15 + T.cabL / 2, front = T.front;
+  mbox(g, T.boxW - .5, .3, front + T.rear - .3, 0, .5, (front - T.rear) / 2, P.black);
+  rmesh(g, RB(T.boxW, T.boxH, T.boxL, .06), M(0xf0f1f0, { roughness: .45, metalness: .2 }), 0, .95 + T.boxH / 2, bz);
+  for (let z = -T.rear + .55; z < -T.rear + T.boxL - .3; z += .9) mbox(g, T.boxW + .04, T.boxH - .12, .05, 0, 1.0, z, 0xd6d9db);
+  mbox(g, T.boxW + .03, .26, T.boxL + .02, 0, 1.05, bz, band);
+  rmesh(g, RB(T.cabW, T.cabH, T.cabL, .3), M(cab, { roughness: .35, metalness: .35 }), 0, .62 + T.cabH / 2, cz);
+  mbox(g, T.cabW - .27, T.cabH * .38, .06, 0, .62 + T.cabH * .5, front - .01, WIN);
+  mbox(g, T.cabW + .02, .3, .3, 0, .4, front - .12, P.black);
+  for (const x of [-1, 1]) { mbox(g, .36, .2, .06, x * T.cabW * .35, .78, front + .01, HEAD); mbox(g, .3, .2, .06, x * T.boxW * .38, 1.12, -T.rear - .04, TAIL); }
+  for (const z of T.wheels) for (const x of [-1, 1]) { const w = mcyl(g, T.r, .36, 0, 0, 0, P.black, 12); w.rotation.z = Math.PI / 2; w.position.set(x * (T.boxW / 2 - .2), T.r, z); }
+  return g;
+}
+function makeCar(color) {
+  const g = group(scene);
+  rmesh(g, RB(1.86, .78, 4.4, .26), M(color, { roughness: .32, metalness: .45 }), 0, .7, 0);
+  rmesh(g, RB(1.64, .66, 2.3, .22), WIN, 0, 1.36, -.25);
+  for (const x of [-.62, .62]) { mbox(g, .38, .16, .06, x, .7, 2.16, HEAD); mbox(g, .38, .16, .06, x, .7, -2.16, TAIL); }
+  for (const x of [-.86, .86]) for (const z of [-1.35, 1.35]) { const w = mcyl(g, .34, .26, 0, 0, 0, P.black, 10); w.rotation.z = Math.PI / 2; w.position.set(x, .34, z); }
+  return g;
+}
+TT.bus = { name: '셔틀버스', rear: 4.85, front: 4.85, len: 9.7, w: 2.5 };
+function makeBus(col) {
+  const g = group(scene);
+  rmesh(g, RB(2.5, 2.75, 9.7, .32), M(col, { roughness: .4, metalness: .3 }), 0, .4 + 1.375, 0);
+  mbox(g, 2.54, .95, 8.4, 0, 1.6, -.3, WIN);
+  mbox(g, 2.2, 1.25, .06, 0, 1.4, 4.86, WIN);
+  mbox(g, 2.3, .12, 8.8, 0, 3.15, 0, 0xe5e7eb);
+  mbox(g, 2.56, .22, 9.0, 0, .95, 0, 0xf4f4f2);
+  for (const x of [-1, 1]) { mbox(g, .36, .2, .06, x * .8, .8, 4.86, HEAD); mbox(g, .3, .22, .06, x * .85, 1.0, -4.86, TAIL); }
+  for (const z of [-3.2, 3.0]) for (const x of [-1, 1]) { const w = mcyl(g, .48, .36, 0, 0, 0, P.black, 12); w.rotation.z = Math.PI / 2; w.position.set(x * 1.05, .48, z); }
+  return g;
+}
+const SIM_RATE = 12;                                   // simulated seconds per real second
+const sim = { t: 0, clock: 13 * 3600 + 30 * 60, events: [], unread: 0, plates: new Set(), season: 'd1', buyers: [], samples: [], buyerSeq: 1200, sampleSeq: 40, scanned: 0, journeys: 0, kHist: [], mHist: [], seminarIn: 0 };
+function plate() { let p; do { p = `경기${80 + Math.floor(rnd() * 19)}${'바사아자'[Math.floor(rnd() * 4)]}${1000 + Math.floor(rnd() * 9000)}`; } while (sim.plates.has(p)); sim.plates.add(p); return p; }
+const VEHS = [], GHOSTS = [];
+function mkVeh(kind, name, obj, len, lane, s, extra = {}) {
+  const v = { id: kind === 'car' ? 'car' + VEHS.length : plate(), kind, name, obj, len, lane, s, v: 0, vmax: kind === 'car' ? 11 + rnd() * 2 : 9.5, state: 'moving', plan: [], stopAt: Infinity, cargo: [], t: 0, ...extra };
+  VEHS.push(v); placeVeh(v); return v;
+}
+function placeVeh(v) { v.lane.pose(v.s, _pose); v.obj.position.set(_pose.p.x, .12, _pose.p.z); v.obj.rotation.y = Math.atan2(_pose.t.x, _pose.t.z); }
+function parkIn(v, P) { P.veh = v; v.lane = P.lane; v.s = P.stopS; v.pocket = P; v.state = 'stopped'; v.stopAt = P.stopS; placeVeh(v); }
+function gapAhead(v) {
+  let g = Infinity; const L = v.lane;
+  for (const o of VEHS) if (o !== v && o.lane === L) { const d = L.ahead(v.s, o.s); if (d > 0 && (!L.closed || d < L.len / 2)) g = Math.min(g, d - (o.len + v.len) / 2); }
+  for (const h of GHOSTS) if (h.lane === L) { const d = L.ahead(v.s, h.s); if (d > -1 && (!L.closed || d < L.len / 2)) g = Math.min(g, d - (h.len + v.len) / 2); }
+  return g;
+}
+function laneClear(L, s0, s1, except) {
+  const inR = s => (L.closed ? L.ahead(s0, s) <= L.ahead(s0, s1) : s >= s0 && s <= s1);
+  return !VEHS.some(o => o !== except && o.lane === L && inR(o.s)) && !GHOSTS.some(h => h.lane === L && h.owner !== except && inR(h.s));
+}
+function ghost(lane, s, len, owner, until = Infinity) { const g = { lane, s, len, owner, until }; GHOSTS.push(g); return g; }
+function dropGhost(g) { const i = GHOSTS.indexOf(g); if (i >= 0) GHOSTS.splice(i, 1); }
+const speedK = () => (sim.season === 'rain' ? .75 : 1);
+function stepVeh(v, dt) {
+  v.t += dt;
+  if (v.state === 'stopped') {
+    if (v.release) {
+      const pk = v.pocket;
+      if (laneClear(pk.host, pk.host.wrap(pk.s1 - 24), pk.host.wrap(pk.s1 + 6), v)) { v.release = false; v.state = 'moving'; v.stopAt = Infinity; v.exitGhost = ghost(pk.host, pk.s1, v.len + 2, v); }
+    }
+    return;
+  }
+  const L = v.lane, w = v.plan[0];
+  let want = Math.min(v.vmax * speedK(), L.vmax * speedK(), Math.max(0, gapAhead(v) - 2.5) * 1.3);
+  if (v.stopAt !== Infinity) want = Math.min(want, Math.sqrt(2 * 3 * Math.max(0, L.ahead(v.s, v.stopAt))) + .05);
+  if (L === LOOP && w) {
+    const target = w.zone ? w.zone.exitS : w.pocket?.host === LOOP ? w.pocket.s0 : null;
+    if (target != null) { const d = L.ahead(v.s, target); if (d < 30) want = Math.min(want, 3.5 + d * .3); }
+  }
+  v.v += clamp(want - v.v, -9 * dt, 3 * dt); v.v = Math.max(0, v.v);
+  const before = v.s;
+  v.s = L.closed ? L.wrap(v.s + v.v * dt) : Math.min(L.len, v.s + v.v * dt);
+  if (v.stopAt !== Infinity && L.ahead(before, v.stopAt) <= v.v * dt + 1e-6) v.s = v.stopAt;
+  placeVeh(v);
+  const crossed = target => L.ahead(before, target) <= L.ahead(before, v.s) + 1e-6 && L.ahead(before, target) < 50;
+  // lane changes
+  if (L === LOOP) {
+    if (w?.zone && crossed(w.zone.exitS)) {
+      const Z = w.zone;
+      if (!VEHS.some(o => o.lane === Z.lane && o.s < v.len + 4)) { GHOSTS.push({ lane: LOOP, s: Z.exitS, len: v.len + 2, owner: v, until: sim.t + 3 }); v.lane = Z.lane; v.s = 0; v.plan.shift(); }
+    } else if (w?.pocket && w.pocket.host === LOOP && crossed(w.pocket.s0)) {
+      const pk = w.pocket;
+      if (!pk.veh) { GHOSTS.push({ lane: LOOP, s: pk.s0, len: v.len + 2, owner: v, until: sim.t + 2.5 }); pk.veh = v; v.pocket = pk; v.lane = pk.lane; v.s = 0; v.stopAt = pk.stopS; v.plan.shift(); }
+      else { v.plan.shift(); const zi = v.plan.findIndex(p => p.zone); v.plan.splice(zi < 0 ? v.plan.length : zi, 0, w); }
+    }
+  } else if (v.pocket && L === v.pocket.lane) {
+    if (v.stopAt !== Infinity && v.s >= v.stopAt - 1e-3) { v.state = 'stopped'; v.v = 0; v.t = 0; v.pocket.arrive?.(v); onArrive(v); }
+    else if (v.s >= L.len - .05) { const pk = v.pocket; dropGhost(v.exitGhost); v.exitGhost = null; pk.veh = null; v.lane = pk.host; v.s = pk.s1; v.pocket = null; }
+  } else {
+    const Z = Object.values(ZONES).find(z => z.lane === L);
+    if (w?.pocket && w.pocket.host === L && v.s >= w.pocket.s0 - .05) { const pk = w.pocket; GHOSTS.push({ lane: L, s: pk.s0, len: v.len + 2, owner: v, until: sim.t + 2.5 }); pk.veh = v; v.pocket = pk; v.lane = pk.lane; v.s = 0; v.stopAt = pk.stopS; v.plan.shift(); }
+    else if (Z) {
+      if (!v.joining) {
+        v.stopAt = Z.stopS;
+        if (v.s >= Z.stopS - .05 && laneClear(LOOP, LOOP.wrap(Z.joinS - 40), LOOP.wrap(Z.joinS + 10), v)) { v.joining = ghost(LOOP, Z.joinS, v.len + 2, v); v.stopAt = Infinity; }
+      }
+      if (v.s >= L.len - .05) { dropGhost(v.joining); v.joining = null; v.lane = LOOP; v.s = Z.joinS; }
+    }
+  }
+}
+
+/* ---------- build the world and the fleet ---------- */
+buildGround(); buildBackdrop(); buildOutside(); buildHall();
+const SHELL = bake('shell'), UPPER = bake('upper'), ROOF = bake('roof');
+bake('inside'); bake('world');
+const SIGNS = group(scene);
+sign(UPPER, '해외 식품박람회 (예시)', 30, 3, 0, 9.4, HALL.z1 + .55, { bg: '#4338ca', size: 150 });
+sign(SIGNS, '입장 게이트', 12, 1.2, 0, 6.7, 44.75, { bg: '#4338ca', size: 96 });
+sign(SIGNS, '현장 등록', 6, .8, -21, 2.25, 49.25, { bg: '#312e81', size: 90 });
+sign(SIGNS, '셔틀버스 정류장', 8, 1, 17, 2.4, 80.85, { bg: '#312e81', size: 86 });
+sign(SIGNS, 'P 주차장', 7, 1.4, -76, 3, 82, { bg: '#2563eb', size: 120 }); box(.2, 3, .2, -76, 0, 81.8, P.steel2);
+logo(SIGNS, 2.6, -33, FLOOR + 2.55, -29.78);
+sign(SIGNS, '에프앤에스식품', 6.4, .8, -33, FLOOR + .8, -29.77, { bg: null, fg: '#ffffff', size: 90 });
+sign(SIGNS, '소스 · 드레싱 · 시즈닝 · 파우더', 9, .5, -32, FLOOR + 4.15, -29.77, { bg: null, fg: '#ffffff', size: 50 });
+['소스', '시즈닝', '파우더'].forEach((t, i) => sign(SIGNS, t, 2.6, .6, -36.95, FLOOR + 2.55, -26 + i * 5, { ry: Math.PI / 2, bg: '#d2232a', size: 110 }));
+sign(SIGNS, '시식', 2.2, .55, -28.5, FLOOR + .45, -7.74, { bg: '#d2232a', size: 120 });
+for (const p of PAVS) sign(SIGNS, p.name, 10, 1.8, p.x, FLOOR + 1.75, p.z - 4.83, { bg: null, fg: '#ffffff', size: 150 });
+sign(SIGNS, '세미나홀', 8, 1.2, -57, FLOOR + 3.6, -11.8, { bg: '#312e81', size: 110 }); box(8, .1, .1, -57, FLOOR + 3, -11.8, P.steel2);
+sign(SIGNS, '푸드코트', 7, 1.2, 71.6, FLOOR + 3.4, 10, { ry: -Math.PI / 2, bg: '#f08a24', size: 110 });
+sign(SIGNS, '부스 창고', 4.4, .7, -36, FLOOR + 2.9, -41.8, { bg: '#475569', size: 100 });
+// LED wall: an abstract looping animation (shapes and the F&S mark), not a recorded video
+const LEDC = document.createElement('canvas'); LEDC.width = 1024; LEDC.height = 452;
+const LEDT = new THREE.CanvasTexture(LEDC); LEDT.colorSpace = THREE.SRGBColorSpace;
+const LED = new THREE.Mesh(new THREE.PlaneGeometry(9, 3.97), new THREE.MeshBasicMaterial({ map: LEDT, toneMapped: false }));
+LED.position.set(-21.75, FLOOR + 2.55, -29.37); SIGNS.add(LED);
+box(9.4, 4.3, .3, -21.75, .55, -29.6, 0x111318); bake('world');
+const LED_WORDS = ['소스', '드레싱', '시즈닝', '파우더'];
+function drawLED(t) {
+  const g = LEDC.getContext('2d'), w = LEDC.width, h = LEDC.height;
+  const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#120f2e'); gr.addColorStop(1, '#2a0c12'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 7; i++) { const x = ((t * 90 + i * 170) % (w + 300)) - 150; g.fillStyle = i % 2 ? 'rgba(210,35,42,.35)' : 'rgba(99,102,241,.32)'; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 70, 0); g.lineTo(x - 90, h); g.lineTo(x - 160, h); g.fill(); }
+  for (let i = 0; i < 5; i++) { const a = t * .8 + i * 1.26, r = 150; g.fillStyle = 'rgba(255,255,255,.18)'; g.beginPath(); g.arc(w / 2 + Math.cos(a) * r * 1.6, h / 2 + Math.sin(a) * r * .6, 14 + i * 3, 0, 7); g.fill(); }
+  g.fillStyle = '#d2232a'; g.beginPath(); g.arc(w / 2, h * .42, 92, 0, 7); g.fill();
+  g.strokeStyle = '#fff'; g.lineWidth = 5; g.beginPath(); g.arc(w / 2, h * .42, 80, 0, 7); g.stroke();
+  g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = 'italic 700 70px Georgia, serif'; g.fillText('F&S', w / 2, h * .43);
+  const k = Math.floor(t / 2.5) % LED_WORDS.length, f = (t % 2.5) / 2.5;
+  g.globalAlpha = Math.min(1, Math.min(f, 1 - f) * 6); g.font = '700 56px Pretendard, "Apple SD Gothic Neo", sans-serif'; g.fillText(LED_WORDS[k], w / 2, h * .82); g.globalAlpha = 1;
+  LEDT.needsUpdate = true;
+}
+drawLED(0);
+// seminar screen and gate scanner lights
+const SEM_SCREEN = sign(SIGNS, '세미나', 10, 3.4, -57, FLOOR + 3.2, -51.45, { bg: '#1e1b4b', size: 150 });
+const SCAN_LIGHTS = GATE_LANES.map(lx => { const m = new THREE.Mesh(new THREE.BoxGeometry(.3, .1, .3), new THREE.MeshStandardMaterial({ color: 0x334155, emissive: 0x22c55e, emissiveIntensity: 0 })); m.position.set(lx - 1.82, 1.16, 44.6); scene.add(m); return m; });
+// string lights over the food court for the evening reception
+const STRING = new THREE.InstancedMesh(new THREE.SphereGeometry(.12, 8, 6), LAMP, 60);
+for (let i = 0; i < 60; i++) { const row = Math.floor(i / 20), x = 24 + (i % 20) * 2.3; _m4.compose(_p.set(x, FLOOR + 4.2 + Math.sin(i % 20 / 19 * Math.PI) * .5, 4 + row * 6.5), _q.identity(), _s.set(1, 1, 1)); STRING.setMatrixAt(i, _m4); }
+scene.add(STRING);
+const ROOM_LIGHTS = [[-26, 8, -18], [46, 8, 10], [0, 9, 52], [34, 8, -31]].map(([x, y, z]) => { const l = new THREE.PointLight(0xffe2b8, 0, 70, 1.6); l.position.set(x, y, z); scene.add(l); return l; });
+function buildInstanced() {
+  const pines = TREES.filter((_, i) => i % 3 === 0), rounds = TREES.filter((_, i) => i % 3 !== 0);
+  const trunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(.35, .45, 2.4, 6), M(P.trunk), TREES.length);
+  const crown = new THREE.InstancedMesh(new THREE.ConeGeometry(2.6, 6.4, 8), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .85 }), pines.length);
+  const ballM = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1.9, 1), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .85, flatShading: true }), rounds.length * 3);
+  const AUTUMN = [0xe08a3a, 0xe9c35a, 0xc65a3e, 0x86a35a, 0xd9a441, 0x9bb062];
+  TREES.forEach(([x, z, s], i) => { _m4.compose(_p.set(x, 1.2 * s, z), _q.identity(), _s.set(s, s, s)); trunk.setMatrixAt(i, _m4); });
+  pines.forEach(([x, z, s], i) => { _m4.compose(_p.set(x, 5.2 * s, z), _q.identity(), _s.set(s, s * (.9 + (i % 5) * .08), s)); crown.setMatrixAt(i, _m4); crown.setColorAt(i, _col.set(i % 2 ? P.tree : P.tree2).offsetHSL(0, 0, (i % 4) * .02 - .03)); });
+  rounds.forEach(([x, z, s], i) => { for (let k = 0; k < 3; k++) { const a = i * 2.3 + k * 2.1, r = k === 0 ? 0 : 1.1 * s; _m4.compose(_p.set(x + Math.cos(a) * r, (k === 0 ? 5.0 : 3.9) * s, z + Math.sin(a) * r), _q.setFromEuler(_e.set(0, a, 0)), _s.set(s * (1.1 - k * .12), s * .95, s * (1.1 - k * .12))); ballM.setMatrixAt(i * 3 + k, _m4); ballM.setColorAt(i * 3 + k, _col.set(AUTUMN[i % AUTUMN.length]).offsetHSL((i % 7) * .006 - .02, 0, k * .03 - .03)); } });
+  trunk.castShadow = crown.castShadow = ballM.castShadow = true; scene.add(trunk, crown, ballM);
+  for (const m of [crown.material, ballM.material]) { m.userData = { base: new THREE.Color(0xffffff), crown: true }; GROUND_MATS.push(m); }
+  const pole = new THREE.InstancedMesh(new THREE.CylinderGeometry(.12, .16, 7, 6), M(P.steel2), LAMPS.length);
+  const head = new THREE.InstancedMesh(new THREE.BoxGeometry(1.6, .3, .6), LAMP, LAMPS.length);
+  LAMPS.forEach(([x, z, dx, dz], i) => { _m4.compose(_p.set(x, 3.5, z), _q.identity(), _s.set(1, 1, 1)); pole.setMatrixAt(i, _m4); _m4.compose(_p.set(x + dx * .8, 7, z + dz * .8), _q.setFromEuler(_e.set(0, Math.atan2(-dz, dx), 0)), _s.set(1, 1, 1)); head.setMatrixAt(i, _m4); });
+  scene.add(pole, head);
+}
+buildInstanced();
+// fleet: two shuttle buses (one per stop) and through traffic that sometimes parks
+const BUSES = STOPS.map((pk, i) => {
+  const v = mkVeh('bus', `셔틀버스 ${i + 1}호`, makeBus(i ? 0x0f766e : P.indigo), TT.bus.len, LOOP, LOOP.len * (.15 + i * .5), { type: 'bus', id: `SHUTTLE-0${i + 1}`, vmax: 9, home: pk, pax: 0, alight: 0, dwell: 0 });
+  v.plan = [{ pocket: pk }]; return v;
+});
+const CARS = [];
+for (let i = 0; i < 7; i++) CARS.push(mkVeh('car', '승용차', makeCar(CAR_COLS[i % CAR_COLS.length]), 4.4, LOOP, LOOP.len * (.32 + i * .095) % LOOP.len, { type: 'car', id: 'car' + i }));
+
+
+/* ================================================================
+   3. operations: arrivals, gate, booth journey (tasting → meeting → cards → sample), seminars, shuttles, parking
+   ================================================================ */
+const hhmm = sec => { const m = ((Math.floor(sec / 60) % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+const hour = () => (sim.clock / 3600) % 24;
+const dayOf = c => Math.floor(c / 86400);
+function logEvent(text, kind = 'info') { sim.events.unshift({ time: sim.clock, text, kind }); if (sim.events.length > 40) sim.events.pop(); sim.unread++; }
+const MODES = {
+  d1: { name: 'D1 오픈', en: 'D1 Opening', k: 1.0 },
+  d2: { name: 'D2 피크', en: 'D2 Peak', k: 1.6 },
+  d3: { name: 'D3 마감 정리', en: 'D3 Wrap-up', k: .6 },
+  recep: { name: '저녁 네트워킹 리셉션', en: 'Evening reception', k: 1.0 },
+};
+const OPEN = 9.5, CLOSE = 18, RECEP_END = 21.5;
+const hallOpen = () => hour() >= OPEN && hour() < CLOSE;
+const anyOpen = () => hour() >= OPEN && hour() < RECEP_END;
+const flowK = () => { const h = hour(); return (h < OPEN || h >= RECEP_END - .4 ? 0 : h < 11 ? .75 : h < 16 ? 1 : h < CLOSE ? .7 : sim.season === 'recep' ? 1.0 : .45) * MODES[sim.season].k; };
+// fictional buyers: clearly placeholder company names, real country codes as origin only
+const COUNTRIES = [['US', 'USD', '미국'], ['CA', 'USD', '캐나다'], ['DE', 'EUR', '독일'], ['FR', 'EUR', '프랑스'], ['NL', 'EUR', '네덜란드'], ['JP', 'JPY', '일본'], ['VN', 'USD', '베트남'], ['TH', 'USD', '태국'], ['SG', 'USD', '싱가포르'], ['AE', 'USD', '아랍에미리트'], ['AU', 'USD', '호주'], ['MX', 'USD', '멕시코']];
+const BTYPES = ['식품수입', '외식체인', '식자재 유통', '소매체인', 'HMR 제조', '온라인 유통'];
+const GROUPS = ['소스', '드레싱', '시즈닝', '파우더'], PACKS = ['스틱', '파우치', '컵', 'PET/병', '지대'];
+const STEPS = ['방문', '시식', '상담', '샘플 요청', '견적', '계약 협의'], SKEYS = ['visit', 'taste', 'meet', 'sample', 'quote', 'deal'];
+const stageOf = r => { let i = 0; SKEYS.forEach((k, j) => { if (r.t[k]) i = j; }); return i; };
+function newBuyer(a) {
+  const [cc, cur, cname] = COUNTRIES[Math.floor(rnd() * COUNTRIES.length)];
+  const g1 = Math.floor(rnd() * 4), items = rnd() < .45 ? [GROUPS[g1], GROUPS[(g1 + 1 + Math.floor(rnd() * 3)) % 4]] : [GROUPS[g1]];
+  const r = { id: `B-${++sim.buyerSeq}`, cc, cur, cname, company: `${cc} ${BTYPES[Math.floor(rnd() * BTYPES.length)]} ${String.fromCharCode(65 + Math.floor(rnd() * 26))}사`, items, pack: PACKS[Math.floor(rnd() * PACKS.length)], moq: [50, 100, 150, 200, 300][Math.floor(rnd() * 5)], lead: 21 + Math.floor(rnd() * 5) * 6, t: { visit: sim.clock }, next: '시식 안내', agent: a };
+  sim.buyers.unshift(r); if (sim.buyers.length > 300) sim.buyers.pop();
+  return r;
+}
+
+/* ---------- agents: walkers keep a minimum spacing by construction ---------- */
+const AG = []; let agSeq = 0;
+function clearAt(a, x, z) {
+  for (const o of AG) { if (o === a) continue; const m = a.r + o.r + GAP, dx = o.x - x, dz = o.z - z; if (dx * dx + dz * dz < m * m) return false; }
+  return true;
+}
+function addAgent(kind, x, z, o = {}) {
+  const a = { id: ++agSeq, kind, r: kind === 'cart' ? R_CART : R_PERSON, x, z, path: [], speed: 1.35 + rnd() * .3, blocked: 0, heading: 0, st: 'idle', t: 0, plan: [], ...o };
+  if (!clearAt(a, x, z)) return null;
+  a.obj = kind === 'cart' ? makeCart(o.cartIdx) : makePerson(o.look || kind);
+  a.obj.userData.agent = a; AG.push(a); placeAgent(a); return a;
+}
+function removeAgent(a) { if (a.qWant) { a.qWant.pending--; a.qWant = null; } const i = AG.indexOf(a); if (i >= 0) AG.splice(i, 1); a.obj.removeFromParent(); a.gone = true; if (a.spot && a.spot.occ === a) a.spot.occ = null; if (a.table && a.table.buyer === a) a.table.buyer = null; if (a.queue) leaveQueue(a); }
+const inHall = (x, z) => x > HALL.x0 && x < HALL.x1 && z > HALL.z0 && z < HALL.z1;
+function placeAgent(a) {
+  const o = a.obj, onStage = a.x < -47.6 && a.x > -66 && a.z < -45 && a.z > -50;
+  o.position.set(a.x, (inHall(a.x, a.z) ? FLOOR : .06) + (onStage ? .6 : 0) + (a.sit ? -.34 : a.moving ? Math.abs(Math.sin(a.walk * 9)) * .04 : 0), a.z);
+  o.rotation.y = a.moving || a.face == null ? a.heading : a.face;
+}
+const SIDE = [0, .5, -.5, 1.0, -1.0, 1.57, -1.57];
+function moveAgent(a, dt) {
+  if (!a.path.length) { a.moving = false; return true; }
+  const [tx, tz] = a.path[0], dx = tx - a.x, dz = tz - a.z, d = Math.hypot(dx, dz);
+  if (d < .03) { a.path.shift(); a.moving = a.path.length > 0; return !a.path.length; }
+  const st = Math.min(d, a.speed * dt);
+  let ok = false;
+  for (const ang of SIDE) {
+    const c = Math.cos(ang), s = Math.sin(ang), ux = (dx * c - dz * s) / d, uz = (dx * s + dz * c) / d, k = ang ? st * .8 : st;
+    if (clearAt(a, a.x + ux * k, a.z + uz * k)) { a.x += ux * k; a.z += uz * k; a.heading = Math.atan2(ux, uz); ok = true; break; }
+  }
+  a.moving = true;
+  if (ok) { a.blocked = Math.max(0, a.blocked - dt * 2); a.walk = (a.walk || 0) + dt; if (Math.hypot(tx - a.x, tz - a.z) < .03) a.path.shift(); }
+  else {
+    a.blocked += dt;
+    // a blocked waypoint (or a loose final target such as a door) counts as reached when close
+    if (d < 1.2 && a.blocked > .3 && (a.path.length > 1 || a.loose)) { a.path.shift(); a.blocked = 0; }
+  }
+  if (!a.path.length) a.moving = false;
+  return !a.path.length;
+}
+const P2 = p => [p[0], p[1]];
+function goSpot(a, s, from) { s.occ = a; a.spot = s; a.face = null; a.loose = false; a.path = [...(from ? route(from, s.via) : []), ...s.appr.map(P2), P2(s.pos)]; }
+function leaveSpot(a) { const s = a.spot; if (!s) return; if (s.occ === a) s.occ = null; a.spot = null; a.sit = false; a.face = null; a.path = [...s.appr.slice().reverse().map(P2), ...(s.via ? [P2(NODES[s.via])] : [])]; a.at = s.via; a.loose = true; }
+const freeSpot = (group, pick = 'rand') => { const f = (SPOTS[group] || []).filter(s => !s.occ); return f.length ? (pick === 'first' ? f[0] : f[Math.floor(rnd() * f.length)]) : null; };
+
+/* ---------- queues: members walk to slot i; the front one is served ---------- */
+// a walker reserves a place, walks to the queue's tail entry, and only then takes the last slot
+function mkQueue(slots, entry) { return { slots, entry, members: [], pending: 0 }; }
+const GATEQ = GATE_Q.map(sl => mkQueue(sl, [sl[0][0], 56.4]));
+const TASTEQ = mkQueue(TASTE_Q, [-12.6, -4.6]);
+const BUSQ = mkQueue(BUS_Q, [8.6, 82.6]);
+const qRoom = q => q.slots.length - q.members.length - q.pending;
+function joinQueue(a, q, lead = []) {
+  if (qRoom(q) <= 0) return false;
+  q.pending++; a.qWant = q; a.path = [...lead, P2(q.entry)]; a.face = null; a.loose = true; return true;
+}
+function enterQueue(a) { const q = a.qWant; a.qWant = null; q.pending--; q.members.push(a); a.queue = q; a.inQ = false; a.loose = false; a.path = [P2(q.slots[q.members.length - 1])]; }
+function leaveQueue(a) {
+  const q = a.queue; if (!q) return; const i = q.members.indexOf(a); a.queue = null;
+  if (i < 0) return; q.members.splice(i, 1);
+  q.members.forEach((m, j) => { if (j >= i) m.path = [P2(q.slots[j])]; });
+}
+const atFront = a => a.queue && a.queue.members[0] === a && a.inQ && !a.path.length;
+
+
+/* ---------- visitors ---------- */
+const VIS_CAP = 70;
+const visitors = () => AG.filter(a => a.kind === 'visitor');
+function makePlan(buyer) {
+  const h = hour();
+  if (h >= CLOSE) return rnd() < .55 ? ['recep', 'booth'] : ['booth', 'recep'];
+  const p = buyer ? ['booth'] : [];
+  if (rnd() < .8) p.push('pav'); if (rnd() < .45) p.push('pav');
+  if (rnd() < .35) p.push('seminar'); if (rnd() < .3) p.push('food');
+  if (!buyer && rnd() < .4) p.push('booth');
+  for (let i = p.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
+  return p;
+}
+function spawnVisitor(x, z, origin) {
+  if (visitors().length >= VIS_CAP) return null;
+  const buyer = rnd() < .62;
+  const a = addAgent('visitor', x, z, { look: buyer ? 'buyer' : 'visitor', origin, buyer, plan: makePlan(buyer) });
+  if (!a) return null;
+  if (origin?.car) a.lead = [[x + 4, z], [-44, 62]];
+  const reg = rnd() < .28 && freeSpot('reg');
+  if (reg) { goSpot(a, reg); a.st = 'reg'; } else toGate(a);
+  return a;
+}
+function toGate(a) {
+  const q = GATEQ.reduce((b, q) => (qRoom(q) > qRoom(b) ? q : b), GATEQ[0]);
+  if (joinQueue(a, q, a.lead || [])) { a.st = 'gateQ'; a.lead = null; } else { a.st = 'waitGate'; a.t = 0; a.path = [[-12 + rnd() * 24, 62 + rnd() * 8]]; }
+}
+const SESSIONS_H = [10.5, 12, 13.5, 15, 16.5];
+const SESSION_TITLES = ['해외 바이어 상담 실무', '소스·시즈닝 트렌드', '샘플 발송과 수출 서류', '식품 안전 인증 제도 개요', '외식 메뉴 개발 사례'];
+function sessions() { const d0 = dayOf(sim.clock) * 86400; return SESSIONS_H.map((h, i) => ({ i, start: d0 + h * 3600, end: d0 + h * 3600 + 40 * 60, title: SESSION_TITLES[i] })); }
+const sessionNow = () => sessions().find(s => sim.clock >= s.start - 15 * 60 && sim.clock < s.end);
+function nextActivity(a) {
+  if (a.gone) return;
+  if (hour() >= RECEP_END - .1) a.plan = [];
+  // a seminar about to start draws some of the visitors who are between activities
+  const ss = hallOpen() && sessionNow();
+  if (ss && a.seenSession !== ss.i && sim.clock < ss.start + 5 * 60) { a.seenSession = ss.i; const s = rnd() < .55 && freeSpot('seminar', 'first'); if (s) { goSpot(a, s, a.at); a.st = 'spot'; a.session = ss; return; } }
+  while (a.plan.length) {
+    const k = a.plan.shift();
+    if (k === 'booth' && anyOpen()) {
+      if (!a.rec) { a.rec = newBuyer(a); }
+      if (joinQueue(a, TASTEQ, route(a.at, 'C'))) { a.st = 'tasteQ'; return; }
+      if (!a.retried) { a.retried = true; a.plan.push('booth'); } continue;
+    }
+    if (k === 'pav' && hallOpen()) { const s = freeSpot('pav'); if (s) { goSpot(a, s, a.at); a.st = 'spot'; a.dwell = 8 + rnd() * 9; s.pav.visits++; return; } continue; }
+    if (k === 'seminar' && hallOpen()) {
+      const ss = sessionNow(); if (!ss || sim.clock > ss.start + 8 * 60) continue;
+      const s = freeSpot('seminar', 'first'); if (s) { goSpot(a, s, a.at); a.st = 'spot'; a.session = ss; return; } continue;
+    }
+    if ((k === 'food' || k === 'recep') && anyOpen()) {
+      const s = (k === 'recep' && freeSpot('recep')) || freeSpot('food'); if (s) { goSpot(a, s, a.at); a.st = 'spot'; a.dwell = k === 'recep' ? 25 + rnd() * 25 : 18 + rnd() * 16; return; } continue;
+    }
+  }
+  toExit(a);
+}
+function toExit(a) {
+  a.st = 'exit';
+  a.loose = true;
+  if (a.origin?.car) { a.path = [...route(a.at, 'WD'), [-37, 23], [-60, 26], carDoor(a.origin.car)]; a.exitTo = 'car'; return; }
+  a.path = [...route(a.at, 'OUT'), [8, 23], [16, 32], [16, 62]];
+  a.exitTo = a.origin === 'bus' || rnd() < .35 ? 'bus' : 'walk';
+}
+const carDoor = v => [v.home.stop[0] + 2.0, v.home.stop[1]];
+function stepVisitor(a, dt) {
+  a.t += dt;
+  let arrived = moveAgent(a, dt);
+  if (a.qWant && arrived) { enterQueue(a); arrived = false; }
+  if (a.queue && arrived && !a.inQ) a.inQ = true;
+  switch (a.st) {
+    case 'reg': if (arrived) { a.face = a.spot.face; a.regT = (a.regT || 0) + dt; if (a.regT > 3) { const s = a.spot; s.occ = null; a.spot = null; a.face = null; a.path = [[s.pos[0], 56]]; a.st = 'toGate0'; } } break;
+    case 'toGate0': if (arrived) toGate(a); break;
+    case 'waitGate': if (a.t > 2 && arrived) { a.t = 0; toGate(a); } break;
+    case 'gateQ':
+      if (atFront(a)) {
+        a.face = N_; a.scan = (a.scan || 0) + dt;
+        if (a.scan > 3.5) {
+          const l = GATEQ.indexOf(a.queue); SCAN_LIGHTS[l].userData.flash = .6; leaveQueue(a); a.face = null; sim.scanned++;
+          a.path = [[GATE_LANES[l], 41.5], [-12 + l * 2.6, 23], P2(NODES.IN)]; a.at = 'IN'; a.st = 'toHall'; a.loose = true;
+        }
+      }
+      break;
+    case 'toHall': if (arrived) nextActivity(a); break;
+    case 'walk': if (arrived) nextActivity(a); break;
+    case 'spot':
+      if (arrived && !a.settled) { a.settled = true; a.face = a.spot.face; a.sit = ['seminar', 'food', 'meet'].includes(a.spot.group); a.t = 0; if (a.spot.group === 'seminar') sim.seminarIn++; }
+      if (a.settled) {
+        const done = a.session ? sim.clock > a.session.end + a.id % 5 * 20 : a.t > a.dwell || hour() >= RECEP_END - .1;
+        if (done) { a.settled = false; a.session = null; leaveSpot(a); a.st = 'walk'; }
+      }
+      break;
+    case 'tasteQ':
+      if (atFront(a)) { const s = freeSpot('taste'); if (s) { leaveQueue(a); goSpot(a, s); a.st = 'toTaste'; } }
+      break;
+    case 'toTaste': if (arrived) { a.face = N_; a.st = 'taste'; a.t = 0; a.rec.t.taste = sim.clock; a.rec.next = '상담 테이블 안내'; } break;
+    case 'taste':
+      a.obj.userData.cup.visible = a.t > 1.5 && a.t < 11;
+      if (a.t > 12) {
+        a.obj.userData.cup.visible = false;
+        const s = a.spot; s.occ = null; a.spot = null; a.face = null;
+        if (anyOpen() && rnd() < (a.buyer ? .85 : .25)) { a.path = [[s.pos[0], -2.6], ...route('B', 'BI')]; a.st = 'toBooth'; a.loose = true; }
+        else { a.rec.next = '브로슈어 제공 · 후속 메일'; a.path = [[s.pos[0], -2.6], P2(NODES.B)]; a.at = 'B'; a.st = 'walk'; a.loose = true; }
+      }
+      break;
+    case 'toBooth': if (arrived) { a.at = 'BI'; a.t = 0; seekTable(a); } break;
+    case 'waitTable':
+      if (arrived) a.face = a.spot?.face;
+      if (TABLES.some(T => !T.buyer) && arrived) { leaveSpot(a); const lead = a.path; seekTable(a); a.path = [...lead, ...a.path]; }
+      else if (a.t > 45) { a.rec.next = '상담 예약 안내'; leaveSpot(a); a.path.push(...route('BM', 'BE')); a.at = 'BE'; a.st = 'walk'; }
+      break;
+    case 'toSeat': if (arrived) { a.face = W_; a.sit = true; a.st = 'meet'; a.t = 0; a.rec.t.meet = sim.clock; a.rec.next = '샘플 요청 확인'; a.meetLen = 26 + rnd() * 12; } break;
+    case 'meet': {
+      const T = a.table;
+      if (a.t > 9 && !a.cards) { a.cards = true; cardFx(T); a.rec.cards = true; }
+      if (a.t > a.meetLen) {
+        if (rnd() < .82) sampleFx(a, T);
+        else a.rec.next = '추가 자료 송부';
+        T.buyer = null; a.table = null; a.sit = false; a.face = null; a.spot.occ = null; a.spot = null;
+        a.path = [P2(NODES[T.seat.via]), ...route(T.seat.via, 'BE')]; a.at = 'BE'; a.st = 'walk'; a.loose = true;
+      }
+      break;
+    }
+    case 'exit':
+      if (!arrived) break;
+      if (a.exitTo === 'car') { const v = a.origin.car; removeAgent(a); v.release = true; v.plan = []; v.parkDone = true; break; }
+      if (a.exitTo === 'bus' && joinQueue(a, BUSQ)) { a.st = 'busQ'; break; }
+      a.path = [[52, 84]]; a.loose = true; a.st = 'leave'; break;
+    case 'leave': if (arrived) removeAgent(a); break;
+    case 'busQ': if (arrived) a.face = W_; break;
+    case 'board': if (arrived) { a.bus.pax++; removeAgent(a); } break;
+  }
+  placeAgent(a);
+}
+function seekTable(a) {
+  const T = TABLES.find(T => !T.buyer);
+  if (T) { T.buyer = a; a.table = T; T.seat.occ = a; a.spot = T.seat; a.path = [...route(a.at, T.seat.via), P2(T.seat.pos)]; a.st = 'toSeat'; a.loose = false; return; }
+  const s = freeSpot('display');
+  if (s) { goSpot(a, s, a.at); a.st = 'waitTable'; a.t = 0; return; }
+  a.rec.next = '상담 예약 안내'; a.path = route('BI', 'BE'); a.at = 'BE'; a.st = 'walk'; a.loose = true;
+}
+
+/* ---------- small effects: tasting cups, business cards, sample boxes ---------- */
+const HOPS = [];
+function hop(obj, to, dur, h, onEnd) { const from = obj.getWorldPosition(V()); scene.attach(obj); HOPS.push({ obj, from, to: to.clone(), t: 0, dur, h, onEnd }); }
+function stepHops(dt) {
+  for (let i = HOPS.length - 1; i >= 0; i--) {
+    const H = HOPS[i]; H.t += dt / H.dur; const k = Math.min(1, H.t);
+    H.obj.position.lerpVectors(H.from, H.to, k); H.obj.position.y += Math.sin(k * Math.PI) * H.h;
+    if (k >= 1) { HOPS.splice(i, 1); H.onEnd?.(H.obj); }
+  }
+}
+const CARD_MAT = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, toneMapped: false });
+function cardFx(T) {
+  const y = FLOOR + 1.05, A = V(T.seat.pos[0] - .2, y, T.z), B = V(T.staffPos[0] + .2, y, T.z);
+  [[A, B], [B, A]].forEach(([p, q], k) => { for (let j = 0; j < 3; j++) { const c = new THREE.Mesh(PGEO.card, CARD_MAT); c.rotation.set(-1.2, j, 0); c.position.copy(p); scene.add(c); setTimeoutSim(() => hop(c, q.clone().add(V(0, j * .05, 0)), .7, .45 + j * .1, x => x.removeFromParent()), k * .35 + j * .12); } });
+  logEvent(`${T.buyer?.rec?.company || '바이어'} · ${T.i + 1}번 테이블 명함 교환`);
+}
+const SHELF = [];
+function sampleFx(a, T) {
+  const r = a.rec; r.t.sample = sim.clock; r.next = '샘플 발송 준비'; sim.journeys++;
+  const s = { id: `S-${String(++sim.sampleSeq).padStart(4, '0')}`, buyer: r, items: r.items.join('·'), pack: r.pack, moq: r.moq, lead: r.lead, cur: r.cur, status: '요청 접수', t: { req: sim.clock } };
+  sim.samples.unshift(s); if (sim.samples.length > 200) sim.samples.pop();
+  if (rnd() < .7) r.quoteAt = sim.clock + (.5 + rnd()) * 3600;
+  const b = new THREE.Mesh(PGEO.sbox, M(P.kraft)); b.position.set(T.x, FLOOR + .9, T.z); b.castShadow = true; b.userData.sample = s; scene.add(b);
+  hop(b, V(-14.6, FLOOR + 1.32 + Math.min(SHELF.length, 5) * .23, -25.4 + (SHELF.length % 3) * .4), 1.2, 1.2, x => SHELF.push(x));
+  logEvent(`${s.id} 샘플 요청 · ${r.company} · ${s.items}`, 'ok');
+}
+const LATER = [];
+function setTimeoutSim(fn, delay) { LATER.push({ at: sim.t + delay, fn }); }
+function stepLater() { for (let i = LATER.length - 1; i >= 0; i--) if (LATER[i].at <= sim.t) { const f = LATER[i].fn; LATER.splice(i, 1); f(); } }
+
+
+/* ---------- shuttle buses: alight at the stop, then board the waiting queue ---------- */
+function onArrive(v) {
+  if (v.kind === 'bus' && v.pocket === v.home) {
+    v.dwell = 0; v.pax = 0; v.boardT = 0;
+    const room = VIS_CAP - visitors().length;
+    v.alight = Math.max(0, Math.min(room, Math.round((3 + rnd() * 6) * flowK() * 1.2)));
+    v.arrivals = v.alight; sim.busArrivals = (sim.busArrivals || 0) + 1;
+    logEvent(`${v.name} ${v.home.name} 도착 · ${v.alight}명 하차`);
+  }
+  if (v.kind === 'car' && v.home && v.pocket === v.home) { v.needDriver = true; }
+}
+function stepBuses(dt) {
+  BUSES.forEach((v, i) => {
+    if (v.state === 'stopped' && v.pocket === v.home && !v.release) {
+      v.dwell += dt; v.boardT += dt;
+      const door = BUS_DOOR[i];
+      if (v.alight > 0) { if (v.boardT > .7) { v.boardT = 0; if (spawnVisitor(door[0], door[1], 'bus')) v.alight--; else if (visitors().length >= VIS_CAP) v.alight = 0; } return; }
+      const walking = AG.some(a => a.st === 'board' && a.bus === v);
+      const front = BUSQ.members[0];
+      if (front && front.inQ && !front.path.length && v.boardT > .8 && v.pax < 30 && !AG.some(a => a.st === 'board')) {
+        leaveQueue(front); front.st = 'board'; front.bus = v; front.face = null; front.loose = true; front.path = i ? [[24.6, 84.6], P2(door)] : [P2(door)]; v.boardT = 0;
+      } else if (!walking && v.dwell > 12 && (!BUSQ.members.length || v.pax >= 30 || v.dwell > 40)) {
+        v.release = true; v.plan = [];
+        if (v.pax) logEvent(`${v.name} 출발 · ${v.pax}명 탑승`);
+      }
+    } else if (v.state === 'moving' && v.lane === LOOP && !v.plan.length) v.plan = [{ pocket: v.home }];
+  });
+}
+/* ---------- parking: through traffic sometimes parks; the driver walks to the gate and back ---------- */
+function stepCars(dt) {
+  for (const v of CARS) {
+    if (v.state === 'moving' && v.lane === LOOP && !v.plan.length && !v.home && anyOpen() && hour() < 20 && rnd() < dt * .025) {
+      const bay = PARK.bays.find(b => !b.res);
+      if (bay) { bay.res = v; v.home = bay; v.plan = [{ zone: PARK }, { pocket: bay }]; }
+    }
+    if (v.needDriver && v.state === 'stopped') { const [x, z] = carDoor(v); const a = spawnVisitor(x, z, { car: v }); if (a) { v.needDriver = false; v.driver = a; } }
+    if (v.parkDone && v.pocket !== v.home) { v.home.res = null; v.home = null; v.parkDone = false; v.driver = null; }
+  }
+}
+/* ---------- carts: samples from the booth shelf to the storage room, catering in the food court ---------- */
+const CARTS = CART_ROUTES.map((R, i) => { const a = addAgent('cart', R.home[0], R.home[1], { cartIdx: i, route: R, speed: 1.1, st: 'home', t: 0 }); a.heading = i ? -Math.PI / 2 : Math.PI; return a; });
+function stepCart(c, dt) {
+  c.t += dt; const arrived = moveAgent(c, dt), R = c.route, load = c.obj.userData.load;
+  if (c.st === 'home') {
+    if (c.cartIdx === 0) load.forEach((m, k) => { m.visible = k < 2; });
+    const due = c.cartIdx === 0 ? (SHELF.length >= 2 || (SHELF.length && c.t > 40)) : c.t > 14;
+    if (due && anyOpen()) { c.st = 'out'; c.path = R.path.map(P2); }
+  } else if (c.st === 'out' && arrived) { c.st = 'work'; c.t = 0; }
+  else if (c.st === 'work') {
+    if (c.cartIdx === 0 && c.t > 1.5 && SHELF.length) { const b = SHELF.pop(); hop(b, c.obj.localToWorld(V(0, .8, .3)), .6, .6, x => { x.removeFromParent(); c.cargo = (c.cargo || []); c.cargo.push(x.userData.sample); }); c.t = 1; }
+    if (c.cartIdx === 1) load.forEach((m, k) => { m.visible = c.t < 3 ? true : k < 1; });
+    if (c.t > 4 && !SHELF.length) { c.st = 'back'; c.path = [...R.path.slice(0, -1).reverse().map(P2), P2(R.home)]; if (c.cartIdx === 0) load.forEach(m => { m.visible = true; }); }
+  } else if (c.st === 'back' && arrived) {
+    c.st = 'home'; c.t = 0;
+    if (c.cargo?.length) { for (const s of c.cargo) { s.status = '보관실 입고'; s.t.store = sim.clock; } logEvent(`샘플 카트 · 요청 샘플 ${c.cargo.length}건 부스 창고 입고`); c.cargo = []; }
+  }
+  placeAgent(c);
+}
+/* ---------- seminar sessions and the speaker ---------- */
+let speaker = null, lastSession = -1;
+function stepSeminar(dt) {
+  const ss = sessions().find(s => sim.clock >= s.start - 6 * 60 && sim.clock < s.end + 2 * 60);
+  if (ss && !speaker && sim.clock < ss.end) { speaker = addAgent('speaker', SPEAKER_IN[0], SPEAKER_IN[1], { look: 'speaker', st: 'in', session: ss }); if (speaker) speaker.path = [P2(SPEAKER_POS)]; }
+  if (speaker) {
+    const arrived = moveAgent(speaker, dt);
+    if (speaker.st === 'in' && arrived) { speaker.face = S_; speaker.st = 'talk'; }
+    if (speaker.st === 'talk' && sim.clock > speaker.session.end) { speaker.st = 'out'; speaker.face = null; speaker.path = [P2(SPEAKER_IN)]; }
+    if (speaker.st === 'out' && arrived) { removeAgent(speaker); speaker = null; }
+    else placeAgent(speaker);
+  }
+  const live = sessions().find(s => sim.clock >= s.start && sim.clock < s.end);
+  SEM_SCREEN.material.color.setScalar(live ? 1 : .35);
+  if (live && live.i !== lastSession) { lastSession = live.i; logEvent(`세미나 ${live.i + 1} 시작 · ${live.title}(예시) · 참석 ${AG.filter(a => a.spot?.group === 'seminar').length}명`); }
+}
+/* ---------- arrivals on foot and the post-fair follow-up of buyers ---------- */
+function stepArrivals(dt) {
+  if (rnd() < dt * .12 * flowK()) spawnVisitor(EAST_WALK[0], EAST_WALK[1], 'walk');
+  for (const r of sim.buyers) {
+    if (r.quoteAt && !r.t.quote && sim.clock >= r.quoteAt) { r.t.quote = sim.clock; r.next = '견적 회신 대기'; if (rnd() < .5) r.dealAt = sim.clock + (1 + rnd() * 1.5) * 3600; logEvent(`${r.id} 견적서 발송(예시) · ${r.company}`); }
+    if (r.dealAt && !r.t.deal && sim.clock >= r.dealAt) { r.t.deal = sim.clock; r.next = '조건 협의 일정 조율'; logEvent(`${r.id} 계약 협의 시작(예시) · ${r.company}`, 'ok'); }
+  }
+  for (const s of sim.samples) if (s.status === '보관실 입고' && sim.clock - s.t.store > 3600) { s.status = '발송 준비'; s.t.ready = sim.clock; }
+  if (!sim.kNext || sim.t > sim.kNext) {
+    sim.kNext = sim.t + 2;
+    sim.kHist.push(sim.buyers.filter(r => r.t.visit > sim.clock - 3600).length); if (sim.kHist.length > 24) sim.kHist.shift();
+    sim.mHist.push(sim.buyers.filter(r => r.t.meet > sim.clock - 3600).length); if (sim.mHist.length > 24) sim.mHist.shift();
+  }
+}
+// staff at their posts
+const STAFF = STAFF_POS.map(s => { const a = addAgent('staff', s.p[0], s.p[1], { look: s.role === 'reg' || s.role === 'pav' || s.role === 'food' ? 'crew' : 'staff', role: s.role }); a.face = s.face; a.sit = !!s.sit; placeAgent(a); return a; });
+
+function stepSim(dt) {
+  sim.t += dt; sim.clock += dt * SIM_RATE;
+  for (let i = GHOSTS.length - 1; i >= 0; i--) if (GHOSTS[i].until < sim.t) GHOSTS.splice(i, 1);
+  for (const v of VEHS) stepVeh(v, dt);
+  stepBuses(dt); stepCars(dt); stepArrivals(dt);
+  for (const a of AG.slice()) if (a.kind === 'visitor' && !a.gone) stepVisitor(a, dt);
+  for (const c of CARTS) stepCart(c, dt);
+  stepSeminar(dt); stepLater(); stepHops(dt);
+  for (const m of SCAN_LIGHTS) { m.userData.flash = Math.max(0, (m.userData.flash || 0) - dt); m.material.emissiveIntensity = m.userData.flash > 0 ? 2.2 : 0; }
+}
+
+
+/* ================================================================
+   4. picking, camera, dashboard, fair-day modes, language, day / night, loop
+   ================================================================ */
+const SIM_NOTE = ['박람회와 국가관, 바이어(회사명·국가), 방문·상담·샘플 수, MOQ·리드타임, 세미나 일정과 화면의 번호는 흐름을 보여주기 위한 가상 시뮬레이션입니다. 제품군(소스·드레싱·시즈닝·파우더)과 회사 연혁만 에프앤에스식품 홈페이지 기준 사실입니다.',
+  'The fair, pavilions, buyers (company names, countries), visit/meeting/sample counts, MOQ, lead times, seminar schedule and all numbers on screen are a fictional simulation. Only the product groups (sauce, dressing, seasoning, powder) and the company history come from the F&S website.'];
+let LANG = 'ko';
+const I18N = {
+  brand: ['FNS 엑스포', 'FNS Expo'], user: ['운영', 'Ops'], brandSub: ['해외 식품박람회 부스 상담', 'Overseas food fair booth'], sim: ['시뮬레이션', 'Simulation'],
+  ext: ['외관', 'Exterior'], cut: ['단면', 'Cutaway'], day: ['낮', 'Day'], night: ['밤', 'Night'],
+  k1: ['부스 방문자', 'Booth visitors'], k2: ['상담 건수', 'Meetings'], k3: ['샘플 요청', 'Sample requests'], unitPpl: ['명', ''], unitCase: ['건', ''],
+  tracker: ['바이어 트래커', 'Buyer tracker'], tabBuyers: ['바이어', 'Buyers'], tabSamples: ['샘플', 'Samples'], tabSched: ['일정', 'Schedule'], live: ['실시간 시뮬레이션', 'Live simulation'],
+  mDetail: ['상세', 'Detail'], mTracker: ['트래커', 'Tracker'], mTable: ['현황표', 'Table'], search: ['바이어, 국가, 구역 검색', 'Search buyers, countries, zones'],
+  loading: ['전시장 문을 열고 있습니다', 'Opening the hall'], visits: ['방문', 'Visits'], next: ['다음', 'Next'], done: ['완료', 'done'],
+  map: ['전체 지도', 'Overview'], gate: ['입구', 'Entrance'], booth: ['FNS 부스', 'FNS booth'], pav: ['국가관', 'Pavilions'], seminar: ['세미나홀', 'Seminar hall'], shuttle: ['셔틀·주차', 'Shuttle & parking'], food: ['푸드코트', 'Food court'],
+  mapSub: ['5개 구역', '5 zones'], gateSub: ['배지 스캔 · 현장 등록', 'Badge scan · registration'], boothSub: ['시식 · 상담 · 샘플', 'Tasting · meeting · samples'], pavSub: ['지역관 6곳(예시)', '6 regional pavilions (example)'], seminarSub: ['세션 일정(예시)', 'Sessions (example)'], shuttleSub: ['정류장 2 · 주차 3칸', '2 stops · 3 bays'],
+  kindFair: ['FNS 엑스포', 'FNS Expo'], titleFair: ['박람회 부스 흐름', 'Booth flow at the fair'], kindZone: ['구역', 'Zone'], kindBuyer: ['바이어(가상)', 'Buyer (fictional)'], kindVisitor: ['참관객', 'Visitor'], kindBus: ['셔틀버스', 'Shuttle bus'], kindSample: ['샘플 요청', 'Sample request'], kindPav: ['국가관(예시)', 'Pavilion (example)'],
+  otherWorld: ['다른 월드', 'Other world'],
+};
+const STEPS_EN = ['Visit', 'Tasting', 'Meeting', 'Sample request', 'Quote', 'Negotiation'];
+const GROUPS_EN = { 소스: 'Sauce', 드레싱: 'Dressing', 시즈닝: 'Seasoning', 파우더: 'Powder' };
+const TH = {
+  buyers: [['바이어', '국가', '관심 품목', '단계', '다음 액션', '방문'], ['Buyer', 'Country', 'Interest', 'Stage', 'Next action', 'Visit']],
+  samples: [['요청번호', '바이어', '품목·포장', 'MOQ(예시)', '리드타임(예시)', '통화', '상태'], ['Request', 'Buyer', 'Items · pack', 'MOQ (example)', 'Lead time (example)', 'Currency', 'Status']],
+  sched: [['시각', '일정', '장소', '상태'], ['Time', 'Item', 'Place', 'Status']],
+};
+// stat labels in the detail panel
+const SK = { '전시장 안 참관객': 'Visitors in hall', '입장 대기': 'Gate queue', 'FNS 부스 안': 'At FNS booth', '시식 대기': 'Tasting queue', '시식 중': 'Tasting now', '상담 테이블': 'Meeting tables', '세미나': 'Seminar', '셔틀 대기': 'Shuttle queue', '오늘 입장': 'Entered today', '배지 스캔 레인': 'Scan lanes', '현장 등록 데스크': 'Registration desk', '오늘 방문': 'Visits today', '오늘 상담': 'Meetings today', '오늘 샘플 요청': 'Samples today', 'LED 월': 'LED wall', '브로슈어 스탠드': 'Brochure stand', '관람 중': 'Viewing now', '누적 관람': 'Visits', '지금 세션': 'Session', '상태': 'Status', '참석': 'Seated', '연사': 'Speaker', '정류장 대기열': 'Stop queue', '주차 칸': 'Parking bays', '좌석': 'Seats', '리셉션': 'Reception', '차량번호': 'ID', '위치': 'Location', '이번 정차 하차': 'Alighted', '이번 정차 탑승': 'Boarded', '바이어 ID': 'Buyer ID', '국가': 'Country', '관심 품목': 'Interest', '관심 포장': 'Packaging', '단계': 'Stage', '다음 액션': 'Next action', '결제 통화': 'Currency', 'MOQ(예시)': 'MOQ (example)', '리드타임(예시)': 'Lead time (example)', '부스 방문': 'Booth visit', '현재 활동': 'Doing now', '도착 경로': 'Arrived by', '요청번호': 'Request', '바이어': 'Buyer', '품목·포장': 'Items · pack', '통화': 'Currency', '요청 시각': 'Requested' };
+const L = k => (I18N[k] ? I18N[k][LANG === 'ko' ? 0 : 1] : k);
+const LK = k => (LANG === 'ko' ? k : SK[k] || k);
+const stepName = i => (LANG === 'ko' ? STEPS[i] : STEPS_EN[i]);
+const PICKS = [];
+function proxy(def, w, h, d, x, y, z) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), HIDE); m.position.set(x, y, z); m.layers.set(1); scene.add(m);
+  m.userData.pick = def; def.proxy = m; if (!PICKS.includes(def)) PICKS.push(def); return def;
+}
+const ZDEF = id => ({ id, kind: 'zone', zone: id, get name() { return L(id); }, keys: `${I18N[id][0]} ${I18N[id][1]}` });
+const Z_GATE = proxy(ZDEF('gate'), 44, 8, 22, -8, 4, 50), Z_BOOTH = proxy(ZDEF('booth'), 26, 6, 26, -26, 3, -18), Z_PAV = ZDEF('pav'), Z_SEM = proxy(ZDEF('seminar'), 26, 6, 40, -57, 3, -31), Z_FOOD = proxy(ZDEF('food'), 48, 6, 18, 46, 3, 10);
+const Z_SHUT = proxy(ZDEF('shuttle'), 82, 6, 12, 11, 3, 86); proxy(Z_SHUT, 30, 6, 72, -93, 3, 40); PICKS.push(Z_PAV);
+const PAV_DEFS = PAVS.map(p => proxy({ id: 'pav:' + p.id, kind: 'pavone', p, name: p.name, keys: `${p.name} 국가관 pavilion` }, 16, 4, 12, p.x, 2, p.z));
+const VEH_DEFS = BUSES.map(v => ({ id: 'veh:' + v.id, kind: 'veh', v, name: v.name, keys: `${v.name} ${v.id} 셔틀 버스 shuttle bus` }));
+PICKS.push(...VEH_DEFS);
+const agentDef = a => (a.rec ? buyerDef(a.rec) : { id: 'ag:' + a.id, kind: 'agent', a, name: `참관객 ${a.id}` });
+const buyerDef = r => ({ id: 'buyer:' + r.id, kind: 'buyer', r, name: r.company, keys: `${r.id} ${r.cc} ${r.cname} ${r.items.join(' ')}` });
+const sampleDef = s => ({ id: 'sample:' + s.id, kind: 'sample', s, name: s.id });
+const MAP_DEF = { id: 'map', kind: 'map', get name() { return L('map'); } };
+function defById(id) {
+  if (!id) return null;
+  if (id === 'map') return MAP_DEF;
+  if (id.startsWith('buyer:')) { const r = sim.buyers.find(r => 'buyer:' + r.id === id); return r ? buyerDef(r) : null; }
+  if (id.startsWith('sample:')) { const s = sim.samples.find(s => 'sample:' + s.id === id); return s ? sampleDef(s) : null; }
+  if (id.startsWith('ag:')) { const a = AG.find(a => 'ag:' + a.id === id); return a ? agentDef(a) : null; }
+  return PICKS.find(d => d.id === id) || null;
+}
+const agentOf = d => (d?.kind === 'agent' ? d.a : d?.kind === 'buyer' && d.r.agent && !d.r.agent.gone ? d.r.agent : null);
+
+// ---------- camera: glide + follow ----------
+let glide = null, followGet = null, followPrev = null, selected = null;
+const easeIO = t => (t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+function sph() { const o = camera.position.clone().sub(controls.target); const r = o.length(); return { r, theta: Math.atan2(o.x, o.z), phi: Math.acos(clamp(o.y / r, -1, 1)) }; }
+function setView(t, dist, theta, phi) { controls.target.copy(t); camera.position.set(t.x + dist * Math.sin(phi) * Math.sin(theta), t.y + dist * Math.cos(phi), t.z + dist * Math.sin(phi) * Math.cos(theta)); camera.lookAt(t); }
+function flyTo(target, dist, theta, phi, dur = 1.5) {
+  const s = sph(), to = { target, dist, theta: s.theta + angleDelta(s.theta, theta), phi };
+  if (REDUCE) { setView(target, dist, theta, phi); controls.update(); glide = null; return; }
+  glide = { from: { target: controls.target.clone(), dist: s.r, theta: s.theta, phi: s.phi }, to, t: 0, dur };
+}
+function stepGlide(dt) {
+  if (!glide) return;
+  glide.t += dt / glide.dur;
+  const k = easeIO(Math.min(1, glide.t)), { from, to } = glide;
+  const tgt = (followGet && followPos()) || to.target;
+  setView(from.target.clone().lerp(tgt, k), Math.exp(lerp(Math.log(from.dist), Math.log(to.dist), k)), lerp(from.theta, to.theta, k), lerp(from.phi, to.phi, k));
+  if (glide.t >= 1) { glide = null; controls.update(); followPrev = followGet ? followPos() : null; }
+}
+function followPos() { const o = followGet?.(); return o && o.parent && o.visible !== false ? o.getWorldPosition(V()).add(V(0, 1.5, 0)) : null; }
+let facadeMode = 'ext', autoCut = false, facadeT = 9, facadeWas = false;
+const sectionOn = () => facadeMode === 'cut' || autoCut;
+function syncFacade() { const c = sectionOn(); if (c !== facadeWas) { facadeWas = c; facadeT = REDUCE ? 9 : 0; } document.querySelectorAll('#facade-seg button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.f === 'cut') === c))); }
+function setFacade(mode) { facadeMode = mode; if (mode === 'ext') autoCut = false; syncFacade(); }
+function stepFacade(dt) { facadeT += dt; const c = sectionOn(); ROOF.visible = c ? facadeT < .02 : facadeT > .3; UPPER.visible = c ? facadeT < .3 : facadeT > .02; }
+const VIEWS = {
+  street: () => [V(0, 4, 40), 230, .55, 1.12],
+  map: () => [V(-12, 0, 14), 375, .42, .86],
+  gate: () => [V(2, 1, 58), 100, .32, .95],
+  booth: () => [V(-27, 1, -19.5), 80, .35, .9],
+  pav: () => [V(34, 1, -31), 112, .28, .86],
+  seminar: () => [V(-57, 1, -33), 82, .32, .86],
+  shuttle: () => [V(-58, 1, 52), 215, .1, .9],
+  food: () => [V(46, 1, 10), 62, .3, .86],
+  pavone: d => [V(d.p.x, 1, d.p.z + 2), 44, .3, .9],
+};
+function viewOf(d) {
+  if (d.kind === 'veh') return [d.v.obj.getWorldPosition(V()).add(V(0, 1.5, 0)), 44, .5, .9];
+  const a = agentOf(d); if (a) return [a.obj.getWorldPosition(V()).add(V(0, 1, 0)), 30, .4, .9];
+  if (d.kind === 'zone') return VIEWS[d.zone]();
+  if (d.kind === 'pavone') return VIEWS.pavone(d);
+  if (d.kind === 'buyer' || d.kind === 'sample') return VIEWS.booth();
+  return VIEWS.map();
+}
+function select(def, { fly = true, sheet = true } = {}) {
+  selected = def; followGet = null; followPrev = null;
+  autoCut = !!def && (def.kind === 'zone' && ['booth', 'pav', 'seminar', 'food'].includes(def.zone) || def.kind === 'pavone' || def.kind === 'buyer' || def.kind === 'agent' || def.kind === 'sample');
+  syncFacade();
+  if (!def) { glide = null; ring.visible = false; renderDetail(); markRows(); syncArea(); return; }
+  if (def.kind === 'veh') followGet = () => def.v.obj;
+  const a = agentOf(def); if (a) followGet = () => a.obj;
+  const v = fly && viewOf(def);
+  if (v) flyTo(...v);
+  renderDetail(); markRows(); syncArea();
+  if (mqMobile.matches && sheet) setMTab('detail');
+}
+
+// ---------- ring + labels ----------
+const ring = new THREE.Mesh(new THREE.RingGeometry(1, 1.14, 56), new THREE.MeshBasicMaterial({ color: 0xa5b4fc, transparent: true, opacity: .95, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+ring.rotation.x = -Math.PI / 2; ring.renderOrder = 10; ring.visible = false; scene.add(ring);
+function ringAnchor(d) {
+  if (!d) return null;
+  if (d.kind === 'veh') return [d.v.obj.getWorldPosition(V()).setY(.25), TT.bus.len / 2 + 1.2];
+  const a = agentOf(d); if (a) return [a.obj.getWorldPosition(V()).setY(FLOOR + .1), 1.1];
+  if (d.kind === 'pavone') return [V(d.p.x, FLOOR + .1, d.p.z), 9.5];
+  if (d.kind === 'zone') { const z = ZONE_RING[d.zone]; return z ? [V(z[0], z[1], z[2]), z[3]] : null; }
+  return null;
+}
+const ZONE_RING = { booth: [-26, FLOOR + .12, -18, 14], seminar: [-57, FLOOR + .75, -47.5, 9], gate: [0, .15, 46, 13] };
+const labelsEl = $('#labels');
+const AREA_LABELS = [['gate', V(0, 9, 46)], ['booth', V(-26, 10, -18)], ['pav', V(34, 8, -31)], ['seminar', V(-57, 8, -31)], ['shuttle', V(-11, 6, 86)], ['food', V(46, 7, 10)]]
+  .map(([id, pos]) => { const b = document.createElement('button'); b.className = 'wlabel'; b.addEventListener('click', () => select(defById(id))); labelsEl.append(b); return { b, pos, id }; });
+const selLabel = document.createElement('div'); selLabel.className = 'wlabel sel'; labelsEl.append(selLabel);
+const _v = V();
+function project(pos, el) {
+  _v.copy(pos).project(camera);
+  const x = (_v.x + 1) / 2 * innerWidth, y = (1 - _v.y) / 2 * innerHeight;
+  el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%) translateY(-12px)`;
+  el.style.visibility = _v.z > 1 || x < 0 || x > innerWidth || y < 70 || y > innerHeight ? 'hidden' : 'visible';
+}
+
+
+// ---------- dashboard ----------
+const stat = (k, v) => `<div class="stat"><span>${LK(k)}</span><b>${v}</b></div>`;
+const prog = f => `<div class="prog"><i style="width:${Math.round(clamp(f, 0, 1) * 100)}%"></i></div>`;
+const pill = (t, c = 'mute') => `<span class="pill ${c}">${t}</span>`;
+const STAGE_PILL = ['mute', 'info', 'info', 'warn', 'warn', 'ok'];
+const stagePill = r => { const i = stageOf(r); return pill(stepName(i), STAGE_PILL[i]); };
+const ccTag = r => `<span class="cc">${r.cc}</span>`;
+const today = () => dayOf(sim.clock);
+const todayN = k => sim.buyers.filter(r => r.t[k] && dayOf(r.t[k]) === today()).length;
+const atBooth = () => AG.filter(a => a.kind === 'visitor' && ['tasteQ', 'toTaste', 'taste', 'toBooth', 'waitTable', 'toSeat', 'meet'].includes(a.st)).length;
+const busyTables = () => TABLES.filter(T => T.buyer).length;
+const ACT = { reg: '현장 등록', toGate0: '입장 게이트로 이동', gateQ: '입장 대기', waitGate: '입장 대기', toHall: '전시장 입장', tasteQ: '시식 대기', toTaste: '시식대로 이동', taste: '시식 중', toBooth: '상담 테이블로 이동', waitTable: '제품 진열대 관람 · 상담 대기', toSeat: '상담 테이블로 이동', meet: '상담 중', exit: '퇴장', leave: '퇴장', busQ: '셔틀 대기', board: '셔틀 탑승', walk: '이동 중' };
+function activity(a) {
+  if (a.st === 'spot' && a.spot) return { pav: `${a.spot.pav.name} 관람`, seminar: '세미나 참석', food: '푸드코트', recep: '네트워킹 리셉션' }[a.spot.group] || '이동 중';
+  return ACT[a.st] || '이동 중';
+}
+const FACTS = [['1989.03', '한국153식품 설립'], ['2011.03', 'KS Q ISO 9001:2009 품질경영시스템 인증'], ['2011.10', '㈜에프앤에스식품 법인 전환'], ['2016.03', '기업부설연구소 설립 인증'], ['2018.11', '식품안전경영시스템(ISO22000) 인증'], ['2019.11', '식품안전경영시스템(FSSC22000) 인증'], ['2021.05', '제1공장(오산 원동) HACCP 획득']];
+let detailKey = '';
+function renderDetail() {
+  const d = selected;
+  let kind = L('kindFair'), title = L('titleFair'), fixed = '', live = '';
+  const inHallN = AG.filter(a => a.kind === 'visitor' && inHall(a.x, a.z)).length, gateN = GATEQ.reduce((s, q) => s + q.members.length, 0);
+  const sess = sessions(), cur = sess.find(s => sim.clock < s.end), semN = AG.filter(a => a.spot?.group === 'seminar' && a.settled).length;
+  const sessTxt = s => (s ? `${hhmm(s.start)} ${s.title}(예시)` : '오늘 세션 종료');
+  const sessState = s => (!s ? '-' : sim.clock >= s.start ? pill('진행 중', 'ok') : sim.clock >= s.start - 15 * 60 ? pill('입장 중', 'info') : pill('예정', 'mute'));
+  const ag = agentOf(d);
+  if (!d || d.kind === 'map') {
+    fixed = '<div class="desc">가상의 해외 식품박람회(예시)입니다. 참관객이 입장 게이트에서 배지를 스캔하고 전시장에 들어와, 에프앤에스식품 부스에서 시식하고 상담 테이블에 앉아 명함을 교환한 뒤 샘플을 요청합니다. 국가관·세미나홀·푸드코트와 셔틀버스·주차장도 함께 움직입니다.</div>';
+    live = `<div class="stats">${stat('전시장 안 참관객', `${inHallN}명`)}${stat('입장 대기', `${gateN}명`)}${stat('FNS 부스 안', `${atBooth()}명`)}${stat('상담 테이블', `${busyTables()} / 4`)}${stat('세미나', `${sessTxt(cur)} · ${semN}명`)}${stat('셔틀 대기', `${BUSQ.members.length}명`)}</div>`;
+  } else if (d.kind === 'zone' && d.zone === 'gate') {
+    kind = L('kindZone'); title = L('gate');
+    fixed = '<div class="desc">셔틀버스·주차장·보행로로 온 참관객이 줄을 서서 배지를 스캔하고 들어갑니다. 사전 등록이 없으면 현장 등록 데스크에 먼저 들릅니다. 나가는 사람은 게이트 동쪽 통로로 빠집니다.</div>';
+    live = `<div class="stats">${stat('입장 대기', `${gateN}명`)}${GATEQ.map((q, i) => stat(`배지 스캔 레인 ${i + 1}`, `${q.members.length}명`)).join('')}${stat('현장 등록 데스크', `${SPOTS.reg.filter(s => s.occ).length} / 3`)}${stat('오늘 입장', `${sim.scanned}명`)}</div>`;
+  } else if (d.kind === 'zone' && d.zone === 'booth') {
+    kind = L('kindZone'); title = L('booth');
+    fixed = `<div class="desc">빨간 뒷벽에 F&amp;S 마크, 왼쪽 진열대에 소스·시즈닝·파우더, 앞쪽에 시식대와 제품 안내 리플릿 스탠드, 안쪽에 상담 테이블 4개가 있습니다. LED 월은 회사 소개를 표현한 추상 애니메이션이 반복됩니다. 요청된 샘플 상자는 선반에 모였다가 샘플 카트가 부스 창고로 옮깁니다.</div><ul class="facts">${FACTS.map(([t, x]) => `<li><time class="num">${t}</time><span>${x}</span></li>`).join('')}</ul>`;
+    live = `<div class="stats">${stat('시식 대기', `${TASTEQ.members.length}명`)}${stat('시식 중', `${SPOTS.taste.filter(s => s.occ).length} / 3`)}${stat('상담 테이블', `${busyTables()} / 4`)}${stat('오늘 방문', `${todayN('visit')}명`)}${stat('오늘 상담', `${todayN('meet')}건`)}${stat('오늘 샘플 요청', `${todayN('sample')}건`)}</div>`;
+  } else if (d.kind === 'zone' && d.zone === 'pav') {
+    kind = L('kindZone'); title = L('pav');
+    fixed = '<div class="desc">지역별 국가관 6곳은 예시로 만든 가상 부스입니다. 이름은 지역 구분만 쓰고 실제 국가관·기업을 나타내지 않습니다.</div>';
+    live = `<div class="stats">${PAVS.map(p => stat(p.name, `${SPOTS.pav.filter(s => s.pav === p && s.occ).length}명 관람 · 누적 ${p.visits}`)).join('')}</div>`;
+  } else if (d.kind === 'pavone') {
+    const p = d.p; kind = L('kindPav'); title = p.name;
+    live = `<div class="stats">${stat('관람 중', `${SPOTS.pav.filter(s => s.pav === p && s.occ).length} / 3명`)}${stat('누적 관람', `${p.visits}명`)}</div>`;
+  } else if (d.kind === 'zone' && d.zone === 'seminar') {
+    kind = L('kindZone'); title = L('seminar');
+    fixed = '<div class="desc">세션은 하루 다섯 번, 40분씩 열립니다. 제목과 시간은 예시이며, 시작 15분 전부터 참관객이 자리를 채웁니다.</div>';
+    live = `<div class="stats">${stat('지금 세션', sessTxt(cur))}${stat('상태', sessState(cur))}${stat('참석', `${semN} / ${SPOTS.seminar.length}석`)}${stat('연사', speaker ? (speaker.st === 'talk' ? '발표 중' : '이동 중') : '-')}</div>`;
+  } else if (d.kind === 'zone' && d.zone === 'food') {
+    kind = L('kindZone'); title = L('food');
+    fixed = '<div class="desc">참관객이 쉬어 가는 곳입니다. 18시 이후에는 네트워킹 리셉션 장소로 바뀌고 줄 조명이 켜집니다.</div>';
+    live = `<div class="stats">${stat('좌석', `${SPOTS.food.filter(s => s.occ).length} / ${SPOTS.food.length}`)}${stat('리셉션', hour() >= CLOSE && hour() < RECEP_END ? pill('진행 중', 'ok') : pill('18:00 시작', 'mute'))}</div>`;
+  } else if (d.kind === 'zone' && d.zone === 'shuttle') {
+    kind = L('kindZone'); title = L('shuttle');
+    fixed = '<div class="desc">셔틀버스 두 대가 순환 도로를 돌며 정류장 A·B에 섭니다. 내린 사람은 입장 게이트로 가고, 나가는 사람은 정류장 대기열에 섰다가 탑승합니다. 주차장에 차를 세운 운전자는 걸어서 들어갔다가 돌아와 차를 뺍니다.</div>';
+    live = `<div class="stats">${BUSES.map(v => stat(v.name, `${busStatus(v)} · ${vehWhere(v)}`)).join('')}${stat('정류장 대기열', `${BUSQ.members.length}명`)}${stat('주차 칸', `${PARK.bays.filter(b => b.res).length} / ${PARK.bays.length} 사용`)}</div>`;
+  } else if (d.kind === 'veh') {
+    const v = d.v; kind = L('kindBus'); title = v.name;
+    live = `<div class="stats">${stat('차량번호', `<span class="num">${v.id}</span>`)}${stat('상태', pill(busStatus(v), v.state === 'stopped' ? 'mute' : 'info'))}${stat('위치', vehWhere(v))}${stat('이번 정차 하차', `${v.arrivals || 0}명`)}${stat('이번 정차 탑승', `${v.pax || 0}명`)}</div>`;
+  } else if (d.kind === 'buyer') {
+    const r = d.r; kind = L('kindBuyer'); title = r.company;
+    live = `<div class="stats">${stat('바이어 ID', `<span class="num">${r.id}</span>`)}${stat('국가', `${ccTag(r)} ${r.cname}`)}${stat('관심 품목', r.items.join(' · '))}${stat('관심 포장', r.pack)}${stat('단계', stagePill(r))}${stat('다음 액션', r.next)}${stat('결제 통화', r.cur)}${stat('MOQ(예시)', `${r.moq}박스`)}${stat('리드타임(예시)', `${r.lead}일`)}${stat('부스 방문', hhmm(r.t.visit))}${ag ? stat('현재 활동', activity(ag)) : ''}</div>${prog(stageOf(r) / 5)}`;
+  } else if (d.kind === 'agent') {
+    const a = d.a; kind = L('kindVisitor'); title = `${L('kindVisitor')} ${a.id}`;
+    live = `<div class="stats">${stat('현재 활동', activity(a))}${stat('도착 경로', a.origin?.car ? '주차장' : a.origin === 'bus' ? '셔틀버스' : '보행로')}</div>`;
+  } else if (d.kind === 'sample') {
+    const s = d.s; kind = L('kindSample'); title = s.id;
+    live = `<div class="stats">${stat('바이어', s.buyer.company)}${stat('품목·포장', `${s.items} · ${s.pack}`)}${stat('MOQ(예시)', `${s.moq}박스`)}${stat('리드타임(예시)', `${s.lead}일`)}${stat('통화', s.cur)}${stat('상태', pill(s.status, s.status === '발송 준비' ? 'ok' : 'info'))}${stat('요청 시각', hhmm(s.t.req))}</div>`;
+  }
+  const key = (d?.id || 'none') + kind + title + LANG;
+  if (key !== detailKey) { detailKey = key; $('#d-kind').textContent = kind; $('#d-title').textContent = title; $('#d-body').innerHTML = `${fixed}<div id="d-live">${live}</div><p class="note">${SIM_NOTE[LANG === 'ko' ? 0 : 1]}</p>`; }
+  else { const el = $('#d-live'); if (el && el.innerHTML !== live) el.innerHTML = live; }
+}
+$('#d-close').addEventListener('click', () => select(null));
+function busStatus(v) { return v.state === 'stopped' ? (v.alight > 0 ? '하차 중' : '탑승 중') : '운행 중'; }
+function vehWhere(v) { if (v.pocket) return v.pocket.name; const n = v.plan[0]; return n?.pocket ? `순환 도로 → ${n.pocket.name}` : '순환 도로'; }
+function spark(el, values, max) {
+  const m = Math.max(1, max ?? Math.max(...values, 1)), w = 64, h = 28, n = values.length;
+  el.innerHTML = `<polyline points="${values.map((v, i) => `${(i / Math.max(1, n - 1)) * w},${h - (v / m) * (h - 4) - 2}`).join(' ')}" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+}
+function updateKpis() {
+  const en = LANG !== 'ko';
+  $('#k1').textContent = todayN('visit');
+  $('#k1-sub').textContent = en ? `At booth ${atBooth()} · tasting queue ${TASTEQ.members.length}` : `지금 부스 ${atBooth()}명 · 시식 대기 ${TASTEQ.members.length}명`;
+  spark($('#k1-spark'), sim.kHist);
+  $('#k2').textContent = todayN('meet');
+  $('#k2-sub').textContent = en ? `Tables in use ${busyTables()} / 4` : `상담 테이블 ${busyTables()} / 4 사용 중`;
+  spark($('#k2-spark'), sim.mHist);
+  const todayS = sim.samples.filter(s => dayOf(s.t.req) === today()), by = GROUPS.map(g => todayS.filter(s => s.buyer.items.includes(g)).length);
+  $('#k3').textContent = todayS.length;
+  const top = by.indexOf(Math.max(...by));
+  $('#k3-sub').textContent = todayS.length ? (en ? `Top: ${GROUPS_EN[GROUPS[top]]} ${by[top]}` : `${GROUPS[top]} ${by[top]}건 최다 · 4개 품목`) : (en ? 'No requests yet' : '아직 요청 없음');
+  const mx = Math.max(1, ...by);
+  $('#k3-bars').querySelectorAll('i').forEach((el, i) => { el.style.height = `${4 + by[i] / mx * 26}px`; el.style.background = ['#d2232a', '#f59e0b', '#a5b4fc', '#c9b38a'][i]; });
+}
+function trackedBuyer() {
+  const d = selected;
+  if (d?.kind === 'buyer') return d.r;
+  if (d?.kind === 'sample') return d.s.buyer;
+  const act = sim.buyers.filter(r => r.agent && !r.agent.gone);
+  return act.sort((a, b) => stageOf(b) - stageOf(a) || a.t.visit - b.t.visit)[0] || sim.buyers[0];
+}
+function updateTracker() {
+  const r = trackedBuyer(), line = $('#tr-line');
+  if (line.dataset.lang !== LANG) { line.dataset.lang = LANG; line.querySelectorAll('.tr-step').forEach(e => e.remove()); line.insertAdjacentHTML('beforeend', STEPS.map((_, i) => `<div class="tr-step"><div class="tr-dot"></div><time class="num">--:--</time><span>${stepName(i)}</span></div>`).join('')); }
+  if (!r) return;
+  const idx = stageOf(r);
+  $('#tr-id').textContent = r.id.slice(2); $('#tr-meta').textContent = r.company;
+  line.querySelectorAll('.tr-step').forEach((el, i) => {
+    el.classList.toggle('done', i < idx || (i === idx && i === 5));
+    el.classList.toggle('now', i === idx && i !== 5);
+    el.querySelector('.tr-dot').textContent = i < idx ? '✓' : '';
+    el.querySelector('time').textContent = r.t[SKEYS[i]] ? hhmm(r.t[SKEYS[i]]) : '--:--';
+  });
+  $('#tr-fill').style.width = `${idx / 5 * 84}%`;
+  $('#tr-eta').textContent = stepName(idx);
+  $('#tr-eta-l').textContent = idx >= 5 ? (LANG === 'ko' ? '계약 협의 중' : 'In negotiation') : `${L('next')}: ${stepName(idx + 1)}`;
+}
+let tableTab = 'buyers';
+function schedRows() {
+  const d0 = dayOf(sim.clock) * 86400, st = (a, b) => (sim.clock >= b ? pill('종료', 'mute') : sim.clock >= a ? pill('진행 중', 'ok') : pill('예정', 'info'));
+  return [[d0 + OPEN * 3600, '전시장 개장', '전시장', 'gate', st(d0 + OPEN * 3600, d0 + CLOSE * 3600)],
+    ...sessions().map(s => [s.start, `세미나 ${s.i + 1} · ${s.title}(예시)`, '세미나홀', 'seminar', st(s.start, s.end)]),
+    [d0 + CLOSE * 3600, '전시장 마감 · 네트워킹 리셉션', '푸드코트', 'food', st(d0 + CLOSE * 3600, d0 + RECEP_END * 3600)],
+    [d0 + 9 * 3600, '셔틀버스 순환 운행', '정류장 A·B', 'shuttle', st(d0 + 9 * 3600, d0 + 22 * 3600)]].sort((a, b) => a[0] - b[0]);
+}
+function updateTable() {
+  const th = TH[tableTab][LANG === 'ko' ? 0 : 1];
+  let rows = '';
+  if (tableTab === 'buyers') for (const r of sim.buyers.slice(0, 20)) rows += `<tr data-id="buyer:${r.id}"><td>${r.company}</td><td>${ccTag(r)}</td><td>${r.items.join('·')}</td><td>${stagePill(r)}</td><td>${r.next}</td><td class="num">${hhmm(r.t.visit)}</td></tr>`;
+  else if (tableTab === 'samples') for (const s of sim.samples.slice(0, 20)) rows += `<tr data-id="sample:${s.id}"><td class="num">${s.id}</td><td>${s.buyer.company}</td><td>${s.items} · ${s.pack}</td><td class="num">${s.moq}박스</td><td class="num">${s.lead}일</td><td>${s.cur}</td><td>${pill(s.status, s.status === '발송 준비' ? 'ok' : 'info')}</td></tr>`;
+  else for (const [t, name, place, id, state] of schedRows()) rows += `<tr data-id="${id}"><td class="num">${hhmm(t)}</td><td>${name}</td><td>${place}</td><td>${state}</td></tr>`;
+  $('#t-head').innerHTML = `<tr>${th.map(x => `<th>${x}</th>`).join('')}</tr>`; $('#t-body').innerHTML = rows;
+  $('#t-c1').textContent = sim.buyers.filter(r => r.agent && !r.agent.gone).length;
+  $('#t-c2').textContent = sim.samples.filter(s => dayOf(s.t.req) === today()).length;
+  $('#t-c3').textContent = sessions().filter(s => sim.clock < s.end).length;
+  markRows();
+}
+function markRows() { $('#t-body').querySelectorAll('tr').forEach(r => r.classList.toggle('sel', !!selected && r.dataset.id === selected.id)); }
+$('#t-body').addEventListener('click', e => { const r = e.target.closest('tr'); const d = r && defById(r.dataset.id); if (d) select(d); });
+document.querySelectorAll('.tabs [role=tab]').forEach(b => b.addEventListener('click', () => { tableTab = b.dataset.tab; document.querySelectorAll('.tabs [role=tab]').forEach(x => x.setAttribute('aria-selected', String(x === b))); updateTable(); }));
+function updateAlerts() {
+  $('#alert-count').textContent = Math.min(99, sim.unread); $('#alert-count').hidden = sim.unread === 0;
+  if (!$('#alert-menu').hidden) $('#alert-menu').innerHTML = sim.events.slice(0, 14).map(e => `<div class="alert-row"><time class="num">${hhmm(e.time)}</time><span>${e.text}</span></div>`).join('') || '<div class="alert-row">새 알림이 없습니다</div>';
+}
+function updateClock() { $('#clock').textContent = hhmm(sim.clock); const day = sunUp(); document.querySelectorAll('#time-seg button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.time === 'day') === day))); }
+
+
+// ---------- menus: area, search, fair-day mode, alerts, language ----------
+const AREAS = ['map', 'gate', 'booth', 'pav', 'seminar', 'shuttle'];
+const WORLDS = [['network.html', '00 FNS 네트워크'], ['field.html', '01 원료 산지'], ['lab.html', '02 기업부설연구소'], ['index.html', '03 오산 HQ 공장'], ['safe.html', '04 HACCP 품질 관제'], ['logis.html', '05 평택 서탄 물류창고'], ['city.html', '06 B2B 고객사 상권'], ['run.html', '07 소스101 런'], ['expo.html', '08 해외 식품박람회']];
+function toggleMenu(btn, menu, open) {
+  const willOpen = open ?? menu.hidden;
+  document.querySelectorAll('.menu').forEach(m => { if (m !== menu) m.hidden = true; });
+  document.querySelectorAll('[aria-haspopup]').forEach(b => { if (b !== btn) b.setAttribute('aria-expanded', 'false'); });
+  menu.hidden = !willOpen; btn?.setAttribute('aria-expanded', String(willOpen));
+}
+function buildAreaMenu() {
+  $('#area-menu').innerHTML = AREAS.map(id => `<button data-id="${id}">${L(id)}<small>${L(id + 'Sub')}</small></button>`).join('') + '<div class="sep"></div>' + WORLDS.filter(([f]) => f !== 'expo.html').map(([f, n]) => `<a href="./${f}">${n}<small>${L('otherWorld')}</small></a>`).join('');
+}
+$('#area-btn').addEventListener('click', e => { e.stopPropagation(); toggleMenu($('#area-btn'), $('#area-menu')); });
+$('#area-menu').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; toggleMenu($('#area-btn'), $('#area-menu'), false); select(defById(b.dataset.id) || Z_PAV); });
+function syncArea() {
+  const d = selected; let id = 'map';
+  if (d?.kind === 'zone') id = d.zone; else if (d?.kind === 'pavone') id = 'pav'; else if (d?.kind === 'buyer' || d?.kind === 'sample') id = 'booth'; else if (d?.kind === 'veh') id = 'shuttle';
+  $('#area-name').textContent = L(id);
+}
+$('#search').addEventListener('input', () => {
+  const q = $('#search').value.trim().toLowerCase(), menu = $('#search-menu');
+  if (!q) { menu.hidden = true; return; }
+  const all = [...PICKS, ...sim.buyers.slice(0, 120).map(buyerDef)];
+  const hits = all.filter(d => (d.name + ' ' + (d.keys || '')).toLowerCase().includes(q)).slice(0, 8);
+  menu.innerHTML = hits.map(d => `<button data-id="${d.id}">${d.name}<small>${d.kind === 'buyer' ? d.r.cc : d.kind === 'veh' ? 'BUS' : ''}</small></button>`).join('') || '<div class="alert-row">찾는 항목이 없습니다</div>';
+  toggleMenu(null, menu, true);
+});
+$('#search-menu').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $('#search-menu').hidden = true; $('#search').value = ''; select(defById(b.dataset.id)); });
+const MICON = {
+  d1: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a5b4fc" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  d2: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#f6b94a" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>',
+  d3: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#9aa3ae" stroke-width="2"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5"/></svg>',
+  recep: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#f472b6" stroke-width="2"><path d="M8 3h8l-1 7a3 3 0 0 1-6 0z"/><path d="M12 13v7M8 21h8"/></svg>',
+};
+const modeName = k => (LANG === 'ko' ? MODES[k].name : MODES[k].en);
+function buildModeMenu() { $('#weather-menu').innerHTML = Object.keys(MODES).map(k => `<button data-w="${k}">${MICON[k]}${modeName(k)}<small class="num">${LANG === 'ko' ? '방문' : 'Visits'} ×${MODES[k].k.toFixed(1)}</small></button>`).join(''); }
+$('#weather-btn').addEventListener('click', e => { e.stopPropagation(); toggleMenu($('#weather-btn'), $('#weather-menu')); });
+$('#weather-menu').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; toggleMenu($('#weather-btn'), $('#weather-menu'), false); setSeason(b.dataset.w, true); });
+function syncModeChip() { const k = sim.season; $('#weather-ic').innerHTML = MICON[k]; $('#weather-temp').textContent = modeName(k); $('#weather-name').textContent = `${LANG === 'ko' ? '방문' : 'Visits'} ×${MODES[k].k.toFixed(1)}`; }
+function setSeason(k, user = false) {
+  sim.season = k; syncModeChip();
+  logEvent(`일정 모드: ${MODES[k].name}${k === 'd3' ? ' · 방문 감소, 샘플 정리' : ''}`);
+  if (user && k === 'recep' && (hour() < CLOSE || hour() >= RECEP_END)) warpTo(18.6);
+}
+$('#alert-btn').addEventListener('click', e => { e.stopPropagation(); toggleMenu($('#alert-btn'), $('#alert-menu')); sim.unread = 0; updateAlerts(); });
+document.addEventListener('click', e => { if (!e.target.closest('.dd, .search')) document.querySelectorAll('.menu').forEach(m => { m.hidden = true; }); });
+addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.menu').forEach(m => { m.hidden = true; }); });
+document.querySelectorAll('#time-seg button').forEach(b => b.addEventListener('click', () => warpTo(b.dataset.time === 'day' ? 13.5 : 20.5)));
+document.querySelectorAll('#facade-seg button').forEach(b => b.addEventListener('click', () => setFacade(b.dataset.f)));
+function setMTab(t) { document.body.dataset.mtab = t; document.querySelectorAll('.mtabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === t))); }
+document.querySelectorAll('.mtabs button').forEach(b => b.addEventListener('click', () => setMTab(document.body.dataset.mtab === b.dataset.m ? 'none' : b.dataset.m)));
+function setLang(l) {
+  LANG = l; document.documentElement.lang = l === 'ko' ? 'ko' : 'en';
+  document.querySelectorAll('[data-i]').forEach(el => { el.textContent = L(el.dataset.i); });
+  $('.brand b').textContent = L('brand');
+  $('#search').placeholder = L('search'); $('#search').setAttribute('aria-label', L('search'));
+  $('#loading').textContent = L('loading');
+  $('#date').textContent = new Intl.DateTimeFormat(l === 'ko' ? 'ko-KR' : 'en-US', l === 'ko' ? { month: 'long', day: 'numeric', weekday: 'long' } : { month: 'short', day: 'numeric', weekday: 'short' }).format(new Date());
+  document.querySelectorAll('#lang-seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === l)));
+  AREA_LABELS.forEach(x => { x.b.textContent = L(x.id); });
+  buildAreaMenu(); buildModeMenu(); syncModeChip(); syncArea();
+  detailKey = ''; renderDetail(); updateKpis(); updateTracker(); updateTable();
+}
+document.querySelectorAll('#lang-seg button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.l)));
+
+// ---------- picking ----------
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+ray.layers.enable(1);
+let down = null;
+canvas.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
+canvas.addEventListener('pointerup', e => {
+  if (!down || e.button !== 0 || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) { down = null; return; }
+  down = null;
+  ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const d = pickAt(); if (d) select(d);
+});
+function pickAt() {
+  const cands = [], people = AG.filter(a => a.kind === 'visitor').map(a => a.obj), buses = VEH_DEFS.map(d => d.v.obj);
+  for (const h of ray.intersectObjects(people, true)) { let o = h.object; while (o && !o.userData.agent) o = o.parent; if (o) { cands.push({ def: agentDef(o.userData.agent), pr: 5, d: h.distance }); break; } }
+  for (const h of ray.intersectObjects(buses, true)) { let o = h.object; while (o && !buses.includes(o)) o = o.parent; if (o) { cands.push({ def: VEH_DEFS[buses.indexOf(o)], pr: 4, d: h.distance }); break; } }
+  for (const h of ray.intersectObjects(PICKS.filter(p => p.proxy).flatMap(p => scene.children.filter(m => m.userData.pick === p)), false)) { const def = h.object.userData.pick; cands.push({ def, pr: def.kind === 'pavone' ? 3 : 2, d: h.distance }); }
+  cands.sort((a, b) => b.pr - a.pr || a.d - b.d);
+  return cands[0]?.def;
+}
+controls.addEventListener('start', () => { glide = null; followGet = null; });
+let flash = 0;
+
+// ---------- time of day ----------
+const C3 = c => new THREE.Color(c);
+const SKY = { day: [C3('#6fa3d8'), C3('#b9d4ea'), C3('#e8eef2')], gold: [C3('#3f5c8e'), C3('#e09d74'), C3('#f8c08c')], night: [C3('#060a14'), C3('#111c33'), C3('#26324d')] };
+const RISE = 6.6, SET = 17.95;
+const sunUp = () => { const h = hour(); return h > RISE + .1 && h < SET - .05; };
+let warp = 0;
+function warpTo(h) { let d = h * 3600 - (sim.clock % 86400); if (d < 0) d += 86400; warp = d; }
+const _c1 = new THREE.Color(), _c3 = new THREE.Color();
+function stepTime() {
+  const h = hour(), a = (h - RISE) / (SET - RISE);
+  const se = Math.sin(Math.PI * clamp(a, -.15, 1.15));
+  const day = clamp((se + .08) / .3, 0, 1), gold = 1 - clamp((se - .1) / .6, 0, 1);
+  const hor = _c3.copy(SKY.day[2]).lerp(SKY.gold[2], gold * day).lerp(SKY.night[2], 1 - day);
+  const azS = Math.PI * clamp(a, -.15, 1.15);
+  skyU.sunPosition.value.set(Math.cos(azS), se * .75, Math.sin(azS) * .7 + .35).normalize();
+  const clearSky = sim.season !== 'rain';
+  skyU.turbidity.value = clearSky ? 6.5 : 14; skyU.rayleigh.value = clearSky ? 1.5 : .5;
+  scene.background = null;
+  scene.environmentIntensity = lerp(.08, .32, day);
+  scene.fog.color.copy(clearSky ? hor : _c1.copy(hor).lerp(C3(0x8a96a3), .5));
+  scene.fog.near = clearSky ? 900 : 300; scene.fog.far = clearSky ? 2600 : 1400;
+  const az = Math.PI * clamp(a, 0, 1), elev = Math.max(.12, se) * .85;
+  sun.userData.dir = day > 0 ? V(Math.cos(az), Math.sin(elev) + .15, Math.sin(az) * .7 + .35).normalize() : V(-.4, .9, .3).normalize();
+  sun.color.copy(_c1.set(0xfff4e6).lerp(C3(0xff9d55), gold)).lerp(C3(0x9fb4e0), 1 - day);
+  sun.intensity = lerp(.35, lerp(3.2, 2.5, gold), day) * (clearSky ? 1 : .45);
+  hemi.color.copy(_c1.set(0xd6e2ff).lerp(C3(0xffcfa8), gold * .85)).lerp(C3(0x34507e), 1 - day);
+  hemi.groundColor.set(0x8f7b63).lerp(C3(0x1c2028), 1 - day);
+  hemi.intensity = lerp(.35, .55, day) * (clearSky ? 1 : 1.3) + flash * 2.5;
+  const night = 1 - day;
+  WIN.emissiveIntensity = night * 1.1; LIGHTP.emissiveIntensity = .55 + night * 1.6; APT.emissiveIntensity = night * .9;
+  LAMP.emissiveIntensity = .15 + night * 3; HEAD.emissiveIntensity = .2 + night * 3; TAIL.emissiveIntensity = .2 + night * 2.2;
+  renderer.toneMappingExposure = lerp(.95, 1.0, day);
+}
+
+// ---------- layout-aware framing ----------
+function hudInsets() {
+  if (mqMobile.matches) { const top = $('.topbar').getBoundingClientRect().bottom + 80; const bot = document.body.dataset.mtab === 'none' ? 60 : innerHeight * .46 + 60; return { l: 0, r: 0, t: top, b: bot }; }
+  const r = $('#detail').getBoundingClientRect();
+  return { l: 0, r: innerWidth - r.left, t: 150, b: 230 };
+}
+function resize() {
+  document.documentElement.style.setProperty('--top', `${Math.round($('.topbar').getBoundingClientRect().bottom + 8)}px`);
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight;
+  const i = hudInsets();
+  camera.setViewOffset(innerWidth, innerHeight, (i.r - i.l) / 2, (i.b - i.t) / 2, innerWidth, innerHeight);
+  camera.updateProjectionMatrix();
+  composer?.setSize(innerWidth, innerHeight);
+}
+addEventListener('resize', resize);
+function stepWarp(dt) {
+  if (warp <= 0) return;
+  const s = Math.min(warp, Math.max(600, warp * dt * 2.2));
+  warp -= s; sim.clock += s;
+  for (const e of sim.events) e.time += s;
+  for (const r of sim.buyers) { for (const k in r.t) r.t[k] += s; if (r.quoteAt) r.quoteAt += s; if (r.dealAt) r.dealAt += s; }
+  for (const x of sim.samples) for (const k in x.t) x.t[k] += s;
+}
+function stepLights() {
+  const night = 1 - clamp((Math.sin(Math.PI * clamp((hour() - RISE) / (SET - RISE), -.15, 1.15)) + .08) / .3, 0, 1);
+  ROOM_LIGHTS.forEach(l => { l.intensity = night * 900; });
+  STRING.visible = hour() >= 17.5 && hour() < RECEP_END + .1;
+}
+
+
+// one live fact for the selected zone's label
+function zoneFact(z) {
+  const en = LANG !== 'ko', cur = sessions().find(s => sim.clock < s.end);
+  if (z === 'booth') return en ? `Tasting queue ${TASTEQ.members.length} · tables ${busyTables()}/4` : `시식 대기 ${TASTEQ.members.length}명 · 테이블 ${busyTables()}/4`;
+  if (z === 'seminar') return !cur ? (en ? 'No more sessions today' : '오늘 세션 종료') : sim.clock >= cur.start ? (en ? `In session · ${hhmm(cur.start)}` : `진행 중 · ${hhmm(cur.start)} 세션`) : (en ? `Next ${hhmm(cur.start)}` : `다음 세션 ${hhmm(cur.start)}`);
+  if (z === 'gate') { const n = GATEQ.reduce((s, q) => s + q.members.length, 0); return en ? `Queue ${n} · entered ${sim.scanned}` : `입장 대기 ${n}명 · 오늘 ${sim.scanned}명`; }
+  if (z === 'pav') return en ? `Viewing ${SPOTS.pav.filter(s => s.occ).length}` : `관람 중 ${SPOTS.pav.filter(s => s.occ).length}명`;
+  if (z === 'food') return en ? `Seats ${SPOTS.food.filter(s => s.occ).length}/${SPOTS.food.length}` : `좌석 ${SPOTS.food.filter(s => s.occ).length}/${SPOTS.food.length}`;
+  if (z === 'shuttle') return en ? `Stop queue ${BUSQ.members.length}` : `정류장 대기 ${BUSQ.members.length}명`;
+  return '';
+}
+// ---------- loop ----------
+let hudT = 0, ledT = 0;
+const limits = new THREE.Box3(V(-460, 0, -360), V(460, 60, 400));
+function step(dt, draw = true) {
+  stepSim(dt); stepWarp(dt); stepTime(); stepLights(); stepFacade(dt);
+  stepGlide(dt);
+  if (!glide && followGet) { const p = followPos(); if (p && followPrev) { const d = p.clone().sub(followPrev); controls.target.add(d); camera.position.add(d); } followPrev = p; if (!p) followGet = null; }
+  if (!glide) {
+    controls.update();
+    const c = V().copy(controls.target).clamp(limits.min, limits.max).sub(controls.target);
+    if (c.lengthSq()) { controls.target.add(c); camera.position.add(c); }
+  }
+  const t = controls.target, dist = camera.position.distanceTo(t), half = clamp(dist * .42, 45, 460);
+  sun.target.position.copy(t); sun.position.copy(t).addScaledVector(sun.userData.dir || V(0, 1, 0), 520);
+  const sc = sun.shadow.camera;
+  if (Math.abs(sc.right - half) > 2) { sc.left = -half; sc.right = half; sc.top = half; sc.bottom = -half; sc.near = 20; sc.far = 1200; sc.updateProjectionMatrix(); }
+  const ra = ringAnchor(selected);
+  ring.visible = !!ra;
+  if (ra) { ring.position.copy(ra[0]); ring.scale.setScalar(ra[1] * (1 + Math.sin(sim.t * 5) * .07)); }
+  const far = dist > 150;
+  for (const l of AREA_LABELS) { l.b.hidden = !far || (selected && selected.id === l.id); if (!l.b.hidden) project(l.pos, l.b); }
+  const ag = agentOf(selected);
+  if (selected && ra && (ag || ['veh', 'pavone', 'zone'].includes(selected.kind))) {
+    selLabel.hidden = false;
+    selLabel.innerHTML = selected.kind === 'zone' ? `${L(selected.zone)}<small>${zoneFact(selected.zone)}</small>` : selected.kind === 'veh' ? `${selected.v.name}<small>${busStatus(selected.v)}</small>` : selected.kind === 'pavone' ? `${selected.p.name}<small>${L('kindPav')}</small>` : ag.rec ? `${ag.rec.company}<small>${stepName(stageOf(ag.rec))} · ${activity(ag)}</small>` : `${L('kindVisitor')} ${ag.id}<small>${activity(ag)}</small>`;
+    project(ra[0].clone().add(V(0, selected.kind === 'zone' ? 7 : selected.kind === 'pavone' ? 4 : selected.kind === 'veh' ? 4.2 : 2.6, 0)), selLabel);
+  } else selLabel.hidden = true;
+  ledT += dt; if (ledT > .1) { ledT = 0; drawLED(sim.t); }
+  hudT -= dt;
+  if (hudT <= 0) { hudT = .4; updateKpis(); updateTracker(); updateTable(); updateAlerts(); updateClock(); renderDetail(); }
+  if (!draw) return;
+  if (composer) composer.render(); else renderer.render(scene, camera);
+}
+const timer = new THREE.Clock();
+function frame() { requestAnimationFrame(frame); const dt = Math.min(.05, timer.getDelta()); if (document.hidden) return; step(dt); }
+
+// warm up: run the fair before the first frame so every stage is already busy
+const warm0 = performance.now();
+for (let i = 0; i < 4200; i++) stepSim(.1);
+if (DEBUG) console.info('warm-up ms', Math.round(performance.now() - warm0));
+setLang('ko'); setSeason('d1'); sim.events.shift(); sim.unread = 3;
+resize();
+setView(...VIEWS.street());
+renderDetail(); updateKpis(); updateTracker(); updateTable(); updateClock();
+if (DEBUG) window.__sim = { setView, VIEWS, setFacade, step: (n = 1, dt = 1 / 30) => { for (let i = 0; i < n; i++) step(dt); }, stepSim, select, defById, sim, AG, BUSES, CARS, VEHS, PARK, STOPS, TABLES, SPOTS, GATEQ, TASTEQ, BUSQ, CARTS, GHOSTS, LOOP, camera, controls, renderer, scene, setSeason, setLang, warpTo, V, get selected() { return selected; } };
+$('#loading').hidden = true;
+const QS = new URLSearchParams(location.search);
+if (DEBUG && QS.has('selftest')) selftest();
+frame();
+// ?debug&focus=<id>&s=<mode>&t=<hour>&lang=en opens a view directly (for checks and screenshots)
+const FOCUS = DEBUG && QS.get('focus');
+if (DEBUG && QS.get('s')) setSeason(QS.get('s'));
+if (DEBUG && QS.get('lang')) setLang(QS.get('lang'));
+if (DEBUG && QS.get('t')) warpTo(+QS.get('t'));
+if (FOCUS) {
+  const d = defById(FOCUS) || (FOCUS === 'pav' ? Z_PAV : MAP_DEF);
+  if (QS.has('cut')) setFacade('cut');
+  select(d, { sheet: false, fly: false });
+  for (let i = 0; i < 600 && (i < 90 || warp > 0); i++) step(1 / 30, false);
+  const v = d.kind === 'map' ? VIEWS.map() : viewOf(d); if (v) setView(...v);
+  step(1 / 30);
+} else setTimeout(() => { select(MAP_DEF, { sheet: false }); setFacade('cut'); }, REDUCE ? 0 : 1800);
+
+// ---------- ?debug&selftest: long run with overlap, spacing and flow checks ----------
+function selftest() {
+  if (QS.get('s')) setSeason(QS.get('s'));
+  if (QS.get('t')) { warpTo(+QS.get('t')); for (let i = 0; i < 400 && warp > 0; i++) stepWarp(.1); }
+  const out = { errors: [], layoutErrors: LAYOUT_ERRORS.slice(0, 8), mode: sim.season, steps: 6000, simStart: hhmm(sim.clock) };
+  try {
+    const W = v => (v.kind === 'bus' ? 2.5 : 1.86);
+    const obb = v => { const a = v.obj.rotation.y, f = [Math.sin(a), Math.cos(a)], r = [Math.cos(a), -Math.sin(a)]; return { c: [v.obj.position.x, v.obj.position.z], f, r, hl: v.len / 2 - .05, hw: W(v) / 2 - .05 }; };
+    const sat = (A, B) => { const d = [B.c[0] - A.c[0], B.c[1] - A.c[1]]; for (const ax of [A.f, A.r, B.f, B.r]) { const dot = (u, w) => u[0] * w[0] + u[1] * w[1]; const ra = A.hl * Math.abs(dot(A.f, ax)) + A.hw * Math.abs(dot(A.r, ax)), rb = B.hl * Math.abs(dot(B.f, ax)) + B.hw * Math.abs(dot(B.r, ax)); if (Math.abs(dot(d, ax)) > ra + rb) return false; } return true; };
+    let vehOverlapFrames = 0, vehOverlapPairs = new Set(), vehStuck = 0, minPP = Infinity, minCartGap = Infinity, spacingViolations = 0, peopleStuck = 0, maxBlocked = 0, maxPeople = 0;
+    const still = new Map(), j0 = sim.journeys, m0 = sim.buyers.filter(r => r.t.meet).length, scan0 = sim.scanned, bus0 = sim.events.length;
+    let parkedSeen = 0, maxSeminar = 0;
+    for (let i = 0; i < out.steps; i++) {
+      stepSim(.1);
+      const bb = VEHS.map(obb);
+      for (let p = 0; p < VEHS.length; p++) for (let q = p + 1; q < VEHS.length; q++) if (Math.hypot(bb[p].c[0] - bb[q].c[0], bb[p].c[1] - bb[q].c[1]) < 12 && sat(bb[p], bb[q])) { vehOverlapFrames++; vehOverlapPairs.add(`${VEHS[p].id}/${VEHS[q].id}`); }
+      for (const v of VEHS) { const k = v.state === 'moving' && v.v < .05 ? (still.get(v) || 0) + .1 : 0; if (k > 90 && (still.get(v) || 0) <= 90) vehStuck++; still.set(v, k); }
+      const ppl = AG.filter(a => a.kind !== 'cart'); maxPeople = Math.max(maxPeople, ppl.length);
+      for (let p = 0; p < ppl.length; p++) for (let q = p + 1; q < ppl.length; q++) { const d = Math.hypot(ppl[p].x - ppl[q].x, ppl[p].z - ppl[q].z); if (d < minPP) minPP = d; if (d < MIN_PP - 1e-6) spacingViolations++; }
+      for (const c of CARTS) for (const a of ppl) minCartGap = Math.min(minCartGap, Math.hypot(c.x - a.x, c.z - a.z) - c.r - a.r);
+      for (const a of AG) { maxBlocked = Math.max(maxBlocked, a.blocked); if (a.blocked > 30 && !a.stuckCounted) { a.stuckCounted = true; peopleStuck++; out.stuckAt = out.stuckAt || []; if (out.stuckAt.length < 6) out.stuckAt.push(`${a.kind}:${a.st} (${a.x.toFixed(1)},${a.z.toFixed(1)})`); } }
+      parkedSeen = Math.max(parkedSeen, PARK.bays.filter(b => b.veh).length);
+      maxSeminar = Math.max(maxSeminar, AG.filter(a => a.spot?.group === 'seminar' && a.settled).length);
+    }
+    Object.assign(out, {
+      simEnd: hhmm(sim.clock), vehicles: VEHS.length, vehOverlapFrames, vehOverlapPairs: [...vehOverlapPairs], vehStuck,
+      minPersonDistance: +minPP.toFixed(3), minSpacingRule: MIN_PP, spacingViolations, minCartClearance: +minCartGap.toFixed(3), peopleStuck, maxBlockedSec: +maxBlocked.toFixed(1), maxPeople,
+      sampleJourneysInWindow: sim.journeys - j0, sampleJourneysTotal: sim.journeys, meetingsInWindow: sim.buyers.filter(r => r.t.meet).length - m0, badgeScansInWindow: sim.scanned - scan0,
+      quotes: sim.buyers.filter(r => r.t.quote).length, deals: sim.buyers.filter(r => r.t.deal).length, samplesStored: sim.samples.filter(s => s.status !== '요청 접수').length, maxParkedCars: parkedSeen, maxSeminarSeated: maxSeminar,
+      busArrivals: sim.busArrivals || 0,
+    });
+    // selecting a buyer flies to and follows that person, with ring and detail
+    const fb = sim.buyers.find(r => r.agent && !r.agent.gone);
+    if (fb) { select(buyerDef(fb), { sheet: false }); out.followBuyer = { id: fb.id, follow: !!followGet, ring: !!ringAnchor(selected), title: $('#d-title').textContent }; select(null); }
+    out.zoneRings = ['booth', 'seminar', 'gate'].map(id => { const d = defById(id); select(d, { sheet: false, fly: false }); step(1 / 30, false); const r = { id, ring: !!ringAnchor(selected) && ring.visible, label: !selLabel.hidden, title: $('#d-title').textContent }; return r; }); select(null);
+    for (const id of ['map', 'gate', 'booth', 'seminar', 'shuttle', 'pav:eu', 'veh:SHUTTLE-01']) if (!defById(id)) out.errors.push('focus id missing: ' + id);
+    // language toggle: the required labels must carry no Hangul in English
+    setLang('en'); updateKpis(); updateTracker(); updateTable(); renderDetail(); syncArea();
+    const els = ['.brand b', '#area-name', '#weather-temp', '#weather-name', '#d-kind', '#d-title', '.tr-head h3', '#tr-eta', '#tr-eta-l'].map(s => $(s)).concat([...document.querySelectorAll('[data-i], .kpi h3, .kpi .sub, #tr-line span, .tabs [role=tab], #t-head th, .mtabs button')]);
+    out.enLabelsChecked = els.length; out.enHangul = els.filter(e => /[가-힣]/.test(e.textContent)).map(e => e.textContent.trim().slice(0, 30)).concat(/[가-힣]/.test($('#search').placeholder) ? ['search placeholder'] : []);
+    setLang('ko');
+  } catch (e) { out.errors.push(String(e && e.stack || e)); }
+  out.errors.push(...window.__errs);
+  const p = $('#selftest'); p.dataset.done = '1'; p.textContent = JSON.stringify(out, null, 1);
+}
+</script>
+</body>
+</html>

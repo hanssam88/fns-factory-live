@@ -67,6 +67,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid #ffffffcc; outlin
 .menu button:hover, .menu button[aria-selected='true'] { background: var(--glass-hi2); }
 .menu small { color: var(--muted); margin-left: auto; font-size: 12px; }
 .menu .sep { height: 1px; background: var(--line); margin: 4px 6px; }
+.menu a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13.5px; color: inherit; text-decoration: none; }
+.menu a:hover { background: var(--glass-hi2); }
+.menu a small { color: var(--muted); margin-left: auto; font-size: 12px; }
+#area-menu { max-height: calc(100vh - 140px); overflow: auto; }
 .clock { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; white-space: nowrap; }
 .clock b { font-size: 16px; }
 .clock small { color: var(--muted); font-size: 11.5px; }
@@ -551,10 +555,10 @@ function ribbon(curve, width, y, mat, seg = 400, offset = 0) {
   }
   for (let i = 0; i < seg; i++) {
     const [ax, az, bx, bz] = pts[i], [cx, cz, dx, dz] = pts[i + 1];
-    pos.push(ax, y, az, bx, y, bz, cx, y, cz, bx, y, bz, dx, y, dz, cx, y, cz);
+    pos.push(ax, y, az, cx, y, cz, bx, y, bz, bx, y, bz, cx, y, cz, dx, y, dz);   // counter-clockwise seen from above, so the road faces up
     const t = mat.userData.tile;
-    if (t) uv.push(ax / t, az / t, bx / t, bz / t, cx / t, cz / t, bx / t, bz / t, dx / t, dz / t, cx / t, cz / t);
-    else uv.push(0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1);
+    if (t) uv.push(ax / t, az / t, cx / t, cz / t, bx / t, bz / t, bx / t, bz / t, cx / t, cz / t, dx / t, dz / t);
+    else uv.push(0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1);
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
@@ -1934,7 +1938,8 @@ function toggleMenu(btn, menu, open) {
   document.querySelectorAll('[aria-haspopup]').forEach(b => { if (b !== btn) b.setAttribute('aria-expanded', 'false'); });
   menu.hidden = !willOpen; btn?.setAttribute('aria-expanded', String(willOpen));
 }
-$('#area-menu').innerHTML = AREAS.map(([id, name, sub]) => `<button data-id="${id}">${name}<small>${sub}</small></button>`).join('');
+const WORLDS = [['network.html', '00 FNS 네트워크'], ['field.html', '01 원료 산지'], ['lab.html', '02 기업부설연구소'], ['index.html', '03 오산 HQ 공장'], ['safe.html', '04 HACCP 품질 관제'], ['logis.html', '05 평택 서탄 물류창고'], ['city.html', '06 B2B 고객사 상권'], ['run.html', '07 소스101 런'], ['expo.html', '08 해외 식품박람회']];
+$('#area-menu').innerHTML = AREAS.map(([id, name, sub]) => `<button data-id="${id}">${name}<small>${sub}</small></button>`).join('') + '<div class="sep"></div>' + WORLDS.filter(([f]) => f !== 'index.html').map(([f, n]) => `<a href="./${f}">${n}<small>다른 월드</small></a>`).join('');
 $('#area-btn').addEventListener('click', e => { e.stopPropagation(); toggleMenu($('#area-btn'), $('#area-menu')); });
 $('#area-menu').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; toggleMenu($('#area-btn'), $('#area-menu'), false); select(b.dataset.id === 'map' ? MAP_DEF : defById(b.dataset.id)); });
 function syncArea() {
